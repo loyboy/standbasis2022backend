@@ -248,9 +248,7 @@ public class OnboardingService {
 			    	String jsonStr = gsonObj.toJson(attributes);		
 			    	
 			    	u.setPermissionsJSON(jsonStr);
-			    	u.setEmail( userRequest.getEmail() );	    	
-			    	
-			    	userRepository.save(u);
+			    	u.setEmail( userRequest.getEmail() );   	
 			    	
 			    	Teacher _tea = new Teacher();
 		    		String myidcal2 = createUuid("teacher-", savedSchool.getSchId() );
@@ -260,14 +258,17 @@ public class OnboardingService {
 		    	
 		    		_tea.setFname(userRequest.getName().split(" ")[0]);
 		    		_tea.setLname(userRequest.getName().split(" ")[1]);
-		    		_tea.setGender( "M/F" );
+		    		_tea.setGender( "M" );
 		    		_tea.setOffice("Proprietor");
 		    		_tea.setEmail( userRequest.getEmail() );
 		    		
-		    		Teacher savedProprietor = teaRepository.save(_tea);
+		    		Teacher tt = teaRepository.save(_tea);
+		    		
+		    		u.setProprietor_id( tt.getTeaId() );
+		    		userRepository.save(u); 
 		    		
 		    		//Save the proprietor as a Teacher oBject		    		
-		    		savedTeachers.add(savedProprietor);
+		    		//savedTeachers.add(savedProprietor);
 			    	TimeUnit.SECONDS.sleep(1);   
 			    	
 			    	// Create users for teachers and send them all a mail 

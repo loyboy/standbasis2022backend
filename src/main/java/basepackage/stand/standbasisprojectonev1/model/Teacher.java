@@ -40,7 +40,7 @@ public class Teacher extends DateAudit{
     
     @NotBlank
     @NotNull
-    @Column(name="gender",columnDefinition="char(1)")
+    @Column(name="gender",columnDefinition="char(3)")
     private String gender;
     
     @Size(max = 100)
@@ -48,7 +48,7 @@ public class Teacher extends DateAudit{
     
     @NotNull
     @Email
-    private String email;
+    private String email;//
     
     private Integer experience;
     
