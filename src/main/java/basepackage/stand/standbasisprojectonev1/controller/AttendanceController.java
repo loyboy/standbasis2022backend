@@ -125,6 +125,16 @@ public class AttendanceController {
 			 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 
+	 @GetMapping("/classToday")
+	 public ResponseEntity<?> getTeacherClassAttendanceToday(
+			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,			 
+			 @RequestParam(value = "today", required=false) Optional<Timestamp> today
+	 ) {
+		 
+		 Map<String, Object> response = service.getTeacherClassesToday( teacher, today  );
+		 return new ResponseEntity<>(response, HttpStatus.OK);	        
+	 }
+	 
 	 @GetMapping("/teachers")
 	 public ResponseEntity<?> getTeacherAttendances(
 			 @RequestParam(value = "q", required=false ) String query,

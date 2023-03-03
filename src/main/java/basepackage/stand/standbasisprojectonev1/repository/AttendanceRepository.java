@@ -38,6 +38,15 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     @Query(" select att from Attendance att where att._desc like :filter ")
     List<Attendance> filterAll( @Param("filter") String filter); 
     
+    @Query("select att from Attendance att where att.timetable.teacher = :tea "
+    		+ "AND (att._date = :today OR :today is null) "    
+    	  )
+    List<Attendance> findByTeacherTodayClass(     		 
+    		@Param("tea") Teacher tea,    		
+    		@Param("today") Timestamp today
+    );
+    //-------------------------------------------------------------------------------------------------
+    
     @Query("select att from Attendance att where att.timetable.school.owner = :owner "
     		+ "AND (att.timetable.school = :sch OR :sch is null) "
     		+ "AND (att.timetable.class_stream = :cls OR :cls is null) "

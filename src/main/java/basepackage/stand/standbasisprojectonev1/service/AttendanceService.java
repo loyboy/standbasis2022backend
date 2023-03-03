@@ -349,6 +349,27 @@ public class AttendanceService {
         return response;
     }
 	
+	//For mobile app 
+	public Map<String, Object> getTeacherClassesToday( Optional<Long> teacherId, Optional<Timestamp> today ){
+		
+			Long teacherowner = teacherId.orElse(null); 
+			Optional<Teacher> teacherownerobj = null;
+			List<Attendance> attendances = null;
+			 
+			if( teacherowner != null ) { teacherownerobj = teaRepository.findById( teacherowner );  }
+		
+			attendances = attRepository.findByTeacherTodayClass( 				
+				teacherownerobj == null ? null : teacherownerobj.get(),				
+				today.isEmpty() ? null : today.get()
+			);
+			
+		 	List<Attendance> calarray = new ArrayList<Attendance>(attendances);
+	        
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("attendances", calarray);
+	        return response;
+	}
+	
 	public Map<String, Object> getPaginatedStudentAttendances(int page, int size, String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Long> classId, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Long> subjectId,  Optional<Integer> status, Optional<Long> studentId,  Optional<Long> attId,  Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
 		CommonActivity.validatePageNumberAndSize(page, size);
         

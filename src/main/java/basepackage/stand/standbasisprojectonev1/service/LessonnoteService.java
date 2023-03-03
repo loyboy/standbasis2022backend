@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.Assessment;
+import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;
@@ -113,6 +114,27 @@ public class LessonnoteService {
 		 }
 		 return null;
 	}	
+	
+		//For mobile app 
+		public Map<String, Object> getTeacherLessonnoteForWeek( Optional<Long> teacherId, Optional<Integer> week ){
+			
+				Long teacherowner = teacherId.orElse(null); 
+				Optional<Teacher> teacherownerobj = null;
+				List<Lessonnote> lessonnotes = null;
+				 
+				if( teacherowner != null ) { teacherownerobj = teaRepository.findById( teacherowner );  }
+			
+				lessonnotes = lsnRepository.findByTeacherWeekLessonnote( 				
+					teacherownerobj == null ? null : teacherownerobj.get(),				
+					week.isEmpty() ? null : week.get()
+				);
+				
+			 	List<Lessonnote> calarray = new ArrayList<Lessonnote>(lessonnotes);
+		        
+		        Map<String, Object> response = new HashMap<>();
+		        response.put("lessonnotes", calarray);
+		        return response;
+		}
 	
 	public Lessonnote findLessonnote(Long id) {		
 		Optional<Lessonnote> lsn = lsnRepository.findById(id);

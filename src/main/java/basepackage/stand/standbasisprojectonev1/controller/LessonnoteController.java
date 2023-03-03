@@ -85,7 +85,16 @@ public class LessonnoteController {
 	 public ResponseEntity<?> getLessonnoteManagements() {
 		 List<LessonnoteManagement> list = serviceManagement.findAll();
 		 return ResponseEntity.ok().body(new ApiContentResponse<LessonnoteManagement>(true, "List of Lessonnotes Management gotten successfully.", list));		
-	 }	
+	 }
+	 
+	 @GetMapping("/notesWeek")
+	 public ResponseEntity<?> getTeacherClassLessonnoteWeek(
+			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,			 
+			 @RequestParam(value = "week", required=false) Optional<Integer> week
+	 ) {		 
+		 Map<String, Object> response = service.getTeacherLessonnoteForWeek( teacher, week  );
+		 return new ResponseEntity<>(response, HttpStatus.OK);	        
+	 }
 	 
 	 @GetMapping("/paginateLessonnoteActivity")
 	 public ResponseEntity<?> getPaginatedLessonnotesActivity(@RequestParam(value = "page", 

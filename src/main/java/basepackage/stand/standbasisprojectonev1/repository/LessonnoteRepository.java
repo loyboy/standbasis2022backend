@@ -48,6 +48,16 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     @Query(" select lsn from Lessonnote lsn where lsn.title like :filter ")
     List<Lessonnote> filterAll( @Param("filter") String filter); 
     
+    @Query(   "select lsn from Lessonnote lsn where lsn.teacher = :tea OR :tea is null "
+    		+ "AND (lsn.week = :week OR :week is null) "
+    		+ "AND (lsn.calendar.status = 1) "
+    	  )
+    List<Lessonnote> findByTeacherWeekLessonnote(     		 
+    		@Param("tea") Teacher tea,    		
+    		@Param("week") Integer week
+    );
+    
+    //------------------------------------------------------------------------------------------
     @Query("select lsn from Lessonnote lsn where lsn.calendar.school.owner = :owner "
     		+ "AND (lsn.calendar.school = :sch OR :sch is null) "
     		+ "AND (lsn.class_index = :cls OR :cls is null) "
