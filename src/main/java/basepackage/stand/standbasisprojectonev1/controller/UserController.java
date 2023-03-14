@@ -33,8 +33,7 @@ public class UserController {
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
 			 @RequestParam(value = "q",required=false) String query,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
-			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> schoolgroup,
-			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher
+			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> schoolgroup
 			 ) {
 		 
 		 Map<String, Object> response = service.getPaginatedUsers( page, size, query, school, schoolgroup );

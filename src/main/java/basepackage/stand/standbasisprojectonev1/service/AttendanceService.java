@@ -90,8 +90,21 @@ public class AttendanceService {
 		return null;		
 	}
 	
+	public Rowcall findAllByRowcall(Long id) {		
+		Optional<Attendance> att = attRepository.findById(id);
+		if (att.isPresent()) {
+			Attendance attval = att.get();			
+			return attRepository.findByRowcall(attval);
+		}
+		return null;		
+	}
+	
 	public List<Attendance> findAll() {		
 		return attRepository.findAll();
+	}
+	
+	public List<Rowcall> saveRowCall( List<Rowcall> rc  ) {		
+		return rowRepository.saveAll(rc);
 	}
 	
 	public Attendance saveOne(AttendanceRequest attRequest) {
@@ -367,6 +380,7 @@ public class AttendanceService {
 	        
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("attendances", calarray);
+	        response.put("amount", calarray.size());
 	        return response;
 	}
 	

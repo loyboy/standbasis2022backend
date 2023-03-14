@@ -37,6 +37,18 @@ public class EnrollmentController {
 		 return ResponseEntity.ok().body(new ApiContentResponse<Enrollment>(true, "List of Enrollments gotten successfully.", list));		
 	 }
 	 
+	 @GetMapping("/class")
+	 public ResponseEntity<?> getEnrollmentsFromClassId(  @RequestParam(value = "id") Integer id ) {
+		 List<Enrollment> list = service.findEnrollmentFromClass(id);
+		 return ResponseEntity.ok().body(new ApiContentResponse<Enrollment>(true, "List of Enrollments by Class ID gotten successfully.", list));		
+	 }
+	 
+	 @GetMapping("/classindex")
+	 public ResponseEntity<?> getEnrollmentsFromClassIndex(  @RequestParam(value = "id") Integer id ) {
+		 List<Enrollment> list = service.findEnrollmentFromClassIndex(id);
+		 return ResponseEntity.ok().body(new ApiContentResponse<Enrollment>(true, "List of Enrollments by Class Index gotten successfully.", list));		
+	 }
+	 
 	 @GetMapping("/paginate")
 	 public ResponseEntity<?> getPaginatedEnrollments(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,

@@ -133,6 +133,7 @@ public class LessonnoteService {
 		        
 		        Map<String, Object> response = new HashMap<>();
 		        response.put("lessonnotes", calarray);
+		        response.put("amount", calarray.size());
 		        return response;
 		}
 	

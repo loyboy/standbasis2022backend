@@ -11,7 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,11 +33,14 @@ import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceActivity;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceManagement;
 import basepackage.stand.standbasisprojectonev1.model.Rowcall;
+import basepackage.stand.standbasisprojectonev1.model.Student;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.payload.ApiContentResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiDataResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.AttendanceComposite;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.AttendanceManagementRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.RowcallRequest;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceActivityService;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceManagementService;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceService;
@@ -343,6 +348,39 @@ public class AttendanceController {
 	     }
 	 }
 	 
+	 
+	 @PutMapping("/rowcall")
+	 public ResponseEntity<?> updateRowcall(  
+			 @RequestBody List<RowcallRequest> rowcallRequest
+	 ) {
+		 Long getOneAtt = rowcallRequest.get(0).getAtt_id();
+		 Rowcall rcCheck = service.findAllByRowcall(getOneAtt);
+		 if (!rcCheck.equals(null)) {
+			 return ResponseEntity.status(400).body(new ApiDataResponse(true, "Attendance rowcall is already in the database", false ));
+		 }
+		 try {
+			 	ModelMapper modelMapper = new ModelMapper(); 
+			 	List<Rowcall> rclist = rowcallRequest.stream().map(t -> 
+			 	{
+			 		Rowcall rc = modelMapper.map(t, Rowcall.class);
+			 		Attendance att = new Attendance();
+			 		Student stu = new Student();
+			 		att.setAttId(t.getAtt_id());
+			 		stu.setPupId(t.getStu_id());
+			 		rc.setAttendance(att);
+			 		rc.setStudent(stu);
+			 		return rc;
+			 	
+			 	}).collect(Collectors.toList());
+		    	
+				 List<Rowcall> rc = service.saveRowCall(rclist);
+				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Attendance rowcall has been updated", "Attendance rowcall size updated is " + rc.size() ));
+			 }
+		 catch (Exception ex) {
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	 }
+	 
 	 //Done by Principal
 	 @PutMapping("/approve/{activity}")
 	 public ResponseEntity<?> approveAttendance(
@@ -363,7 +401,7 @@ public class AttendanceController {
 	 }
 	 
 	 @RequestMapping(path = "/file/{id}", method = PUT, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-	 public ResponseEntity<?> updateAttendancePhoto(@PathVariable(value = "id") Long id, @RequestPart("lsn") MultipartFile multipartFile) {
+	 public ResponseEntity<?> updateAttendancePhoto(@PathVariable(value = "id") Long id, @RequestPart("att") MultipartFile multipartFile) {
 		 try {
 			 	 String fileOriginalName = StringUtils.cleanPath(multipartFile.getOriginalFilename());		         
 			 	 String fileName = "0"+ id.toString() + "." + FileUploadUtil.findExtension(fileOriginalName).get();

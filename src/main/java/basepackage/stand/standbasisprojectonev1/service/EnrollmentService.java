@@ -78,6 +78,12 @@ public class EnrollmentService {
 		List<Enrollment> enc = enrollRepository.findByClassIndex(id);
 		
 		return enc;
+	}	
+	
+	public List<Enrollment> findEnrollmentFromClass(Integer id) {		
+		List<Enrollment> enc = enrollRepository.findByClassId(id);
+		
+		return enc;
 	}
 	
 	public Map<String, Object> getPaginatedEnrollments(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval) {
