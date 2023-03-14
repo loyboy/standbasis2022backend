@@ -90,7 +90,7 @@ public class MyScheduler {
 	
 	// "0 0 0 * * 0" -- once a week
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "0 0 0 * * *")
+	@Scheduled(cron = "0 0 0 * * 0")
     public void insertLessonnotes() {
 		
 		 Map<Integer, String> classMap = new HashMap<>();
@@ -110,7 +110,7 @@ public class MyScheduler {
 		    	
 	    		// Today' date - Start date
 	    		long diff = parseTimestamp(todayDate()).getTime() - it.getCalendar().getStartdate().getTime();
-	    		int weeks = (int) diff / (7 * 24 * 60 * 60 * 1000 );
+	    		int weeks = (int) ( diff / (7 * 24 * 60 * 60 * 1000 ) ) + 1 ;
 				
 				Lessonnote lsn = new Lessonnote();
 				lsn.setTitle( "WEEK-"+ weeks + "_" + it.getSub_name() + "_" + it.getClass_name() );
