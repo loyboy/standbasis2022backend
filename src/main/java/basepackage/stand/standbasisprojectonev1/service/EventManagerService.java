@@ -20,11 +20,13 @@ import org.springframework.stereotype.Service;
 import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.model.User;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.EventManagerRequest;
 import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository;
+import basepackage.stand.standbasisprojectonev1.repository.TeacherRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
@@ -38,6 +40,9 @@ private static final Logger logger = LoggerFactory.getLogger(EventManagerService
 	
 	@Autowired		
     private SchoolRepository schRepository;
+	
+	@Autowired		
+    private TeacherRepository teaRepository;
 	
 	@Autowired		
     private UserRepository userRepository;	
@@ -83,9 +88,10 @@ private static final Logger logger = LoggerFactory.getLogger(EventManagerService
 		 return null;
 	}
 	
-	public Map<String, Object> getPaginatedEvents(int page, int size, String query, String module, Optional<Long> schId, Optional<Long> schgroupId) {
+	public Map<String, Object> getPaginatedEvents(int page, int size, String query, String module, Optional<Long> teaId, Optional<Long> schId, Optional<Long> schgroupId) {
 		CommonActivity.validatePageNumberAndSize(page, size);
 		
+		Long teaowner = teaId.orElse(null);
 		Long schowner = schId.orElse(null);
 		Long schgroup = schgroupId.orElse(null);
 
@@ -98,14 +104,16 @@ private static final Logger logger = LoggerFactory.getLogger(EventManagerService
         		events = eventmanagerRepository.findAll(pageable);
         	}else {
         		Optional<School> schownerobj = null;
-        		Optional<SchoolGroup> schgroupobj = null;
+        		Optional<SchoolGroup> schgroupobj = null;     		
         		
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  }
         		if(schgroup != null) { schgroupobj = groupRepository.findById( schgroup );  }
         		
-        		events = eventmanagerRepository.findByEventSchoolPage(       				
+        		events = eventmanagerRepository.findByEventSchoolPage( 
+        				teaowner == null ? null : teaowner, 
                         schownerobj == null ? null : schownerobj.get(), 
                         schgroupobj == null ? null : schgroupobj.get(), 
+                        module == null ? null : module,
         				pageable
         		);
         	}
@@ -123,6 +131,7 @@ private static final Logger logger = LoggerFactory.getLogger(EventManagerService
         		
         		events = eventmanagerRepository.findFilterByEventSchoolPage(  
         				"%"+ query + "%",
+        				teaowner == null ? null : teaowner, 
                         schownerobj == null ? null : schownerobj.get(), 
                         schgroupobj == null ? null : schgroupobj.get(),
                         module == null ? null : module,

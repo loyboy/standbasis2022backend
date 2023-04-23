@@ -45,11 +45,11 @@ public class EventController {
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
 			 @RequestParam(value = "q", required=false) String query,
 			 @RequestParam(value = "module", required=false) String module,
+			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
 			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> schoolgroup
-			 ) {
-		 
-		 Map<String, Object> response = service.getPaginatedEvents( page, size, query, module, school, schoolgroup );
+			 ) {		 
+		 Map<String, Object> response = service.getPaginatedEvents( page, size, query, module, teacher, school, schoolgroup );
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 

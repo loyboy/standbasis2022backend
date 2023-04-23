@@ -9,5 +9,7 @@ public enum  RoleName {
     PRINCIPAL,
     GUARDIAN,
     PROPRIETOR,    
-    SUPERADMIN
+    SUPERADMIN,
+    
+    EVALUATOR /// as an evaluator, you can edit, and create new school evaluations
 }

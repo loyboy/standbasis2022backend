@@ -45,6 +45,11 @@ public class LessonnoteActivity extends DateAudit{
     
     private String comment_query; // Optional if queried
     
+    //Only applied if revert is initiated by Principal
+    private Integer principal_query_arrangement; // 1 - Satisfied, 0 - Bad
+    private Integer principal_query_grammar; // 1 - Satisfied, 0 - Bad
+    private Integer principal_query_subjectmatter; // 1 - Satisfied, 0 - Bad
+    
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lsn_id", nullable = false)

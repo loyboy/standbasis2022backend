@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
 
 @Repository
 public interface EventManagerRepository extends JpaRepository<EventManager, Long>{
@@ -25,22 +26,25 @@ public interface EventManagerRepository extends JpaRepository<EventManager, Long
 	    Page<EventManager> filter( @Param("filter") String filter, Pageable pg);
 	    
 	    @Query("select evt from EventManager evt "
-	    		+ "WHERE (evt.school = :sch OR :sch is null) "
-	    		+ "OR (evt.school.owner = :group OR :group is null) "
+	    		+ "WHERE evt.module = :module OR :module is null AND ( (evt.user.teacher_id = :tea OR :tea is null) OR (evt.school = :sch OR :sch is null) "
+	    		+ "OR (evt.school.owner = :group OR :group is null) ) "
 	       	 )    
 	    Page<EventManager> findByEventSchoolPage(
+	    		@Param("tea") Long tea, 
 	    		@Param("sch") School sch, 
 	    		@Param("group") SchoolGroup schgroup, 
+	    		@Param("module") String module, 
 	    		Pageable pg
 	    );
 	    
 	    @Query("select evt from EventManager evt "
-	    		+ "WHERE evt.school = :sch OR :sch is null "
-	    		+ "OR (evt.school.owner = :group OR :group is null) "
+	    		+ "WHERE ( evt.school = :sch OR :sch is null "
+	    		+ "OR (evt.school.owner = :group OR :group is null) OR (evt.user.teacher_id = :tea OR :tea is null) )"
 	    		+ "AND ( (evt.comment like :filter OR :filter is null) OR (evt.module = :module OR :module is null) )"
 	       	  )    
 	    Page<EventManager> findFilterByEventSchoolPage(
 	    		@Param("filter") String filter, 
+	    		@Param("tea") Long tea, 
 	    		@Param("sch") School sch, 
 	    		@Param("group") SchoolGroup schgroup, 
 	    		@Param("module") String module, 

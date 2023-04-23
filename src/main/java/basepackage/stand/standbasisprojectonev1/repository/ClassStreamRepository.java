@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.School;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
 
 /**
  * Created by Loy from August 2022.
@@ -20,9 +21,14 @@ import basepackage.stand.standbasisprojectonev1.model.School;
 @Repository
 public interface ClassStreamRepository extends JpaRepository<ClassStream, Long> {
 
-    Optional<ClassStream> findById(Long classId);
-    
-    List<ClassStream> findBySchool(School sch);
+	   Optional<ClassStream> findById(Long classId);
+	    
+	   List<ClassStream> findBySchool(School sch);
+	   
+	   @Query("select DISTINCT(cs) from ClassStream cs INNER JOIN TimeTable tt ON cs.clsId = tt.class_stream.clsId "
+	   		+ "where tt.teacher = :tea "          
+       )
+       List<ClassStream> findByTeacher(@Param("tea") Teacher tea); 
     
        @Query("select cs from ClassStream cs where cs.title like :filter " 
                + "or cs.ext like :filter "            

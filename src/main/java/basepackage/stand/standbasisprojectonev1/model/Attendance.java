@@ -16,6 +16,8 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.data.annotation.Transient;
+
 import basepackage.stand.standbasisprojectonev1.model.audit.DateAudit;
 import lombok.Getter;
 import lombok.Setter;
@@ -68,5 +70,12 @@ public class Attendance extends DateAudit{
     
     public Attendance() {
     	
+    }
+    
+    @Transient
+    public String getPhotoPath() {
+        if (image == null) return null;
+         
+        return "/teacher-attendance/" + attId + "/" + image;
     }
 }

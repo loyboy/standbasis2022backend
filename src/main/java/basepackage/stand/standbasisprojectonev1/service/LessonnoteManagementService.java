@@ -73,6 +73,17 @@ public class LessonnoteManagementService {
 		return null;
 	}
 	
+	public List<LessonnoteManagement> findByLessonnote(Long id) {		
+		Optional<Lessonnote> lsn = lsnRepository.findById(id);
+		if (lsn.isPresent()) {
+			Lessonnote lsnval = lsn.get();
+			List<LessonnoteManagement> lsnmanage = new ArrayList<LessonnoteManagement>();
+			lsnmanage.add( lsnmanageRepository.findByLessonnote(lsnval).get() );
+			return lsnmanage;
+		}
+		return null;		
+	}
+	
 	public LessonnoteManagement update(LessonnoteManagementRequest attRequest, long id) {
 		Optional<Lessonnote> existing = lsnRepository.findById(id);
 		if (existing.isPresent()) {
@@ -92,10 +103,10 @@ public class LessonnoteManagementService {
 				lsnmanage.get().setManagement(30);
 			}
 			
-			if ( lsnval.getGrammar() != null && lsnval.getArrangement() != null) {
+			/*if ( lsnval.getGrammar() != null && lsnval.getArrangement() != null) {
 				Integer quality = ( lsnval.getGrammar() + lsnval.getArrangement() ) <= 0 ? 0 : ( lsnval.getGrammar() + lsnval.getArrangement() )/2 ;
 				lsnmanage.get().setQuality( quality );	
-			}
+			}*/
 			
 			CommonActivity.copyNonNullProperties(attRequest, lsnmanage.get());
 			return lsnmanageRepository.save(lsnmanage.get());

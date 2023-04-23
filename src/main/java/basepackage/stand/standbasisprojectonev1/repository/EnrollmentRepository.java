@@ -23,7 +23,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
                 + "JOIN ClassStream cs ON cs = e.classstream " 
                 + "WHERE cs.clsId = :classId AND cs.status = 1 AND e.status = 1 "            
            	  )
-        List<Enrollment> findByClassId( @Param("classId") Integer classId );
+        List<Enrollment> findByClassId( @Param("classId") Long classId );
     	
     	@Query("select e from Enrollment e " 
             + "JOIN ClassStream cs ON cs = e.classstream " 

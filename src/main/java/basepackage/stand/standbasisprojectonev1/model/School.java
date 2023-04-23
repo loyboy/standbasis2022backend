@@ -88,7 +88,7 @@ public class School extends DateAudit {
 	    private Integer sri, status = 0;
 	    
 	    @Size(max = 100)
-	    private String mission, rating, tour, Calendar_upload, teachers_upload, students_upload, classroom_upload, timetable_upload;
+	    private String mission, rating, tour, Calendar_upload, teachers_upload, students_upload, classroom_upload, timetable_upload, zone, jurisdiction, groupofschool;
 	    
 	    public School() {
 	    	

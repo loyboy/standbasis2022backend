@@ -80,7 +80,7 @@ public class EnrollmentService {
 		return enc;
 	}	
 	
-	public List<Enrollment> findEnrollmentFromClass(Integer id) {		
+	public List<Enrollment> findEnrollmentFromClass(Long id) {		
 		List<Enrollment> enc = enrollRepository.findByClassId(id);
 		
 		return enc;

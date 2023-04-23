@@ -1,5 +1,6 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,12 +17,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
+import basepackage.stand.standbasisprojectonev1.model.EventManager;
+import basepackage.stand.standbasisprojectonev1.model.School;
+import basepackage.stand.standbasisprojectonev1.model.User;
 import basepackage.stand.standbasisprojectonev1.payload.ApiContentResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiDataResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CalendarRequest;
+import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
+import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
+import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
 import basepackage.stand.standbasisprojectonev1.service.CalendarService;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/calendar")
@@ -29,6 +38,12 @@ public class CalendarController {
 
 	 @Autowired
 	 CalendarService service;
+	 
+	 @Autowired
+	 private EventManagerRepository eventRepository;
+	 
+	 @Autowired
+	 private UserRepository userRepository;
 	 
 	 @GetMapping
 	 public ResponseEntity<?> getCalendars() {
@@ -67,9 +82,16 @@ public class CalendarController {
 	 }
 	 
 	 @PutMapping("/{id}")
-	 public ResponseEntity<?> updateCalendar(@PathVariable(value = "id") Long id, @RequestBody CalendarRequest teaRequest) {
+	 public ResponseEntity<?> updateCalendar(@AuthenticationPrincipal UserPrincipal userDetails, @PathVariable(value = "id") Long id, @RequestBody CalendarRequest calRequest) {
 		 try {
-			 Calendar val = service.update(teaRequest,id);			 
+			 Calendar val = service.update(calRequest,id);
+			 
+			 Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+			 //------------------------------------
+			 saveEvent("calendar", "edit", "The User with name: " + u.get().getName() + "has edited a Calendar instance with ID:  " + val.getId(), 
+					 new Date(), u.get(), u.get().getSchool()
+			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Calendar has been updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
@@ -78,15 +100,35 @@ public class CalendarController {
 	 }
 	 
 	 @DeleteMapping("/{id}")
-	 public ResponseEntity<?> deleteCalendar(@PathVariable(value = "id") Long id) {
+	 public ResponseEntity<?> deleteCalendar( @AuthenticationPrincipal UserPrincipal userDetails, @PathVariable(value = "id") Long id) {
 		 try {
 			 Calendar val = service.delete(id);
+			 Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+			 //------------------------------------
+			 saveEvent("calendar", "delete", "The User with name: " + u.get().getName() + "has deleted a Calendar instance with ID:  " + val.getId(), 
+					 new Date(), u.get(), u.get().getSchool()
+			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Calendar has been deleted successfully.", val));				 
 		 }
 		 catch (Exception ex) {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	 
+	 }
+	 
+	 private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 
+		 	
+		 	EventManager _event = new EventManager();
+		 	
+		 	_event.setModule(module);
+	 		_event.setAction(action);
+	 		_event.setComment(comment);
+	 		_event.setDateofevent(d);	
+	 		_event.setUser(u);
+	 		_event.setSchool(sch);
+	 		
+	 		return eventRepository.save(_event);
 	 }
 	 
 }

@@ -99,6 +99,15 @@ public class AttendanceService {
 		return null;		
 	}
 	
+	public Rowcall findRowcall(Long id) {		
+		Optional<Rowcall> rc = rowRepository.findById(id);
+		if (rc.isPresent()) {
+			Rowcall rcval = rc.get();			
+			return rcval;
+		}
+		return null;
+	}
+	
 	public List<Attendance> findAll() {		
 		return attRepository.findAll();
 	}
@@ -363,22 +372,26 @@ public class AttendanceService {
     }
 	
 	//For mobile app 
-	public Map<String, Object> getTeacherClassesToday( Optional<Long> teacherId, Optional<Timestamp> today ){
+	public Map<String, Object> getTeacherClassesToday( Optional<Long> teacherId, Date today ){
 		
 			Long teacherowner = teacherId.orElse(null); 
 			Optional<Teacher> teacherownerobj = null;
 			List<Attendance> attendances = null;
 			 
-			if( teacherowner != null ) { teacherownerobj = teaRepository.findById( teacherowner );  }
+			if( teacherowner != null ) { 
+				teacherownerobj = teaRepository.findById( teacherowner );  
+			}
 		
 			attendances = attRepository.findByTeacherTodayClass( 				
 				teacherownerobj == null ? null : teacherownerobj.get(),				
-				today.isEmpty() ? null : today.get()
+				today.equals(null) ? null : today
 			);
+			
+			//System.out.println(teacherownerobj.get().getEmail() + " --- " + today.getDay());
 			
 		 	List<Attendance> calarray = new ArrayList<Attendance>(attendances);
 	        
-	        Map<String, Object> response = new HashMap<>();
+	        Map<String, Object> response = new HashMap<>();//
 	        response.put("attendances", calarray);
 	        response.put("amount", calarray.size());
 	        return response;

@@ -4,6 +4,7 @@ import org.springframework.http.MediaType;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,11 +25,16 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.School;
+import basepackage.stand.standbasisprojectonev1.model.User;
 import basepackage.stand.standbasisprojectonev1.payload.ApiContentResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiDataResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.SchoolRequest;
+import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
+import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
+import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
 import basepackage.stand.standbasisprojectonev1.service.SchoolService;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
 import basepackage.stand.standbasisprojectonev1.util.FileUploadUtil;
@@ -38,6 +45,12 @@ public class SchoolController {
 
 	 @Autowired
 	 SchoolService service;
+	 
+	 @Autowired
+	 private EventManagerRepository eventRepository;
+	 
+	 @Autowired
+	 private UserRepository userRepository;
 	 
 	 @GetMapping
 	 public ResponseEntity<?> getSchools() {
@@ -84,9 +97,15 @@ public class SchoolController {
 	 }
 	 
 	 @PutMapping("/{id}")
-	 public ResponseEntity<?> updateSchool(@PathVariable(value = "id") Long id, @RequestBody SchoolRequest schRequest) {
+	 public ResponseEntity<?> updateSchool(@AuthenticationPrincipal UserPrincipal userDetails, @PathVariable(value = "id") Long id, @RequestBody SchoolRequest schRequest) {
 		 try {		        
-				 School val = service.update(schRequest,id);			 
+				 School val = service.update(schRequest,id);
+				 Optional<User> u = userRepository.findById( userDetails.getId() );
+					
+				 //------------------------------------
+				 saveEvent("school", "edit", "The User with name: " + u.get().getName() + "has updated a school with ID:  " + val.getSchId(), 
+						 new Date(), u.get(), u.get().getSchool()
+				 );
 				 return ResponseEntity.ok().body(new ApiDataResponse(true, "School data has been updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
@@ -113,13 +132,33 @@ public class SchoolController {
 	 
 	 
 	 @DeleteMapping("/{id}")
-	 public ResponseEntity<?> deleteSchool(@PathVariable(value = "id") Long id) {
+	 public ResponseEntity<?> deleteSchool(@AuthenticationPrincipal UserPrincipal userDetails, @PathVariable(value = "id") Long id) {
 		 try {
 			 School val = service.delete(id);
+			 Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+			 //------------------------------------
+			 saveEvent("school", "delete", "The User with name: " + u.get().getName() + "has deleted a school with ID:  " + val.getSchId(), 
+					 new Date(), u.get(), u.get().getSchool()
+			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "School has been deleted successfully.", val));				 
 		 }
 		 catch (Exception ex) {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
+	 }
+	 
+	 private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 
+		 	
+		 	EventManager _event = new EventManager();
+		 	
+		 	_event.setModule(module);
+	 		_event.setAction(action);
+	 		_event.setComment(comment);
+	 		_event.setDateofevent(d);	
+	 		_event.setUser(u);
+	 		_event.setSchool(sch);
+	 		
+	 		return eventRepository.save(_event);
 	 }
 }

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,9 +30,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import basepackage.stand.standbasisprojectonev1.model.Assessment;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceActivity;
+import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteActivity;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteManagement;
+import basepackage.stand.standbasisprojectonev1.model.School;
+import basepackage.stand.standbasisprojectonev1.model.Subject;
+import basepackage.stand.standbasisprojectonev1.model.User;
 import basepackage.stand.standbasisprojectonev1.payload.ApiContentResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiDataResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
@@ -39,6 +44,9 @@ import basepackage.stand.standbasisprojectonev1.payload.onboarding.AssessmentReq
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteActivityRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteComposite;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteRequest;
+import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
+import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
+import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
 import basepackage.stand.standbasisprojectonev1.service.AssessmentService;
 import basepackage.stand.standbasisprojectonev1.service.LessonnoteActivityService;
 import basepackage.stand.standbasisprojectonev1.service.LessonnoteManagementService;
@@ -67,6 +75,12 @@ public class LessonnoteController {
 	 @Autowired
 	 AssessmentService serviceAssessment;
 	 
+	 @Autowired
+	 private EventManagerRepository eventRepository;
+	 
+	 @Autowired
+	 private UserRepository userRepository;
+	 
 	 private final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	 
 	 @GetMapping
@@ -81,9 +95,15 @@ public class LessonnoteController {
 		 return ResponseEntity.ok().body(new ApiContentResponse<LessonnoteActivity>(true, "List of Lessonnotes Activity gotten successfully.", list));		
 	 }	
 	 
-	 @GetMapping("/management")
-	 public ResponseEntity<?> getLessonnoteManagements() {
-		 List<LessonnoteManagement> list = serviceManagement.findAll();
+	 @GetMapping(value = {"/management", "/management/{lsn}"})
+	 public ResponseEntity<?> getLessonnoteManagements(@PathVariable(value = "lsn", required = false) Long lsn) {		
+		 List<LessonnoteManagement> list = null;
+		 if (lsn != null) {
+			 list = serviceManagement.findByLessonnote(lsn);
+		 }
+		 else {
+			 list = serviceManagement.findAll();
+		 }
 		 return ResponseEntity.ok().body(new ApiContentResponse<LessonnoteManagement>(true, "List of Lessonnotes Management gotten successfully.", list));		
 	 }
 	 
@@ -356,6 +376,7 @@ public class LessonnoteController {
 	//Teacher only
 	@PutMapping("/status/{id}")
 	public ResponseEntity<?> updateLessonnote( 
+			 	 @AuthenticationPrincipal UserPrincipal userDetails,
 				 @PathVariable(value = "id") Long id,
 				 @RequestBody LessonnoteRequest lsnRequest 		 
 		 ) {
@@ -363,6 +384,12 @@ public class LessonnoteController {
 			 Lessonnote val = null;
 			 if (lsnRequest.getAction().equals("closure") || lsnRequest.getAction().equals("launch") ) {
 				 val = service.update(lsnRequest,id);
+				 
+				 Optional<User> u = userRepository.findById( userDetails.getId() );				
+				 //------------------------------------
+				 saveEvent("lessonnote", "edit", "The User with name: " + u.get().getName() + "has updated a lessonnote template status with ID:  " + id + " done by the Teacher ", 
+						 new Date(), u.get(), u.get().getSchool()
+				 );
 			 }
 			 
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Lessonnote has been edited successfully.", val));	
@@ -377,12 +404,21 @@ public class LessonnoteController {
 	 //Teacher only
 	 @PutMapping("/{id}")
 	 public ResponseEntity<?> submitLessonnote( 
+			 @AuthenticationPrincipal UserPrincipal userDetails,
 			 @PathVariable(value = "id") Long id,
 			 @RequestBody LessonnoteComposite lsnRequest 		 
 	 ) {
 		 try {			 
 			 Lessonnote val = service.update(lsnRequest.getLessonnote(),id);
-			 if (val != null) {
+			 
+			 Optional<User> u = userRepository.findById( userDetails.getId() );				
+			 //------------------------------------
+			 saveEvent("lessonnote", "edit", "The User with name: " + u.get().getName() + "has submitted a lessonnote template with ID:  " + id + " done by the Teacher " + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
+					 new Date(), u.get(), u.get().getSchool()
+			 );
+			 
+			 if (val != null) {				 
+				 
 				 
 				 if ( lsnRequest.getLessonnote().getAction().equals("resubmit") ) {				 
 										 
@@ -392,8 +428,13 @@ public class LessonnoteController {
 					 lsnactivity.setExpected( addDays( CommonActivity.parseTimestamp( CommonActivity.todayDate()),1) );//One day expected
 					 lsnactivity.setActivity("Expected to approve/revert this Lessonnote within (1) day");
 					 serviceActivity.saveOne(lsnactivity, val);	
-					 
+					 saveEvent("lessonnoteactivity", "create", "The User with name: " + u.get().getName() + "has created a lessonnote activity template with Lsn ID:  " + id + " done by the Teacher after submitting a Lessonnote " + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
+							 new Date(), u.get(), u.get().getSchool()
+					 );
 					 serviceActivity.update(lsnRequest.getActivity(),lsnRequest.getActivity().getLsnactivityId() );
+					 saveEvent("lessonnoteactivity", "edit", "The User with name: " + u.get().getName() + "has updated a lessonnote activity template with Lsn ID:  " + id + " done by the Teacher after submitting a Lessonnote " + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
+							 new Date(), u.get(), u.get().getSchool()
+					 );
 				 }
 				 else {				 
 					 lsnRequest.getActivity().setOwnertype("Principal");
@@ -401,6 +442,14 @@ public class LessonnoteController {
 					 
 					 serviceActivity.saveOne(lsnRequest.getActivity(), val);
 					 serviceManagement.saveOne(lsnRequest.getManagement(), val);
+					 
+					 saveEvent("lessonnoteactivity", "create", "The User with name: " + u.get().getName() + "has created a lessonnote activity template with Lsn ID:  " + id + " done by the Teacher after submitting a Lessonnote" + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
+							 new Date(), u.get(), u.get().getSchool()
+					 );
+					 
+					 saveEvent("lessonnotemanagement", "create", "The User with name: " + u.get().getName() + "has created a lessonnote management template with Lsn ID:  " + id + " done by the Teacher after submitting a Lessonnote" + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
+							 new Date(), u.get(), u.get().getSchool()
+					 );
 				 }
 			 } 
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Lessonnote has been edited successfully.", val));	
@@ -413,13 +462,21 @@ public class LessonnoteController {
 	 
 	 //Principal only
 	 @PutMapping("/approve/{id}")
-	 public ResponseEntity<?> approveLessonnote(@PathVariable(value = "id") Long id,			
+	 public ResponseEntity<?> approveLessonnote(
+			 @AuthenticationPrincipal UserPrincipal userDetails,
+			 @PathVariable(value = "id") Long id,			
 			 @RequestBody LessonnoteComposite lsnRequest 			
 	  ) {
 		 // @PathVariable(value = "activity") Long lsnactivityId,
 		 try {		 
 			 
-			 LessonnoteActivity lsnact  = serviceActivity.findLessonnoteActivityByLessonnote(id);
+			 LessonnoteActivity lsnact  = serviceActivity.findLessonnoteActivityByLessonnote(id);// this gets only the latest lessonnote with this LSN ID
+			 
+			 Optional<User> u = userRepository.findById( userDetails.getId() );				
+			 //------------------------------------
+			 saveEvent("lessonnote", "edit", "The User with name: " + u.get().getName() + "has approved a lessonnote template with ID:  " + id + " approved by the Principal after approving a Lessonnote", 
+					 new Date(), u.get(), u.get().getSchool()
+			 );
 			 
 			 Lessonnote val = null;
 			 if ( lsnRequest.getActivity().getAction().equals("revert") ) {				 
@@ -433,12 +490,22 @@ public class LessonnoteController {
 				 lsnactivity.setComment_query(lsnRequest.getActivity().getComment_query());
 				 serviceActivity.saveOne(lsnactivity, val);
 				 
-				 serviceActivity.update(lsnRequest.getActivity(),lsnact.getLsnactId());				 
+				 saveEvent("lessonnoteactivity", "create", "The User with name: " + u.get().getName() + "has created a lessonnote activity template with Lsn ID:  " + id + " done by the Principal after approving a Lessonnote" + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
+						 new Date(), u.get(), u.get().getSchool()
+				 );
+				 
+				 serviceActivity.update(lsnRequest.getActivity(),lsnact.getLsnactId());	
+				 saveEvent("lessonnoteactivity", "edit", "The User with name: " + u.get().getName() + "has updated a lessonnote activity template with Lsn ID:  " + id + " done by the Principal after approving a Lessonnote" + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
+						 new Date(), u.get(), u.get().getSchool()
+				 );
 			 }
 			 
 			 else {				
 				 val = service.update(lsnRequest.getLessonnote(),id);
 				 serviceActivity.update(lsnRequest.getActivity(),lsnact.getLsnactId());
+				 saveEvent("lessonnoteactivity", "edit", "The User with name: " + u.get().getName() + "has updated a lessonnote activity template with Lsn ID:  " + id + " done by the Principal after approving a Lessonnote" + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
+						 new Date(), u.get(), u.get().getSchool()
+				 );
 				 serviceManagement.update(lsnRequest.getManagement(),id);
 			 }				 
 			 
@@ -451,10 +518,18 @@ public class LessonnoteController {
 	 
 	 @PostMapping("/assessment")
 	 public ResponseEntity<?> submitScores( 
+			 @AuthenticationPrincipal UserPrincipal userDetails,
 			 @RequestBody AssessmentRequest assRequest		 
 	 ) {
 		 try {			 
 			 Assessment val = serviceAssessment.saveOne(assRequest);
+			 
+			 Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+			 //------------------------------------
+			 saveEvent("assessment", "create", "The User with name: " + u.get().getName() + "has created a assessment score with ID:  " + val.getAssessId(), 
+					 new Date(), u.get(), u.get().getSchool()
+			 );
 			 
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Assessment has been created successfully.", val));	
 		 }
@@ -464,12 +539,20 @@ public class LessonnoteController {
 	 }
 	 
 	 @PutMapping("/assessment/{id}")
-	 public ResponseEntity<?> updateScores( 
+	 public ResponseEntity<?> updateScores(
+			 @AuthenticationPrincipal UserPrincipal userDetails,
 			 @PathVariable(value = "id") Long id, 
 			 @RequestBody AssessmentRequest assRequest		 
 	 ) {
 		 try {			 
-			 Assessment val = serviceAssessment.update(assRequest, id);			 
+			 Assessment val = serviceAssessment.update(assRequest, id);	
+			 
+			 Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+			 //------------------------------------
+			 saveEvent("assessment", "edit", "The User with name: " + u.get().getName() + "has updated a assessment score with ID:  " + val.getAssessId(), 
+					 new Date(), u.get(), u.get().getSchool()
+			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Assessment has been updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
@@ -497,6 +580,20 @@ public class LessonnoteController {
 	 
 	 
 	 //---------------------------------------------------------------------------------------------
+	 private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 
+		 	
+		 	EventManager _event = new EventManager();
+		 	
+		 	_event.setModule(module);
+	 		_event.setAction(action);
+	 		_event.setComment(comment);
+	 		_event.setDateofevent(d);	
+	 		_event.setUser(u);
+	 		_event.setSchool(sch);
+	 		
+	 		return eventRepository.save(_event);
+	 }
+	 
 	 private Integer convertPercentage( Integer actual, Integer max ) {		 
 		 return actual == 0 ? 0 : ( (actual/max) * 100 );
 	 }

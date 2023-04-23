@@ -22,9 +22,11 @@ import org.springframework.stereotype.Service;
 import basepackage.stand.standbasisprojectonev1.exception.BadRequestException;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.School;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.ClassRequest;
 import basepackage.stand.standbasisprojectonev1.repository.ClassStreamRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
+import basepackage.stand.standbasisprojectonev1.repository.TeacherRepository;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
 
 @Service
@@ -36,11 +38,23 @@ public class ClassService {
 	@Autowired		
     private SchoolRepository schRepository;
 	
+	@Autowired		
+    private TeacherRepository teaRepository;
+	
 	public List<ClassStream> findAllBySchool(Long id) {		
 		Optional<School> sch = schRepository.findById(id);
 		if (sch.isPresent()) {
 			School schval = sch.get();			
 			return classRepository.findBySchool(schval);
+		}
+		return null;		
+	}
+	
+	public List<ClassStream> findAllByTeacher(Long id) {		
+		Optional<Teacher> tea = teaRepository.findById(id);
+		if (tea.isPresent()) {
+			Teacher teaval = tea.get();			
+			return classRepository.findByTeacher(teaval);
 		}
 		return null;		
 	}

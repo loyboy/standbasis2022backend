@@ -65,9 +65,16 @@ public class MiscController {
 		 return ResponseEntity.ok().body(new ApiContentResponse<Teacher>(true, "List of teachers gotten successfully.", teacherlist));	
 	 }
 	 
-	 @GetMapping("/allSubjects")
-	 public ResponseEntity<?> findSubjects() {
-		 List<Subject> subjectlist = subjectservice.findAll();
+	 @GetMapping(value = {"/allSubjects", "/allSubjects/{tea}"})
+	 public ResponseEntity<?> findSubjects(@PathVariable(value = "tea", required = false) Long tea) {
+		 List<Subject> subjectlist = null;
+		 if (tea != null) {
+			 subjectlist = subjectservice.findAllByTeacher(tea);
+		 }
+		 else {
+			 subjectlist = subjectservice.findAll();
+		 }
+		 
 		 return ResponseEntity.ok().body(new ApiContentResponse<Subject>(true, "List of subjects gotten successfully.", subjectlist));	
 	 }
 	 

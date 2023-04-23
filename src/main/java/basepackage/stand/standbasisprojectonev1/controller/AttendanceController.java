@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -32,15 +33,23 @@ import org.springframework.web.multipart.MultipartFile;
 import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceActivity;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceManagement;
+import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.Rowcall;
+import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.Student;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
+import basepackage.stand.standbasisprojectonev1.model.User;
 import basepackage.stand.standbasisprojectonev1.payload.ApiContentResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiDataResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.AttendanceComposite;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.AttendanceManagementRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.RowcallRequest;
+import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
+import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
+import basepackage.stand.standbasisprojectonev1.repository.TeacherRepository;
+import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
+import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceActivityService;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceManagementService;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceService;
@@ -63,6 +72,19 @@ public class AttendanceController {
 	 
 	 @Autowired
 	 UserService serviceUser;
+	 
+	 @Autowired
+	 private EventManagerRepository eventRepository;
+	 
+	 @Autowired
+	 private UserRepository userRepository;
+	 
+	 @Autowired
+	 private SchoolRepository schRepository;
+	 
+	 @Autowired
+	 private TeacherRepository teaRepository;
+		
 	 
 	 private final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	 
@@ -133,11 +155,22 @@ public class AttendanceController {
 	 @GetMapping("/classToday")
 	 public ResponseEntity<?> getTeacherClassAttendanceToday(
 			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,			 
-			 @RequestParam(value = "today", required=false) Optional<Timestamp> today
+			 @RequestParam(value = "today", required=false) Optional<String> today
 	 ) {
-		 
-		 Map<String, Object> response = service.getTeacherClassesToday( teacher, today  );
-		 return new ResponseEntity<>(response, HttpStatus.OK);	        
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	        Date parsedDate;
+			try {
+				 parsedDate = dateFormat.parse(today.get());				
+	         
+	        // System.out.print(timestampToday);
+	         
+				 Map<String, Object> response = service.getTeacherClassesToday( teacher, parsedDate );
+				 return new ResponseEntity<>(response, HttpStatus.OK);
+			 
+			} catch (Exception e) {
+				e.printStackTrace();
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+			}
 	 }
 	 
 	 @GetMapping("/teachers")
@@ -290,9 +323,13 @@ public class AttendanceController {
 	 }
 	 
 	 @PutMapping("/management/attendance/{id}")
-	 public ResponseEntity<?> updateAttendanceManagement(@PathVariable(value = "id") Long id, 
+	 public ResponseEntity<?> updateAttendanceManagement(
+			 @AuthenticationPrincipal UserPrincipal userDetails,
+			 @PathVariable(value = "id") Long id, 
 			 @RequestBody AttendanceComposite attRequest
-			 ) {
+			 ) 
+	 	{
+		 
 		 try {
 			 AttendanceManagement val = serviceManagement.updateByAttendance(attRequest.getManagement(), id);
 			 //get Activity ID
@@ -300,6 +337,19 @@ public class AttendanceController {
 			 //then Update the activity
 			 AttendanceActivity attval = serviceActivity.update(attRequest.getActivity(), val2.getAttactId());
 			 
+			 if ( val.getAtt_id().getTeacher().getTeaId() != null) {
+				
+				 Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+				 //------------------------------------
+				 saveEvent("attendancemanagement", "edit", "The Teacher with name: " + val.getAtt_id().getTeacher().getFname() + " " + val.getAtt_id().getTeacher().getLname() + " edited the Attendance Management done by the Principal ", 
+						 new Date(), u.get(), u.get().getSchool()
+				 );		
+				 
+				 saveEvent("attendanceactivity", "edit", "The Teacher with name: " + val.getAtt_id().getTeacher().getFname() + " " + val.getAtt_id().getTeacher().getLname() + " edited the Attendance Management and also sent an update into Activity feed. ", 
+						 new Date(), u.get(), u.get().getSchool()
+				 );		 
+			 }
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Attendance Management and Activity has been updated successfully.", val));
 			
 		 }
@@ -324,7 +374,9 @@ public class AttendanceController {
 	 
 	 //Teacher only
 	 @PutMapping("/{id}")
-	 public ResponseEntity<?> updateAttendance( @PathVariable(value = "id") Long id, 
+	 public ResponseEntity<?> updateAttendance( 
+			 @AuthenticationPrincipal UserPrincipal userDetails,
+			 @PathVariable(value = "id") Long id, 
 			 @RequestBody AttendanceComposite attRequest
 	 ) {
 		 try {
@@ -339,6 +391,20 @@ public class AttendanceController {
 				 serviceManagement.saveOne(attRequest.getManagement(), val);
 			 }	
 			 if (val != null) {
+				 Optional<User> u = userRepository.findById( userDetails.getId() );
+					
+				 //------------------------------------
+				 saveEvent("attendance", "edit", "The Teacher with name: " + val.getTeacher().getFname() + " " + val.getTeacher().getLname() + " edited the Attendance Values done by this Teacher ", 
+						 new Date(), u.get(), u.get().getSchool()
+				 );
+				 
+				 saveEvent("attendanceactivity", "create", "The Teacher with name: " + val.getTeacher().getFname() + " " + val.getTeacher().getLname() + "has his attendance submitted & the Activity has been submitted too. " , 
+						 new Date(), u.get(), u.get().getSchool()
+				 );
+				 
+				 saveEvent("attendancemanagement", "create", "The Teacher with name: " + val.getTeacher().getFname() + " " + val.getTeacher().getLname() + "has his attendance submitted & the Management has been submitted too. " , 
+						 new Date(), u.get(), u.get().getSchool()
+				 );
 				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Attendance has been updated successfully.", val));	
 			 }
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Attendance update was halted.", "Attendance has been taken already."));
@@ -350,12 +416,14 @@ public class AttendanceController {
 	 
 	 
 	 @PutMapping("/rowcall")
-	 public ResponseEntity<?> updateRowcall(  
+	 public ResponseEntity<?> updateRowcall( 
+			 
 			 @RequestBody List<RowcallRequest> rowcallRequest
+			
 	 ) {
 		 Long getOneAtt = rowcallRequest.get(0).getAtt_id();
 		 Rowcall rcCheck = service.findAllByRowcall(getOneAtt);
-		 if (!rcCheck.equals(null)) {
+		 if (rcCheck != null) {
 			 return ResponseEntity.status(400).body(new ApiDataResponse(true, "Attendance rowcall is already in the database", false ));
 		 }
 		 try {
@@ -374,8 +442,29 @@ public class AttendanceController {
 			 	}).collect(Collectors.toList());
 		    	
 				 List<Rowcall> rc = service.saveRowCall(rclist);
+				 
+				/* Optional<User> u = userRepository.findById( userDetails.getId() );
+					
+				 //------------------------------------
+				 saveEvent("attendance", "edit", "The Teacher with name: " + rc.get(0).getAttendance().getTeacher().getFname() + " " + rc.get(0).getAttendance().getTeacher().getLname() + " edited the Attendance Rowcall values done by this Teacher ", 
+						 new Date(), u.get(), u.get().getSchool()
+				 );*/
+				 
 				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Attendance rowcall has been updated", "Attendance rowcall size updated is " + rc.size() ));
 			 }
+		 catch (Exception ex) {
+			 ex.printStackTrace();
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	 }
+	 
+	 @GetMapping("/rowcall/{id}")
+	 public ResponseEntity<?> getRowcallAttendance(@PathVariable(value = "id") Long id) {
+		 try {
+			 Rowcall val = service.findRowcall(id);
+			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Rowcall has been retrieved successfully.", val));
+			
+		 }
 		 catch (Exception ex) {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
@@ -384,6 +473,7 @@ public class AttendanceController {
 	 //Done by Principal
 	 @PutMapping("/approve/{activity}")
 	 public ResponseEntity<?> approveAttendance(
+			 @AuthenticationPrincipal UserPrincipal userDetails,
 			 @PathVariable(value = "activity") Long attactivityId , 
 			 @RequestBody AttendanceComposite attRequest
 	 ) {
@@ -391,6 +481,17 @@ public class AttendanceController {
 						 
 			 AttendanceActivity attval = serviceActivity.update(attRequest.getActivity(), attactivityId);	
 				//update the attendance management
+			 
+			 Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+			 //------------------------------------
+			 saveEvent("attendance", "edit", "The Teacher with name: " + attval.getAtt_id().getTeacher().getFname() + " " + attval.getAtt_id().getTeacher().getLname() + "has his attendance approved & this is done by the School Principal ", 
+					 new Date(), u.get(), u.get().getSchool()
+			 );
+			 
+			 saveEvent("attendanceactivity", "edit", "The Teacher with name: " + attval.getAtt_id().getTeacher().getFname() + " " + attval.getAtt_id().getTeacher().getLname() + "has his attendance approved  by the School Principal & the Activity with ID: " + attval.getAttactId() +  " has been added", 
+					 new Date(), u.get(), u.get().getSchool()
+			 );
 			 
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Attendance activity has been approved/denied successfully.", attval));	
 		 }
@@ -413,17 +514,28 @@ public class AttendanceController {
 				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Teacher Attendance Photo has been added/updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
+			 ex.printStackTrace();
+			 System.out.println("Update Attendance "+ ex.getLocalizedMessage() );
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	 }
 	 
-	 
-	 
-	 
-	 
-	 
-	 
+	 	 
 	 //------------------------------------------------------------------------------------------------------------------
+	 private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 
+		 			 	
+		 	EventManager _event = new EventManager();
+		 	
+		 	_event.setModule(module);
+	 		_event.setAction(action);
+	 		_event.setComment(comment);
+	 		_event.setDateofevent(d);	
+	 		_event.setUser(u);
+	 		_event.setSchool(sch);
+	 		
+	 		return eventRepository.save(_event);
+	 }
+	 
 	 private Integer convertPercentage( Integer actual, Integer max ) {		 
 		 return actual == 0 ? 0 : ( (actual/max) * 100 );
 	 }

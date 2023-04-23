@@ -2,6 +2,7 @@ package basepackage.stand.standbasisprojectonev1.controller;
 
 import basepackage.stand.standbasisprojectonev1.model.RoleName;
 import basepackage.stand.standbasisprojectonev1.model.User;
+import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.payload.LoginRequest;
 import basepackage.stand.standbasisprojectonev1.payload.LoginResponse;
@@ -11,6 +12,7 @@ import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardReques
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.security.JwtTokenProvider;
 import basepackage.stand.standbasisprojectonev1.service.OnboardingService;
+import basepackage.stand.standbasisprojectonev1.service.CalendarService;
 import basepackage.stand.standbasisprojectonev1.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+
 import javax.validation.Valid;
 
 /**
@@ -52,6 +57,10 @@ public class AuthController {
     
     @Autowired
     private OnboardingService boardService;
+    
+    @Autowired
+    private CalendarService calService;
+    
     //
     @Autowired
     private UserService userService;
@@ -81,14 +90,19 @@ public class AuthController {
 		       
 		        
 		        Long realId = null;
+		        
+		        
 		       
 		        LoginResponse lgres = new LoginResponse();
 		        if ( user.getRole() == RoleName.TEACHER) {
-		        	realId = user.getUserId();
+		        	Calendar foundCal = calService.findAllByStatus( user.getSchool().getSchId() , 1).get();
 		        	
+		        	realId = user.getUserId();		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
 		        	lgres.setUsername(user.getUsername());
 		            lgres.setAccess_token(jwt);
+		            lgres.setSchool_date( new Date( foundCal.getStartdate().getTime() ).toLocaleString() );
+		            //lgres.setSchool_date( "2023-01-01" );
 		            lgres.setEmail(user.getEmail());
 		            lgres.setRole("teacher");
 		            lgres.setData_id(user.getTeacher_id());

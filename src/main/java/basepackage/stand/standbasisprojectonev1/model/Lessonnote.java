@@ -14,6 +14,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.data.annotation.Transient;
+
 import basepackage.stand.standbasisprojectonev1.model.audit.DateAudit;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,9 +48,7 @@ public class Lessonnote extends DateAudit{
     
     private Integer classwork, homework, test, midterm, finalexam; // 1 - yes, 0 - no
     
-    private Integer grammar; // Grammar by principal only
-    
-    private Integer arrangement; // Arrangement by principal only
+    private Integer delaythis; //use this to control those weeks that have issues
     
     @NotNull
     private String _file; 
@@ -90,6 +90,13 @@ public class Lessonnote extends DateAudit{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_id", nullable = false)
     private Calendar calendar;
+    
+    @Transient
+    public String getLsnPath() {
+        if (_file == null) return null;
+         
+        return "/teacher-lessonnote/" + lessonnoteId + "/" + _file;
+    }
 }
 
 /**
