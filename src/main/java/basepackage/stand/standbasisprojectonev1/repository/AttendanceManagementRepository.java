@@ -90,6 +90,7 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	    		+ "AND (att.timetable.class_stream = :cls OR :cls is null) "
 	    		+ "AND (att.timetable.teacher = :tea OR :tea is null) "
 	    		+ "AND (att.timetable.calendar = :cal OR :cal is null) "
+	    		+ "AND (att.done = :done OR :done is null) "
 	    		+ "AND (att._date >= :datefrom OR :datefrom is null) "
 	    		+ "AND (att._date <= :dateto OR :dateto is null) "
 	    	   )
@@ -99,6 +100,7 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	    		@Param("cls") ClassStream cls, 
 	    		@Param("tea") Teacher tea,
 	    		@Param("cal") Calendar cal,
+	    		@Param("done") Integer done,
 	    		@Param("datefrom") Timestamp datefrom,
 	    		@Param("dateto") Timestamp dateto,
 	    		Pageable pg
@@ -112,6 +114,7 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	     		+ "AND (att.timetable.class_stream = :cls OR :cls is null) "
 	     		+ "AND (att.timetable.teacher = :tea OR :tea is null) "
 	     		+ "AND (att.timetable.calendar = :cal OR :cal is null) "
+	     		+ "AND (att.done = :done OR :done is null) "
 	     		+ "AND (att._date >= :datefrom OR :datefrom is null) "
 	     		+ "AND (att._date <= :dateto OR :dateto is null) "
 	     		+ "OR att._desc like :filter "
@@ -123,6 +126,7 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	     		@Param("cls") ClassStream cls, 
 	     		@Param("tea") Teacher tea, 
 	     		@Param("cal") Calendar cal,
+	     		@Param("done") Integer done,
 	     		@Param("datefrom") Timestamp datefrom,
 	     		@Param("dateto") Timestamp dateto,
 	     		Pageable pg

@@ -3,11 +3,15 @@ package basepackage.stand.standbasisprojectonev1.scheduler;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,11 +107,23 @@ public class MyScheduler {
 		    
 		 //Get Timetable data for this day with Current calendar
 	    List<TimeTable> tt = timeRepository.findByActiveCalendar(1);
+	    
+	  //  Predicate<TimeTable> distinctByKeysFor = distinctByKeys( t -> t.getSubject() , t -> t.getSubject() );
+	    List<TimeTable> ttnew = tt.stream()
+	            .collect(Collectors.toMap(
+	                    obj -> Arrays.asList(obj.getSubject(), obj.getTeacher()),  // Composite key
+	                    Function.identity(),  // Keep the original object
+	                    (obj1, obj2) -> obj1  // Merge function (in case of duplicate keys)
+	            ))
+	            .values()
+	            .stream()
+	            .collect(Collectors.toList());
+	    
         
-	    for (TimeTable it : tt) {	    	
+	    for (TimeTable it : ttnew) {	    	
 	    	
 	    	if ( it.getCalendar().getEnddate().compareTo( parseTimestamp(todayDate()) ) > 0 ) {
-		    	
+		    	System.out.println("Calendar Timetable ID >> " + it.getTimeId() );
 	    		// Today' date - Start date
 	    		long diff = parseTimestamp(todayDate()).getTime() - it.getCalendar().getStartdate().getTime();
 	    		int weeks = (int) ( diff / (7 * 24 * 60 * 60 * 1000 ) ) + 1 ;
@@ -129,6 +145,7 @@ public class MyScheduler {
 	    //
 	    System.out.println("Insert Lessonnotes with Cron job");
     }
+	
 	
 	 private String todayDate() {
 			Date d = new Date();

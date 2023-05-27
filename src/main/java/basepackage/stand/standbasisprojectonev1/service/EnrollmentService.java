@@ -46,7 +46,7 @@ public class EnrollmentService {
     private EnrollmentRepository enrollRepository;
 	
 	@Autowired		
-    private CalendarRepository attRepository;
+    private CalendarRepository calRepository;
 	
 	@Autowired		
     private StudentRepository stuRepository;
@@ -84,6 +84,16 @@ public class EnrollmentService {
 		List<Enrollment> enc = enrollRepository.findByClassId(id);
 		
 		return enc;
+	}
+	
+	public List<Enrollment> getEnrollmentsByCalendar(Long cal){
+		Optional<Calendar> existing = calRepository.findById(cal);
+		if (existing.isPresent()) {
+			List<Enrollment> enc = enrollRepository.findByCalendar(existing.get());
+			
+			return enc;
+		}
+		return null;		
 	}
 	
 	public Map<String, Object> getPaginatedEnrollments(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval) {
@@ -177,7 +187,7 @@ public class EnrollmentService {
 				enrollval.setClassstream(existingClass.get());
 			}
 			if (enrollRequest.getCalendar() != null) {
-				Optional<Calendar> existingCalendar = attRepository.findById(enrollRequest.getCalendar());
+				Optional<Calendar> existingCalendar = calRepository.findById(enrollRequest.getCalendar());
 				enrollval.setCalendar(existingCalendar.get());
 			}
 			if (enrollRequest.getStatus() != null) {

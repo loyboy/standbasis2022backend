@@ -118,7 +118,7 @@ public class AttendanceManagementService {
 			return null;
 	}
 	
-	public Map<String, Object> getPaginatedTeacherAttendances(int page, int size, String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Long> classId, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto ) {
+	public Map<String, Object> getPaginatedTeacherAttendances(int page, int size, String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Long> classId, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Integer> done,  Optional<Timestamp> datefrom, Optional<Timestamp> dateto ) {
         validatePageNumberAndSize(page, size);
         
         Long schgroup = schgroupId.orElse(null);
@@ -126,6 +126,7 @@ public class AttendanceManagementService {
         Long classowner = classId.orElse(null);
         Long teacherowner = teacherId.orElse(null);
         Long calendarowner = calendarId.orElse(null);
+        Integer doneval = done.orElse(null);
         
         // Retrieve Attendances
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
@@ -153,6 +154,7 @@ public class AttendanceManagementService {
                 				classownerobj == null ? null : classownerobj.get(), 
                 				teacherownerobj == null ? null : teacherownerobj.get(),
                 				calendarownerobj == null ? null : calendarownerobj.get(),
+                				doneval == null ? null : doneval,
                 				datefrom.isEmpty() ? null : datefrom.get(),
                 				dateto.isEmpty() ? null : dateto.get(),       				
                 				pageable
@@ -183,6 +185,7 @@ public class AttendanceManagementService {
                 		classownerobj == null ? null : classownerobj.get(), 
                 		teacherownerobj == null ? null : teacherownerobj.get(),
                 		calendarownerobj == null ? null : calendarownerobj.get(),
+                		doneval == null ? null : doneval,
                 		datefrom.isEmpty() ? null : datefrom.get(),
                 		dateto.isEmpty() ? null : dateto.get(), 
         				pageable

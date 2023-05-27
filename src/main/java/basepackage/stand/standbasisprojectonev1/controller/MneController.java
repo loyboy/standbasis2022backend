@@ -1,0 +1,227 @@
+package basepackage.stand.standbasisprojectonev1.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.sql.Timestamp;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import basepackage.stand.standbasisprojectonev1.model.Calendar;
+import basepackage.stand.standbasisprojectonev1.model.ClassStream;
+import basepackage.stand.standbasisprojectonev1.model.Enrollment;
+import basepackage.stand.standbasisprojectonev1.model.EvaluationValues;
+import basepackage.stand.standbasisprojectonev1.model.Rowcall;
+import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
+import basepackage.stand.standbasisprojectonev1.model.Student;
+import basepackage.stand.standbasisprojectonev1.model.Subject;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
+import basepackage.stand.standbasisprojectonev1.model.TimeTable;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.TimetableRequest;
+import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
+import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
+import basepackage.stand.standbasisprojectonev1.service.CalendarService;
+import basepackage.stand.standbasisprojectonev1.service.ClassService;
+import basepackage.stand.standbasisprojectonev1.service.EnrollmentService;
+import basepackage.stand.standbasisprojectonev1.service.StudentService;
+import basepackage.stand.standbasisprojectonev1.service.SubjectService;
+import basepackage.stand.standbasisprojectonev1.service.TeacherService;
+import basepackage.stand.standbasisprojectonev1.service.TimetableService;
+
+@RestController
+@RequestMapping("/api/mne")
+public class MneController {
+	 
+	 @Autowired
+	 StudentService studentservice;
+	 
+	 @Autowired
+	 TimetableService timetableservice;
+	 
+	 @Autowired
+	 EnrollmentService enrolservice;
+	 
+	 @Autowired
+	 TeacherService teacherservice;
+	 
+	 @Autowired
+	 ClassService classservice;
+	 
+	 @Autowired
+	 SubjectService subjectservice;
+	 
+	 @Autowired
+	 CalendarService calendarservice;
+	 
+	 @Autowired
+	 private AttendanceRepository attRepository;
+	 
+	 @GetMapping("/attendance/students")
+	 public ResponseEntity<?> getStudentAttendance(
+			 @RequestParam(value = "enrol") Long enrolId,
+			 @RequestParam(value = "calendar") Long calendar,
+			 @RequestParam(value = "week") Integer week
+			 ) {		
+		 
+		// Map<String, Object> response = service.getPaginatedCalendars( page, size, query, school );
+		// return new ResponseEntity<>(response, HttpStatus.OK);
+		 
+		 Calendar calobj = calendarservice.findCalendar(calendar);
+		 Enrollment enrolobj = enrolservice.findEnrollment(enrolId);
+		 LocalDate stDate = calobj.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+		 LocalDate endDate = calobj.getEnddate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+		 
+		 List<LocalDate> weekrange = getWeekdayRange(week, stDate, endDate);
+		 
+		 System.out.println("weekrange object: " + stDate.toString() + "  --- " + endDate.toString() );
+		 
+		 LocalDateTime localDateTime1 = weekrange.get(0).atStartOfDay();
+		 LocalDateTime localDateTime2 = weekrange.get(4).atStartOfDay();
+
+	     Timestamp timestampWeekStart = Timestamp.valueOf(localDateTime1);
+	     Timestamp timestampWeekEnd = Timestamp.valueOf(localDateTime2);
+	     
+	     System.out.println("Starttimestamp: " + timestampWeekStart );
+	     System.out.println("endtimestamp: " + timestampWeekEnd );
+	     
+	     System.out.println("myrowcall precall: " + enrolobj.getStudent().getPupId() + " --- " + calendar );
+	     
+	     List<Rowcall> myrowcall = attRepository.findByStudentMne(enrolobj.getStudent().getPupId(), calendar, timestampWeekStart, timestampWeekEnd);
+	     
+	     System.out.println("myrowcall: " + myrowcall.toString() );
+	     
+	     List<TimeTable> pupilclasses = timetableservice.findClassOffered(enrolobj.getClassstream().getClsId(), calendar);
+	     
+	     System.out.println("pupilclasses: " + pupilclasses.toString() );
+	     
+	     List< Map<String, Object> > mnecolumndata = new ArrayList<>();
+	     List< Map<String, Object> > mnecolumn = new ArrayList<>();
+		 
+	     Map<String, Object> objectmnecolumn = new HashMap<>();
+	     objectmnecolumn.put("key", "student_name");
+	     objectmnecolumn.put("label", "Student Name XX");
+	     objectmnecolumn.put("sortable", true);
+	     
+	     mnecolumn.add( objectmnecolumn );
+	     
+	     Map<String, Object> objectmnecolumn2 = new HashMap<>();
+	     objectmnecolumn2.put("key", "performance");
+	     objectmnecolumn2.put("label", "Performance");
+	     objectmnecolumn2.put("sortable", true);
+	     
+	     mnecolumn.add( objectmnecolumn2 );
+	     
+	     Map<String, Object> objectmnecolumndata = new HashMap<>();
+	     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );
+	     
+	     int j = 1;
+	     
+	     Set<String> subjectNamesSet = new HashSet<>();
+
+	     for (TimeTable timetable : pupilclasses) {
+	         Subject subject = timetable.getSubject();
+	         if (subject != null) {
+	             String subjectName = subject.getName();
+	             subjectNamesSet.add(subjectName);
+	         }
+	     }
+	     
+	     List<Integer> allAverage = new ArrayList<>();
+	     
+	     String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
+	     for (String sub : subjectNamesArray) {	    	
+		     
+		     List<Rowcall> rwcallOne = myrowcall.stream().filter(rw -> rw.getAttendance().getTimetable().getSubject().getName().equals(sub) ).collect(Collectors.toList());
+		       
+		     if (rwcallOne.size() > 0) {
+		    	 int perf = 0;
+		    	 List<Rowcall> rwcallPresent = rwcallOne.stream().filter(rw -> rw.getStatus() == 1 ).collect(Collectors.toList());
+		    	 
+		    	 if (rwcallPresent.size() > 0) {
+		    		 perf = ( rwcallPresent.size()/myrowcall.size() ) * 100;
+		    	 }	    	
+		    	 
+			     
+			     Map<String, Object> objectmnecolumntemp = new HashMap<>();
+		    	 objectmnecolumntemp.put("key", "d"+j);
+		    	 objectmnecolumntemp.put("label", sub );
+		    	 objectmnecolumntemp.put("sortable", true);
+		    	 
+			     mnecolumn.add( objectmnecolumntemp );
+			     
+			     System.out.println("pupilclass chose: " + sub );
+			     
+			     allAverage.add(perf);
+			     
+			     objectmnecolumndata.put("d"+j, perf  );		     
+			     
+			     j++;
+		     }
+		     
+		 }
+	     
+	     double averagePerf = allAverage.stream()
+	                .mapToInt(Integer::intValue)
+	                .average()
+	                .orElse(0.0);
+	     
+	     objectmnecolumndata.put("performance", averagePerf);
+	     mnecolumndata.add( objectmnecolumndata ); 
+	     
+	     Map<String, Object> response = new HashMap<>();
+			
+		 response.put("mnecolumn", mnecolumn);
+		 response.put("mnecolumndata", mnecolumndata);
+	     
+		 return new ResponseEntity<>(response, HttpStatus.OK);		
+	 }
+	 
+	 private List<LocalDate> getWeekdayRange(int weekNumber, LocalDate startDate, LocalDate endDate) {
+	        
+		 	List<LocalDate> weekdayRange = new ArrayList<>();
+	        
+	        // Find the first Monday of the given week
+	        LocalDate firstMonday = startDate.with(DayOfWeek.MONDAY);
+	        
+	        // Calculate the start date of the specified week
+	        LocalDate weekStartDate = firstMonday.plusWeeks(weekNumber);
+	        
+	        // Calculate the end date of the specified week (Friday)
+	        LocalDate weekEndDate = weekStartDate.plusDays(4);
+	        
+	        // Ensure the calculated week falls within the given date range
+	        if (weekStartDate.isBefore(startDate)) {
+	            weekStartDate = startDate;
+	        }
+	        
+	        if (weekEndDate.isAfter(endDate)) {
+	            weekEndDate = endDate;
+	        }
+	        
+	        // Add each weekday (Monday to Friday) to the weekdayRange list
+	        LocalDate currentDay = weekStartDate;
+	        while (!currentDay.isAfter(weekEndDate)) {
+	            weekdayRange.add(currentDay);
+	            currentDay = currentDay.plusDays(1);
+	        }
+	        
+	        System.out.println("weekrange--- : " + weekdayRange );
+	        
+	        return weekdayRange;
+	    }
+}

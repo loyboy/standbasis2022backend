@@ -75,6 +75,15 @@ public class EnrollmentController {
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 
+	 @GetMapping("/calendar")
+	 public ResponseEntity<?> getEnrollmentsByCalendar(
+			 @RequestParam(value = "calendar") Long calendar			 
+			 ) {
+		 
+		 List<Enrollment> list = service.getEnrollmentsByCalendar( calendar );
+		 return ResponseEntity.ok().body(new ApiContentResponse<Enrollment>(true, "List of Enrollments by Calendar gotten successfully.", list));	        
+	 }
+	 
 	 @GetMapping("/{id}")
 	 public ResponseEntity<?> getEnrollment(@PathVariable(value = "id") Long id) {
 		 try {

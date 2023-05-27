@@ -1,5 +1,6 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,6 @@ import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
 import basepackage.stand.standbasisprojectonev1.service.CalendarService;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
@@ -130,5 +130,40 @@ public class CalendarController {
 	 		
 	 		return eventRepository.save(_event);
 	 }
+	 
+	 // List<LocalDate> weekdayRange = getWeekdayRange(weekNumber, startDate, endDate);
+     
+/*
+	 private List<LocalDate> getWeekdayRange(int weekNumber, LocalDate startDate, LocalDate endDate) {
+	        List<LocalDate> weekdayRange = new ArrayList<>();
+	        
+	        // Find the first Monday of the given week
+	        LocalDate firstMonday = startDate.with(DayOfWeek.MONDAY);
+	        
+	        // Calculate the start date of the specified week
+	        LocalDate weekStartDate = firstMonday.plusWeeks(weekNumber - 1);
+	        
+	        // Calculate the end date of the specified week (Friday)
+	        LocalDate weekEndDate = weekStartDate.plusDays(4);
+	        
+	        // Ensure the calculated week falls within the given date range
+	        if (weekStartDate.isBefore(startDate)) {
+	            weekStartDate = startDate;
+	        }
+	        
+	        if (weekEndDate.isAfter(endDate)) {
+	            weekEndDate = endDate;
+	        }
+	        
+	        // Add each weekday (Monday to Friday) to the weekdayRange list
+	        LocalDate currentDay = weekStartDate;
+	        while (!currentDay.isAfter(weekEndDate)) {
+	            weekdayRange.add(currentDay);
+	            currentDay = currentDay.plusDays(1);
+	        }
+	        
+	        return weekdayRange;
+	    }
+	*/
 	 
 }

@@ -86,6 +86,19 @@ public class TimetableService {
 		
 	}
 	
+public List<TimeTable> findClassOffered(Long classstream, Long cal) {
+		
+		Optional<ClassStream> clsobj = clsRepository.findById(classstream);
+		Optional<Calendar> calobj = calRepository.findById(cal);
+		if ( clsobj.isPresent() && calobj.isPresent()) {
+			ClassStream clsval = clsobj.get();
+			Calendar calval = calobj.get();
+			return timeRepository.findClassOffered(clsval, calval);
+		}
+		return null;
+		
+	}
+	
 	public List<TimeTable> findAll() {
 		
 		return timeRepository.findAll();

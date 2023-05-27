@@ -261,5 +261,20 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		@Param("dateto") Timestamp dateto,
     		Pageable pg
     	);
-
+    
+    //MNE details here
+    
+    @Query("select rw from Rowcall rw "
+    		+ "JOIN Attendance att ON att = rw.attendance " 
+    		+ "WHERE (att.timetable.calendar.CalendarId = :cal OR :cal is null) "
+    		+ "AND (rw.student.pupId = :pup OR :pup is null) "
+    		+ "AND ( DATE(att._date) >= :datefrom OR :datefrom is null) "
+    		+ "AND ( DATE(att._date) <= :dateto OR :dateto is null) "
+       	 )    
+    List<Rowcall> findByStudentMne(    		
+    		@Param("pup") Long pup,
+    		@Param("cal") Long cal,
+    		@Param("datefrom") Timestamp datefrom,
+    		@Param("dateto") Timestamp dateto
+    	);
 }

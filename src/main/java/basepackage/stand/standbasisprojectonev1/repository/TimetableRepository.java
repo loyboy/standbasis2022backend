@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
+import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
@@ -32,6 +33,11 @@ public interface TimetableRepository extends JpaRepository<TimeTable, Long> {
     		+ "where tt.teacher = :tea " 
             + "or tt.calendar = :cal ")
     List<TimeTable> findByClassTaught(@Param("tea") Teacher tea, @Param("cal") Calendar cal);
+    
+    @Query("select tt from TimeTable tt "
+    		+ "where tt.class_stream = :cls " 
+            + "and tt.calendar = :cal ")
+    List<TimeTable> findClassOffered(@Param("cls") ClassStream cls, @Param("cal") Calendar cal);
     
     @Query("select tt from TimeTable tt WHERE tt.calendar.status = :status ")
     List<TimeTable> findByActiveCalendar(@Param("status") Integer status );

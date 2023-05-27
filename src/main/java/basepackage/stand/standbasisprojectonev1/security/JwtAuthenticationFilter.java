@@ -523,7 +523,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
                 
                 
-                
+                           
                 
                 /*
                     Note that you could also encode the user's username and roles inside JWT claims

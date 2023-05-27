@@ -85,14 +85,10 @@ public class AuthController {
 		        User user = userRepository.findByUsername( loginRequest.getUsername() )
 		                .orElseThrow(() ->
 		                        new UsernameNotFoundException("User not found with username  : " +  loginRequest.getUsername() )
-		        );
+		        );        
+		      
+		        Long realId = null;	        
 		        
-		       
-		        
-		        Long realId = null;
-		        
-		        
-		       
 		        LoginResponse lgres = new LoginResponse();
 		        if ( user.getRole() == RoleName.TEACHER) {
 		        	Calendar foundCal = calService.findAllByStatus( user.getSchool().getSchId() , 1).get();
@@ -102,6 +98,7 @@ public class AuthController {
 		        	lgres.setUsername(user.getUsername());
 		            lgres.setAccess_token(jwt);
 		            lgres.setSchool_date( new Date( foundCal.getStartdate().getTime() ).toLocaleString() );
+		            
 		            //lgres.setSchool_date( "2023-01-01" );
 		            lgres.setEmail(user.getEmail());
 		            lgres.setRole("teacher");
@@ -136,7 +133,7 @@ public class AuthController {
 		        }
 		        
 		        if ( user.getRole() == RoleName.SUPERADMIN) {
-		        	realId = user.getUserId();//xxxx
+		        	realId = user.getUserId();//xxxx  bbbb
 		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
 		        	lgres.setUsername(user.getUsername());
@@ -145,11 +142,23 @@ public class AuthController {
 		            lgres.setRole("admin");
 		            lgres.setData_id(null);
 		            lgres.setId(realId);
-		        }                 
+		        }   
+		        
+		        if ( user.getRole() == RoleName.EVALUATOR) {
+		        	realId = user.getUserId();//xxxx
+		        	
+		        	lgres.setPermissions(null);
+		        	lgres.setUsername(user.getUsername());
+		            lgres.setAccess_token(jwt);
+		            lgres.setEmail(user.getEmail());
+		            lgres.setSchool_id( user.getSchool().getSchId() );
+		            lgres.setRole("evaluator");
+		            lgres.setData_id(null);
+		            lgres.setId(realId);
+		        }   
 		        
 		        System.out.println( " Ending >> " + lgres.getId() );
-		        return ResponseEntity.ok().body(lgres);
-        
+		        return ResponseEntity.ok().body(lgres);        
         }
         catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Login has failed due to invalid user credentials."));

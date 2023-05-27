@@ -94,6 +94,25 @@ public class AttendanceController {
 		 return ResponseEntity.ok().body(new ApiContentResponse<Attendance>(true, "List of Attendances gotten successfully.", list));		
 	 }	
 	 
+	 @GetMapping("/paginateAttendanceManagement")
+	 public ResponseEntity<?> getPaginatedAttendancesManagement(@RequestParam(value = "page", 
+	 		 defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+			 @RequestParam(value = "q", required=false) String query,
+			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
+			 @RequestParam(value = "school", required=false) Optional<Long> school,
+			 @RequestParam(value = "class", required=false) Optional<Long> classid,
+			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
+			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher, //
+			 @RequestParam(value = "attendancedone", required=false) Optional<Integer> done,
+			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
+			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
+			 ) {
+		 
+			 Map<String, Object> response = serviceManagement.getPaginatedTeacherAttendances ( page, size, query, schoolgroup, school, classid, calendar, teacher, done, datefrom, dateto  );
+			 return new ResponseEntity<>(response, HttpStatus.OK);
+	 }
+	 
 	 @GetMapping("/paginateAttendanceActivity")
 	 public ResponseEntity<?> getPaginatedAttendancesActivity(@RequestParam(value = "page", 
 	 		 defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
@@ -189,6 +208,8 @@ public class AttendanceController {
 		 Map<String, Object> response = service.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, subject, datefrom, dateto  );
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
+	 
+	 
 	 
 	 @SuppressWarnings("unchecked")
 	@GetMapping("/mneTeachers")

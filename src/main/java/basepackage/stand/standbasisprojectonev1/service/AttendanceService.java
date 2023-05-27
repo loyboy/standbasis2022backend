@@ -625,7 +625,10 @@ public class AttendanceService {
 				return null;
 			}
 			attval.set_date( new Date() );
-			CommonActivity.copyNonNullProperties(attRequest, attval);
+			System.out.println("Done value: " + attRequest.getDone() + " Att value: " + attval.getAttId() );
+			attval.setDone(attRequest.getDone());
+			attval.setPeriod(attRequest.getPeriod());
+			//CommonActivity.copyNonNullProperties(attRequest, attval);
 			return attRepository.save(attval);
 		}  
 		return null;

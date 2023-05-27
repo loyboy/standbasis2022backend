@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
@@ -30,6 +32,12 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
             + "WHERE cs.class_index = :index AND cs.status = 1 AND e.status = 1 "            
        	  )
     	List<Enrollment> findByClassIndex( @Param("index") Integer classIndex );
+    	
+    	@Query("select e from Enrollment e " 
+                + "JOIN Calendar cs ON cs = e.calendar " 
+                + "WHERE cs = :cal AND cs.status = 1 AND e.status = 1 "            
+           	  )
+        List<Enrollment> findByCalendar( @Param("cal") Calendar cal );
     
     	@Query("select e from Enrollment e " 
             + "JOIN ClassStream cs ON cs = e.classstream " 
