@@ -160,9 +160,9 @@
 			<id>spring-releases</id>
 			<name>Spring Releases</name>
 			<url>https://repo.spring.io/release</url>
-			<snapshot>
+			<snapshots>
 				<enabled>false</enabled>
-			</snapshot>
+			</snapshots>
 		</repository>
 	</repositories>
 	
