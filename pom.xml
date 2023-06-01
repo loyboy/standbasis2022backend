@@ -160,19 +160,19 @@
 			<id>spring-releases</id>
 			<name>Spring Releases</name>
 			<url>https://repo.spring.io/release</url>
-			<snapshots>
+			<snapshot>
 				<enabled>false</enabled>
-			</snapshots>
+			</snapshot>
 		</repository>
 	</repositories>
 	
-	<pluginRepositories>
+	<!--<pluginRepositories>
 		<pluginRepository>
 			<id>snapshots</id>
 			<name>Nexus Local</name>
 			<url>https://repo.spring.io/release</url>
 		</pluginRepository>
-	</pluginRepositories>
+	</pluginRepositories>-->
 
 	<profiles>
 		<profile>
