@@ -173,7 +173,7 @@
 		</repository>
 	</repositories>
 	
-	<pluginRepositories>
+	<!--<pluginRepositories>
 		<pluginRepository>
 			<id>spring-releases</id>
 			<name>Spring Releases</name>
@@ -182,7 +182,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
-	</pluginRepositories>
+	</pluginRepositories>-->
 
 	<profiles>
 		<profile>
