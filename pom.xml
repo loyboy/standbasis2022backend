@@ -138,7 +138,6 @@
 				<version>${spring-native.version}</version>
 				<executions>
 					<execution>
-						<?m2e ignore?>
 						<id>test-generate</id>
 						<goals>
 							<goal>test-generate</goal>
@@ -164,15 +163,34 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/libs-milestone-local</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 	</repositories>
 	
-	<!--<pluginRepositories>
+	<pluginRepositories>
 		<pluginRepository>
-			<id>snapshots</id>
-			<name>Nexus Local</name>
+			<id>spring-releases</id>
+			<name>Spring Releases</name>
 			<url>https://repo.spring.io/release</url>
+			 <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
 		</pluginRepository>
-	</pluginRepositories>-->
+		<pluginRepository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/libs-milestone-local</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+	</pluginRepositories>
 
 	<profiles>
 		<profile>
