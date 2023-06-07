@@ -214,8 +214,8 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		+ "(:score is null) "
     		+ " ) "
     		+ "AND (assess._type = :type OR :type is null) "
-    		+ "AND (lsn.submission >= :datefrom OR :datefrom is null) "
-    		+ "AND (lsn.submission <= :dateto OR :dateto is null) "
+    		+ "AND ( DATE(lsn.submission) >= :datefrom OR :datefrom is null) "
+    		+ "AND ( DATE(lsn.submission) <= :dateto OR :dateto is null) "
        	 )
     
     Page<Assessment> findByStudentSchoolgroupPage(
@@ -275,8 +275,8 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		+ "(:score is null) "
     		+ " ) "
     		+ "AND (assess._type = :type OR :type is null) "
-    		+ "AND (lsn.submission >= :datefrom OR :datefrom is null) "
-    		+ "AND (lsn.submission <= :dateto OR :dateto is null) "
+    		+ "AND ( DATE(lsn.submission) >= :datefrom OR :datefrom is null) "
+    		+ "AND ( DATE(lsn.submission) <= :dateto OR :dateto is null) "
     		+ "OR lsn.title like :filter "
        	 )
     

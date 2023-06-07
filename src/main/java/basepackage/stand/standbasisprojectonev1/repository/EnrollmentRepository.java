@@ -29,9 +29,15 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     	
     	@Query("select e from Enrollment e " 
             + "JOIN ClassStream cs ON cs = e.classstream " 
-            + "WHERE cs.class_index = :index AND cs.status = 1 AND e.status = 1 "            
+            + "WHERE cs.class_index = :index AND cs.status = 1 AND e.status = 1 AND e.calendar.school = :sch "            
        	  )
-    	List<Enrollment> findByClassIndex( @Param("index") Integer classIndex );
+    	List<Enrollment> findByClassIndex( @Param("index") Integer classIndex, @Param("sch") School sch );
+    	
+    	@Query( " select e from Enrollment e "                
+                + "WHERE e.calendar.school = :sch AND "
+                + "e.calendar = :cal"
+           	  )
+        List<Enrollment> findBySchool( @Param("sch") School sch, @Param("cal") Calendar cal );
     	
     	@Query("select e from Enrollment e " 
                 + "JOIN Calendar cs ON cs = e.calendar " 

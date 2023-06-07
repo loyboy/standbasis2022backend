@@ -4,11 +4,14 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import basepackage.stand.standbasisprojectonev1.model.Assessment;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteManagement;
@@ -32,6 +35,82 @@ public interface LessonnoteManagementRepository extends JpaRepository<Lessonnote
 	    		+ "AND lsn.title like :filter "
 	       	 )
 		List<LessonnoteManagement> filterAll( @Param("filter") String filter );
+		
+		@Query("select lsnmanage from LessonnoteManagement lsnmanage "
+				+ "JOIN Lessonnote lsn ON lsn = lsnmanage.lsn_id "
+	    		+ "AND lsn.title like :filter "
+	       	 )
+		Page<LessonnoteManagement> filter( @Param("filter") String filter, Pageable pg); 
+		
+		@Query(
+				 "select lsnmanage from LessonnoteManagement lsnmanage "
+					+ "JOIN Lessonnote lsn ON lsn = lsnmanage.lsn_id "
+					+ "where lsn.calendar.school.owner = :owner "
+		    		+ "AND (lsn.calendar.school = :sch OR :sch is null) "
+		    		+ "AND (lsn.class_index = :cls OR :cls is null) "
+		    		+ "AND (lsn.subject = :sub OR :sub is null) "
+		    		+ "AND (lsn.week = :week OR :week is null) "
+		    		+ "AND (lsn.teacher = :tea OR :tea is null) "
+		    		+ "AND (lsn.calendar = :cal OR :cal is null) "
+		    		+ "AND ( (lsn.submission is null AND :status = 'queued') OR "
+		    		+ "(lsn.submission != null AND lsn.approval = null AND :status = 'submitted') OR "
+		    		+ "(lsn.resubmission != null AND :status = 're-submitted') OR "
+		    		+ "(lsn.revert != null AND :status = 'revert') OR "
+		    		+ "(lsn.approval != null AND :status = 'approved') OR "
+		    		+ "(:status is null) "
+		    		+ " ) "
+		    		+ "AND ( DATE(lsn.submission) >= :datefrom OR :datefrom is null) "
+		    		+ "AND ( DATE(lsn.submission) <= :dateto OR :dateto is null) "
+		    	   )
+		    Page<LessonnoteManagement> findByTeacherSchoolgroupPage( 
+		    		@Param("owner") SchoolGroup owner, 
+		    		@Param("sch") School sch, 
+		    		@Param("cls") Integer cls, 
+		    		@Param("week") Integer week, 
+		    		@Param("tea") Teacher tea,
+		    		@Param("sub") Subject sub,
+		    		@Param("status") String status,
+		    		@Param("cal") Calendar cal,
+		    		@Param("datefrom") Timestamp datefrom,
+		    		@Param("dateto") Timestamp dateto,
+		    		Pageable pg
+		    );
+		 
+		 @Query(
+				 "select lsnmanage from LessonnoteManagement lsnmanage "
+					+ "JOIN Lessonnote lsn ON lsn = lsnmanage.lsn_id "
+					+ "where lsn.calendar.school.owner = :owner "
+		    		+ "AND (lsn.calendar.school = :sch OR :sch is null) "
+		    		+ "AND (lsn.class_index = :cls OR :cls is null) "
+		    		+ "AND (lsn.subject = :sub OR :sub is null) "
+		    		+ "AND (lsn.week = :week OR :week is null) "
+		    		+ "AND (lsn.teacher = :tea OR :tea is null) "
+		    		+ "AND (lsn.calendar = :cal OR :cal is null) "
+		    		+ "AND ( (lsn.submission is null AND :status = 'queued') OR "
+		    		+ "(lsn.submission != null AND lsn.approval = null AND :status = 'submitted') OR "
+		    		+ "(lsn.resubmission != null AND :status = 're-submitted') OR "
+		    		+ "(lsn.revert != null AND :status = 'revert') OR "
+		    		+ "(lsn.approval != null AND :status = 'approved') OR "
+		    		+ "(:status is null) "
+		    		+ " ) "
+		    		+ "AND ( DATE(lsn.submission) >= :datefrom OR :datefrom is null) "
+		    		+ "AND ( DATE(lsn.submission) <= :dateto OR :dateto is null) "
+		    		+ "OR lsn.title like :filter "
+		    	   )
+		    Page<LessonnoteManagement> findFilterByTeacherSchoolgroupPage( 
+		    		@Param("filter") String filter,
+		    		@Param("owner") SchoolGroup owner, 
+		    		@Param("sch") School sch, 
+		    		@Param("cls") Integer cls, 
+		    		@Param("week") Integer week, 
+		    		@Param("tea") Teacher tea,
+		    		@Param("sub") Subject sub,
+		    		@Param("status") String status,
+		    		@Param("cal") Calendar cal,
+		    		@Param("datefrom") Timestamp datefrom,
+		    		@Param("dateto") Timestamp dateto,
+		    		Pageable pg
+		    );
 	
 		@Query("select lsnmanage from LessonnoteManagement lsnmanage "
 				+ "JOIN Lessonnote lsn ON lsn = lsnmanage.lsn_id "

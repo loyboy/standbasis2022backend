@@ -277,4 +277,17 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		@Param("datefrom") Timestamp datefrom,
     		@Param("dateto") Timestamp dateto
     	);
+    
+    @Query("select att from Attendance att "
+    		+ "WHERE (att.timetable.calendar.CalendarId = :cal OR :cal is null) "
+    		+ "AND (att.teacher.teaId = :tea OR :tea is null) "
+    		+ "AND ( DATE(att._date) >= :datefrom OR :datefrom is null) "
+    		+ "AND ( DATE(att._date) <= :dateto OR :dateto is null) "
+       	 )    
+    List<Attendance> findByTeacherMne(    		
+    		@Param("tea") Long tea,
+    		@Param("cal") Long cal,
+    		@Param("datefrom") Timestamp datefrom,
+    		@Param("dateto") Timestamp dateto
+    	);
 }

@@ -9,6 +9,10 @@ import java.util.Map;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
@@ -113,6 +117,111 @@ public class LessonnoteManagementService {
 		} 
 		return null;
 	}
+	
+	public Map<String, Object> getPaginatedTeacherLessonnotes(int page, int size, String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Integer> classId,  Optional<Integer> week, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Long> subjectId, Optional<String> status,  Optional<Timestamp> datefrom, Optional<Timestamp> dateto ) {
+		CommonActivity.validatePageNumberAndSize(page, size);
+        
+        Long schgroup = schgroupId.orElse(null);
+        Long schowner = schId.orElse(null);
+        Integer classowner = classId.orElse(null);
+        Integer weeknow = week.orElse(null);
+        String statusnow = status.orElse(null);
+        Long subjectowner = subjectId.orElse(null);
+        Long teacherowner = teacherId.orElse(null);
+        Long calendarowner = calendarId.orElse(null);
+        
+        // Retrieve Lessonnotes
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
+        Page<LessonnoteManagement> Lessonnotes = null;
+        
+        if ( query == null || query.equals("") ) {
+        	if ( schgroup == null ) {
+        		Lessonnotes = lsnmanageRepository.findAll(pageable);
+        	}
+        	else {
+        		Optional<SchoolGroup> schgroupobj = groupRepository.findById( schgroup );
+        		Optional<School> schownerobj = null;
+        		
+        		Optional<Teacher> teacherownerobj = null;
+        		Optional<Calendar> calendarownerobj = null;
+        		Optional<Subject> subjectownerobj = null;
+        		
+        		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
+        		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
+        		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
+        		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  } 
+        		
+        		Lessonnotes = lsnmanageRepository.findByTeacherSchoolgroupPage(
+        				schgroupobj == null ? null : schgroupobj.get(), 
+                		schownerobj == null ? null : schownerobj.get(), 
+                		classowner,
+                		weeknow,
+                		teacherownerobj == null ? null : teacherownerobj.get(),
+                		subjectownerobj == null ? null : subjectownerobj.get(),
+                		statusnow,
+                		calendarownerobj == null ? null : calendarownerobj.get(),
+                		datefrom.isEmpty() ? null : datefrom.get(),
+                		dateto.isEmpty() ? null : dateto.get(),                				
+        				pageable
+        		);
+        	}        	
+        }
+        else {
+        	if ( schgroup == null ) {
+        		Lessonnotes = lsnmanageRepository.filter("%"+ query + "%",  pageable);
+        	}
+        	else {    
+        		Optional<SchoolGroup> schgroupobj = groupRepository.findById( schgroup );
+        		Optional<School> schownerobj = null;
+        		
+        		Optional<Teacher> teacherownerobj = null;
+        		Optional<Calendar> calendarownerobj = null;
+        		Optional<Subject> subjectownerobj = null;
+        		
+        		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
+        		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
+        		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
+        		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  } 
+        		
+        		Lessonnotes = lsnmanageRepository.findFilterByTeacherSchoolgroupPage( 
+        				"%"+ query + "%",         				
+        				schgroupobj == null ? null : schgroupobj.get(), 
+                        schownerobj == null ? null : schownerobj.get() , 
+                        classowner,
+                        weeknow,
+                        teacherownerobj == null ? null : teacherownerobj.get(),
+                        subjectownerobj == null ? null : subjectownerobj.get(),
+                        statusnow,
+                        calendarownerobj == null ? null : calendarownerobj.get(),
+                        datefrom.isEmpty() ? null : datefrom.get(),
+                        dateto.isEmpty() ? null : dateto.get(), 
+        				pageable
+        		);
+        	}
+        }
+        
+        
+
+        if(Lessonnotes.getNumberOfElements() == 0) {
+        	Map<String, Object> responseEmpty = new HashMap<>();
+        	responseEmpty.put("Lessonnotes", Collections.emptyList());
+        	responseEmpty.put("currentPage", Lessonnotes.getNumber());
+        	responseEmpty.put("totalItems", Lessonnotes.getTotalElements());
+        	responseEmpty.put("totalPages", Lessonnotes.getTotalPages());
+        	
+        	return responseEmpty;
+        }
+        
+        List<LessonnoteManagement> calarray = new ArrayList<LessonnoteManagement>();
+        
+        calarray = Lessonnotes.getContent();
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("lessonnotemanagement", calarray);
+     
+        return response;
+    }
+	
 	
 	public Map<String, Object> getOrdinaryTeacherLessonnotes(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Integer> classId,  Optional<Integer> week, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Long> subjectId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
         

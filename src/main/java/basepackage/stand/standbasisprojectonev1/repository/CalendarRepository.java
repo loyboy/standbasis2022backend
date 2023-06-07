@@ -22,6 +22,11 @@ public interface CalendarRepository extends JpaRepository<Calendar, Long>{
 	               + "and cal.school = :owner"
 	          	 )
 	 	  Optional<Calendar> findByStatus(@Param("status") Integer status, @Param("owner") School ownerId);
+	 	  
+	 	 @Query("select cal from Calendar cal where " 
+	               + "cal.status = 1 "
+	          	 )
+	 	  List<Calendar> findByActive();
 	    
 	      List<Calendar> findBySchool(School sch);
 	    

@@ -86,6 +86,17 @@ public class EnrollmentService {
 		return enc;
 	}
 	
+	public List<Enrollment> findEnrollmentFromSchool(Long sch, Long cal) {	
+		Optional<Calendar> existing = calRepository.findById(cal);
+		Optional<School> existing2 = schRepository.findById(sch);
+		
+		if (existing.isPresent() && existing2.isPresent()) {
+			List<Enrollment> enc = enrollRepository.findBySchool(existing2.get(), existing.get());
+			return enc;
+		}
+		return null;
+	}
+	
 	public List<Enrollment> getEnrollmentsByCalendar(Long cal){
 		Optional<Calendar> existing = calRepository.findById(cal);
 		if (existing.isPresent()) {

@@ -70,6 +70,11 @@ public class CalendarService {
 		return calRepository.findAll();
 	}
 	
+public List<Calendar> findByActive() {
+		
+		return calRepository.findByActive();
+	}
+	
 	public Calendar findCalendar(long id) {
 		
 		Optional<Calendar> enc = calRepository.findById(id);

@@ -43,6 +43,9 @@ public class Teacher extends DateAudit{
     @Column(name="gender",columnDefinition="char(3)")
     private String gender;
     
+    @Column(name="qualification_education",columnDefinition="char(3)")
+    private String qualification_education; //it is a Yes or No option allowed here
+    
     @Size(max = 100)
     private String agerange, bias, coursetype, qualification, office;
     

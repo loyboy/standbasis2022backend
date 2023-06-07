@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;
@@ -114,7 +115,7 @@ public class MneController {
 		 
 	     Map<String, Object> objectmnecolumn = new HashMap<>();
 	     objectmnecolumn.put("key", "student_name");
-	     objectmnecolumn.put("label", "Student Name XX");
+	     objectmnecolumn.put("label", "Student Name");
 	     objectmnecolumn.put("sortable", true);
 	     
 	     mnecolumn.add( objectmnecolumn );
@@ -191,6 +192,115 @@ public class MneController {
 		 return new ResponseEntity<>(response, HttpStatus.OK);		
 	 }
 	 
+	 @GetMapping("/attendance/teachers")
+	 public ResponseEntity<?> getTeacherAttendance(
+			 @RequestParam(value = "teacher") Long teacher,
+			 @RequestParam(value = "calendar") Long calendar,
+			 @RequestParam(value = "week") Integer week
+			 ) {		
+		 
+		// Map<String, Object> response = service.getPaginatedCalendars( page, size, query, school );
+		// return new ResponseEntity<>(response, HttpStatus.OK);
+		 
+		 Calendar calobj = calendarservice.findCalendar(calendar);
+		 Teacher teaobj = teacherservice.findTeacher(teacher);
+		 LocalDate stDate = calobj.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+		 LocalDate endDate = calobj.getEnddate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+		 
+		 List<LocalDate> weekrange = getWeekdayRange(week, stDate, endDate);
+		 
+	// System.out.println("weekrange object: " + stDate.toString() + "  --- " + endDate.toString() );
+		 
+		 LocalDateTime localDateTime1 = weekrange.get(0).atStartOfDay();
+		 LocalDateTime localDateTime2 = weekrange.get(4).atStartOfDay();
+
+	     Timestamp timestampWeekStart = Timestamp.valueOf(localDateTime1);
+	     Timestamp timestampWeekEnd = Timestamp.valueOf(localDateTime2);	     
+	     
+	   // System.out.println("myrowcall precall: " + enrolobj.getStudent().getPupId() + " --- " + calendar );
+	     
+	     List<Attendance> my_attendance = attRepository.findByTeacherMne( teaobj.getTeaId(), calendar, timestampWeekStart, timestampWeekEnd);    
+	     
+	     List<TimeTable> teacherclasses = timetableservice.findClassTaught( teaobj.getTeaId(), calendar);
+	     
+	     List< Map<String, Object> > mnecolumndata = new ArrayList<>();
+	     List< Map<String, Object> > mnecolumn = new ArrayList<>();
+		 
+	     Map<String, Object> objectmnecolumn = new HashMap<>();
+	     objectmnecolumn.put("key", "teacher_name");
+	     objectmnecolumn.put("label", "Teacher Name");
+	     objectmnecolumn.put("sortable", true);
+	     
+	     mnecolumn.add( objectmnecolumn );
+	     
+	     Map<String, Object> objectmnecolumn2 = new HashMap<>();
+	     objectmnecolumn2.put("key", "performance");
+	     objectmnecolumn2.put("label", "Performance");
+	     objectmnecolumn2.put("sortable", true);
+	     
+	     mnecolumn.add( objectmnecolumn2 );
+	     
+	     Map<String, Object> objectmnecolumndata = new HashMap<>();
+	     objectmnecolumndata.put("teacher_name", teaobj.getFname() + " " + teaobj.getLname() );
+	     
+	     int j = 1;
+	     
+	     List<TimeTable> uniqueTimetables = findUniqueTimetables(teacherclasses);
+	     
+	     List<Double> allAverage = new ArrayList<>();
+	     
+	     //String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
+	     
+	     for (TimeTable subclass : uniqueTimetables) {	    	
+		     
+	    	 System.out.println("Unique timetable seen: " + subclass.getTimeId() );
+	    	 
+		     List<Attendance> attcall = my_attendance.stream().filter(att -> att.getTimetable().getSubject().equals(subclass.getSubject()) && att.getTimetable().getClass_stream().equals( subclass.getClass_stream() ) ).collect(Collectors.toList());
+		       
+		     if (attcall.size() > 0) {
+		    	 
+		    	 double perf = 0.0;
+		    	 List<Attendance> attcallPresent = attcall.stream().filter(att -> att.getDone() == 1 ).collect(Collectors.toList());
+		    	 List<Attendance> new_my_attendance = my_attendance.stream().filter(att -> att.getTimetable().getSubject().equals(subclass.getSubject()) && att.getTimetable().getClass_stream().equals( subclass.getClass_stream() ) ).collect(Collectors.toList());
+		    	 	    	
+		    	 
+		    	 if (attcallPresent.size() > 0) {		    		
+		    		 perf = ( (double) attcallPresent.size() / new_my_attendance.size() ) * 100;
+		    	 }    	
+		    	 
+			     Map<String, Object> objectmnecolumntemp = new HashMap<>();
+		    	 objectmnecolumntemp.put("key", "d"+j);
+		    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() );
+		    	 objectmnecolumntemp.put("sortable", true);
+		    	 
+			     mnecolumn.add( objectmnecolumntemp );
+			     
+			     allAverage.add(perf);
+			     
+			     objectmnecolumndata.put("d"+j, (int) perf  );		     
+			     
+			     j++;
+		     }
+		     
+		 }
+	     
+	     double averagePerf = allAverage.stream()
+	                .mapToInt(Double::intValue)
+	                .average()
+	                .orElse(0.0);
+	     
+	     objectmnecolumndata.put("performance", averagePerf);
+	     mnecolumndata.add( objectmnecolumndata ); 
+	     
+	     Map<String, Object> response = new HashMap<>();
+			
+		 response.put("mnecolumn", mnecolumn);
+		 response.put("mnecolumndata", mnecolumndata);
+	     
+		 return new ResponseEntity<>(response, HttpStatus.OK);		
+	 }
+	
+	 
 	 private List<LocalDate> getWeekdayRange(int weekNumber, LocalDate startDate, LocalDate endDate) {
 	        
 		 	List<LocalDate> weekdayRange = new ArrayList<>();
@@ -223,5 +333,28 @@ public class MneController {
 	        System.out.println("weekrange--- : " + weekdayRange );
 	        
 	        return weekdayRange;
+	    }
+	 
+	 private List<TimeTable> findUniqueTimetables(List<TimeTable> timetables) {
+	        List<TimeTable> uniqueTimetables = new ArrayList<>();
+
+	        for (TimeTable timetable : timetables) {
+	            // Check if the timetable's subject and class stream are unique
+	            boolean isUnique = true;
+
+	            for (TimeTable uniqueTimetable : uniqueTimetables) {
+	                if (timetable.getSubject().getName().equals(uniqueTimetable.getSubject().getName()) &&
+	                        timetable.getClass_stream().getTitle().equals(uniqueTimetable.getClass_stream().getTitle())) {
+	                    isUnique = false;
+	                    break;
+	                }
+	            }
+
+	            if (isUnique) {
+	                uniqueTimetables.add(timetable);
+	            }
+	        }
+
+	        return uniqueTimetables;
 	    }
 }

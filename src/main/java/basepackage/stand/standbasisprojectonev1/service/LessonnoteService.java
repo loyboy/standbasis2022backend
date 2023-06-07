@@ -596,7 +596,7 @@ public class LessonnoteService {
 						lsnval.setApproval( CommonActivity.parseTimestamp( CommonActivity.todayDate() ) );
 						lsnval.setCycle_count( lsnval.getCycle_count() + 1 );	
 						
-						List<Enrollment> enrolData = enrolRepository.findByClassIndex( lsnval.getClass_index() );
+						List<Enrollment> enrolData = enrolRepository.findByClassIndex( lsnval.getClass_index(), lsnval.getCalendar().getSchool() );
 						
 						if (lsnval.getClasswork().equals(1)) {
 							for (Enrollment enr : enrolData) {	

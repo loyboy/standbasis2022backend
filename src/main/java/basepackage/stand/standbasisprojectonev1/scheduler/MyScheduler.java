@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,17 +18,34 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import basepackage.stand.standbasisprojectonev1.model.Attendance;
+import basepackage.stand.standbasisprojectonev1.model.Calendar;
+import basepackage.stand.standbasisprojectonev1.model.ClassStream;
+import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
+import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
+import basepackage.stand.standbasisprojectonev1.repository.EnrollmentRepository;
 import basepackage.stand.standbasisprojectonev1.repository.LessonnoteRepository;
 import basepackage.stand.standbasisprojectonev1.repository.TimetableRepository;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceService;
+import basepackage.stand.standbasisprojectonev1.service.CalendarService;
+import basepackage.stand.standbasisprojectonev1.service.ClassService;
+import basepackage.stand.standbasisprojectonev1.service.EnrollmentService;
 
 @Component
 public class MyScheduler {
 	@Autowired
 	AttendanceService service;
+	
+	@Autowired
+	ClassService classservice;
+	
+	@Autowired
+	EnrollmentService enrolservice;
+	
+	@Autowired
+	CalendarService calservice;
 	
 	private final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
@@ -42,18 +58,69 @@ public class MyScheduler {
 	@Autowired		
     private LessonnoteRepository lsnRepository;
 	
+	@Autowired
+	private CalendarRepository calRepository;
+	
+	@Autowired
+	EnrollmentRepository enrolRepository;
+	
+	@Scheduled(cron = "0 0 0 * * *")
+    public void switchToNewTerm() {
+		// get all the calendars that are active
+	List<Calendar> calendars =	calservice.findByActive();
+	
+		for ( Calendar cal: calendars) {
+			if ( parseTimestamp(todayDate()).compareTo(cal.getEnddate()) > 0 ) {
+				// the term has ended for that School
+				// then, get all the enrolments in that school
+				List<Enrollment> allEnrols = enrolservice.getEnrollmentsByCalendar(cal.getCalendarId());
+				// Create a new Calendar object
+				Calendar new_cal = new Calendar();
+				new_cal.setSchool(cal.getSchool());
+				new_cal.setSession(null);
+				new_cal.setStatus(-1);// scheduled status, to be activated manually
+				Calendar savedCalendar = calRepository.save(new_cal);
+				
+				//old calendar, reset to inactive
+				cal.setStatus(0);
+				calRepository.save(cal);
+				
+				List<Enrollment> oldEnrols = allEnrols.stream().map(e ->  {
+					if (e.getStatus() == 1) {
+						e.setStatus(-99);
+						return e;
+					}
+					return null;
+				}).collect(Collectors.toList());
+				
+				List<Enrollment> newEnrols = allEnrols.stream().map(e ->  {
+					if (e.getStatus() == 1) {
+						e.setEnrolId(null);
+						e.setCalendar(savedCalendar);
+						e.setSession_count( e.getSession_count()+1 );
+						e.setClassstream( findNextClass( e.getClassstream() ) );
+						return e;
+					}
+					return null;
+				}).collect(Collectors.toList());				
+				
+				enrolRepository.saveAll(oldEnrols);
+				enrolRepository.saveAll(newEnrols);
+			}
+		}
+		
+	}
 	//@Autowired	
 	//private CalendarRepository calRepository;
 	
 	// "0 0/10 * * * *" - 10 minutes interval
 	// "0 0 0 * * *" - Everyday at 0:00
 	@Scheduled(cron = "0 0 0 * * *")
-    public void insertAttendances() {
-        // this code will be executed every 10 minutes
+    public void insertAttendances() {       
 		
 		//Check what day of the week is this
-		Calendar calendar = Calendar.getInstance();
-	    int day = calendar.get(Calendar.DAY_OF_WEEK);
+		java.util.Calendar calendar = java.util.Calendar.getInstance();
+	    int day = calendar.get(java.util.Calendar.DAY_OF_WEEK);
 	    int daynew = day - 1;
 	    Map<Integer, String> daysOfWeek = new HashMap<>();
 	    daysOfWeek.put(1, "MONDAY");
@@ -146,6 +213,15 @@ public class MyScheduler {
 	    System.out.println("Insert Lessonnotes with Cron job");
     }
 	
+	private ClassStream findNextClass(ClassStream formerClass) {
+		//get all the classes in that school
+		List<ClassStream> allclasses = classservice.findAllBySchool( formerClass.getSchool().getSchId() );
+		List<ClassStream> allclasses_filtered = allclasses.stream().filter(c -> (c.getClass_index() == formerClass.getClass_index() + 1) ).collect(Collectors.toList());
+		if (allclasses_filtered.size() > 0) {
+			return allclasses_filtered.get(0);
+		}
+		return null;
+	}	
 	
 	 private String todayDate() {
 			Date d = new Date();

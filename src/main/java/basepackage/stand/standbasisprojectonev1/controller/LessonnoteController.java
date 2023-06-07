@@ -161,6 +161,27 @@ public class LessonnoteController {
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 
+	 @GetMapping("/management/paginateTeachers")
+	 public ResponseEntity<?> getPaginatedTeacherManagementLessonnotes(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+			 @RequestParam(value = "q", required=false) String query,
+			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
+			 @RequestParam(value = "school", required=false) Optional<Long> school,
+			 @RequestParam(value = "class", required=false) Optional<Integer> classid,
+			 @RequestParam(value = "week", required=false) Optional<Integer> week,
+			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
+			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
+			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
+			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto,
+			 
+			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
+			 @RequestParam(value = "status", required=false) Optional<String> status
+			 ) {
+		 
+		 Map<String, Object> response = serviceManagement.getPaginatedTeacherLessonnotes( page, size, query, schoolgroup, school, classid, week, calendar, teacher, subject, status, datefrom, dateto  );
+		 return new ResponseEntity<>(response, HttpStatus.OK);	        
+	 }
+	 
 	 @GetMapping("/teachers")
 	 public ResponseEntity<?> getTeacherLessonnotes(
 			 @RequestParam(value = "q", required=false) String query,

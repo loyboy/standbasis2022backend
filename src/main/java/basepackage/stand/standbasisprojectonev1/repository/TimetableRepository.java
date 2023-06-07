@@ -31,7 +31,7 @@ public interface TimetableRepository extends JpaRepository<TimeTable, Long> {
     
     @Query("select tt from TimeTable tt "
     		+ "where tt.teacher = :tea " 
-            + "or tt.calendar = :cal ")
+            + "and tt.calendar = :cal ")
     List<TimeTable> findByClassTaught(@Param("tea") Teacher tea, @Param("cal") Calendar cal);
     
     @Query("select tt from TimeTable tt "

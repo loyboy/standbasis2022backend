@@ -47,7 +47,7 @@ public class Enrollment extends DateAudit{
     @JoinColumn(name = "calendar_id", nullable = true)
     private Calendar calendar;
     
-    private Integer status; // 1, 0, -1
+    private Integer status; // 1, 0, -1, -99(term moved)
     
     public Enrollment() {}
     public Enrollment(String id, Student s, ClassStream c, Calendar cal, Integer status  ) {

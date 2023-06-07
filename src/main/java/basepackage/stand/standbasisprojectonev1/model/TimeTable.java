@@ -34,7 +34,7 @@ public class TimeTable extends DateAudit {
     @JoinColumn(name = "sch_id", nullable = false)
     private School school;
     
-    @NotNull
+   
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tea_id", nullable = false)
     private Teacher teacher;
@@ -44,7 +44,7 @@ public class TimeTable extends DateAudit {
     @JoinColumn(name = "class_id", nullable = false)
     private ClassStream class_stream;
     
-    @NotNull
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_id", nullable = false)
     private Subject subject;
