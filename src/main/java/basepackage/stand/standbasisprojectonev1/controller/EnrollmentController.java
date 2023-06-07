@@ -58,8 +58,8 @@ public class EnrollmentController {
 	 }
 	 
 	 @GetMapping("/classindex")
-	 public ResponseEntity<?> getEnrollmentsFromClassIndex(  @RequestParam(value = "id") Integer id ) {
-		 List<Enrollment> list = service.findEnrollmentFromClassIndex(id);
+	 public ResponseEntity<?> getEnrollmentsFromClassIndex(  @RequestParam(value = "id") Integer id , @RequestParam(value = "sch") Long sch ) {
+		 List<Enrollment> list = service.findEnrollmentFromClassIndex(id,sch);
 		 return ResponseEntity.ok().body(new ApiContentResponse<Enrollment>(true, "List of Enrollments by Class Index gotten successfully.", list));		
 	 }
 	 

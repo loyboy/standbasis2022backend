@@ -74,10 +74,13 @@ public class EnrollmentService {
 		return null;
 	}
 	
-	public List<Enrollment> findEnrollmentFromClassIndex(Integer id) {		
-		List<Enrollment> enc = enrollRepository.findByClassIndex(id);
-		
-		return enc;
+	public List<Enrollment> findEnrollmentFromClassIndex(Integer id, Long sch) {
+		Optional<School> existing = schRepository.findById(sch);
+		if (existing.isPresent()) {
+			List<Enrollment> enc = enrollRepository.findByClassIndex(id, existing.get());
+			return enc;
+		}
+		return null;
 	}	
 	
 	public List<Enrollment> findEnrollmentFromClass(Long id) {		
