@@ -33,7 +33,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
             + "or t.coursetype like :filter " 
             + "or t.email like :filter "
             + "or t.office like :filter "
-            + "or t.qualification_academic like :filter "
+            + "or t.qualification like :filter "
             
        		)
        Page<Teacher> filter(@Param("filter") String filter, Pageable pg);    
@@ -46,7 +46,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
                + "or t.coursetype like :filter " 
                + "or t.email like :filter "
                + "or t.office like :filter "
-               + "or t.qualification_academic like :filter "
+               + "or t.qualification like :filter "
                + "and t.school = :owner "
           		)
        
