@@ -110,10 +110,10 @@ public class OnboardingService {
 		    		Calendar _cal = new Calendar();
 		    		String myidcal = createUuid("calendar-", savedSchool.getSchId() );
 		    		_cal.setId(myidcal);
-		    		_cal.setTerm(1);
+		    		_cal.setTerm(-99);
 		    		_cal.setStartdate( parseTimestamp( "2023-01-03 00:00:00" ) );
 		    		_cal.setEnddate( parseTimestamp( "2023-04-21 00:00:00" ) );
-		    		_cal.setStatus(1);
+		    		_cal.setStatus(0);
 		    		_cal.setSession("2022/2023");
 		    		_cal.setSchool(savedSchool);
 		    		
@@ -287,7 +287,7 @@ public class OnboardingService {
 			    			_u.setId(specialIdUser2);
 				    		_u.setUsername(specialIdUsername);
 				    		_u.setStatus(1);
-				    		_u.setEmail( t.getEmail() );
+				    		_u.setEmail( t.getEmail() );//change
 				    		_u.setName( t.getFname() + " " + t.getLname() );
 				    		_u.setRole(RoleName.TEACHER);
 				    		_u.setPassword( passwordencoder.encode( specialPassword ) );

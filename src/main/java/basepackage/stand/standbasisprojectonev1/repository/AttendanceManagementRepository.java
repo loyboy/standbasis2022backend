@@ -68,8 +68,8 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	    		+ "AND (att.timetable.teacher = :tea OR :tea is null) "
 	    		+ "AND (att.timetable.calendar = :cal OR :cal is null) "
 	    		+ "AND (att.timetable.subject = :sub OR :sub is null) "
-	    		+ "AND (att._date >= :datefrom OR :datefrom is null) "
-	    		+ "AND (att._date <= :dateto OR :dateto is null) "
+	    		+ "AND (DATE(att._date) >= :datefrom OR :datefrom is null) "
+	    		+ "AND (DATE(att._date) <= :dateto OR :dateto is null) "
 	      )	    
 	    List<AttendanceManagement> findByTeacherSchoolgroup(
 	    		@Param("owner") SchoolGroup owner, 
@@ -91,8 +91,8 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	    		+ "AND (att.timetable.teacher = :tea OR :tea is null) "
 	    		+ "AND (att.timetable.calendar = :cal OR :cal is null) "
 	    		+ "AND (att.done = :done OR :done is null) "
-	    		+ "AND (att._date >= :datefrom OR :datefrom is null) "
-	    		+ "AND (att._date <= :dateto OR :dateto is null) "
+	    		+ "AND (DATE(att._date) >= :datefrom OR :datefrom is null) "
+	    		+ "AND (DATE(att._date) <= :dateto OR :dateto is null) "
 	    	   )
 	    Page<AttendanceManagement> findByTeacherSchoolgroupPage( 
 	    		@Param("owner") SchoolGroup owner, 

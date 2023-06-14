@@ -26,8 +26,10 @@ public interface EventManagerRepository extends JpaRepository<EventManager, Long
 	    Page<EventManager> filter( @Param("filter") String filter, Pageable pg);
 	    
 	    @Query("select evt from EventManager evt "
-	    		+ "WHERE evt.module = :module OR :module is null AND ( (evt.user.teacher_id = :tea OR :tea is null) OR (evt.school = :sch OR :sch is null) "
-	    		+ "OR (evt.school.owner = :group OR :group is null) ) "
+	    		+ "WHERE evt.module = :module OR :module is null AND "
+	    		+ "(evt.user.teacher_id = :tea OR :tea is null) AND "
+	    		+ "(evt.school = :sch OR :sch is null) AND "
+	    		+ "(evt.school.owner = :group OR :group is null) "
 	       	 )    
 	    Page<EventManager> findByEventSchoolPage(
 	    		@Param("tea") Long tea, 
@@ -38,10 +40,12 @@ public interface EventManagerRepository extends JpaRepository<EventManager, Long
 	    );
 	    
 	    @Query("select evt from EventManager evt "
-	    		+ "WHERE ( evt.school = :sch OR :sch is null "
-	    		+ "OR (evt.school.owner = :group OR :group is null) OR (evt.user.teacher_id = :tea OR :tea is null) )"
-	    		+ "AND ( (evt.comment like :filter OR :filter is null) OR (evt.module = :module OR :module is null) )"
-	       	  )    
+	    		+ "WHERE evt.module = :module OR :module is null AND "
+	    		+ "(evt.user.teacher_id = :tea OR :tea is null) AND "
+	    		+ "(evt.school = :sch OR :sch is null) AND "
+	    		+ "(evt.school.owner = :group OR :group is null) AND "
+	    		+ "(evt.comment like :filter OR :filter is null) "
+	       	 ) 
 	    Page<EventManager> findFilterByEventSchoolPage(
 	    		@Param("filter") String filter, 
 	    		@Param("tea") Long tea, 

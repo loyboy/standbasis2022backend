@@ -40,7 +40,7 @@ public class AttendanceManagement extends DateAudit {
     private Integer score;  
     
     @NotNull
-    private Integer action; // 0 - unattended, 1 - Approved, 2 - There is an issue
+    private Integer action; // 0 - unattended, 1 - Approved, 2 - There is an issue, 3 - resolved
     
     private String comment;
     
