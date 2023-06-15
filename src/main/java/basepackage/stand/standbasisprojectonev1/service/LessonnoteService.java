@@ -676,6 +676,11 @@ public class LessonnoteService {
 						lsnval.setClosure( CommonActivity.parseTimestamp( CommonActivity.todayDate() ) );
 					}
 				}
+				else if (lsnRequest.getAction().equals("closed")) { //for only principal
+					if( lsnval.getPrincipal_closure() == null ) {						
+						lsnval.setPrincipal_closure( CommonActivity.parseTimestamp( CommonActivity.todayDate() ) );
+					}
+				}
 			}
 			CommonActivity.copyNonNullProperties(lsnRequest, lsnval);
 			return lsnRepository.save(lsnval);

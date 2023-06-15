@@ -466,6 +466,21 @@ public class LessonnoteController {
 							 new Date(), u.get(), u.get().getSchool()
 					 );
 				 }
+				 
+				 else if ( lsnRequest.getLessonnote().getAction().equals("closure") ) {				 
+					 
+					 LessonnoteActivityRequest lsnactivity = new LessonnoteActivityRequest();
+					 lsnactivity.setOwnertype("Principal");
+					 lsnactivity.setOwner(null);
+					 lsnactivity.setExpected( addDays( CommonActivity.parseTimestamp( CommonActivity.todayDate()),1) );//One day expected
+					 lsnactivity.setActivity("Expected to approve closure of this Lessonnote within (1) day");
+					 serviceActivity.saveOne(lsnactivity, val);
+					 
+					 saveEvent("lessonnoteactivity", "create", "The User with name: " + u.get().getName() + "has created a lessonnote activity template with Lsn ID:  " + id + " done by the Teacher after closing a Lessonnote " + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
+							 new Date(), u.get(), u.get().getSchool()
+					 );					 
+					 
+				 }
 				 else {				 
 					 lsnRequest.getActivity().setOwnertype("Principal");
 					 lsnRequest.getActivity().setExpected( addDays( CommonActivity.parseTimestamp( CommonActivity.todayDate()),2) );//Two days expected

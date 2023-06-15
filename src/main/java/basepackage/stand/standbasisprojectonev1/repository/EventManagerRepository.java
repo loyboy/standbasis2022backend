@@ -25,7 +25,7 @@ public interface EventManagerRepository extends JpaRepository<EventManager, Long
 	    @Query(" select evt from EventManager evt where evt.comment like :filter ")
 	    Page<EventManager> filter( @Param("filter") String filter, Pageable pg);
 	    
-	    @Query("select evt from EventManager evt "
+	    @Query(	"select evt from EventManager evt "
 	    		+ "WHERE evt.module = :module OR :module is null AND "
 	    		+ "(evt.user.teacher_id = :tea OR :tea is null) AND "
 	    		+ "(evt.school = :sch OR :sch is null) AND "

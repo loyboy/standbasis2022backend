@@ -41,7 +41,7 @@ public class LessonnoteActivity extends DateAudit{
     
     private String activity; // Expected to approve Calendar activity
     
-    private String action; // revert/approved/re-submitted/submitted
+    private String action; // revert/approved/re-submitted/submitted/closure/closed
     
     private String comment_query; // Optional if queried
     
@@ -49,6 +49,7 @@ public class LessonnoteActivity extends DateAudit{
     private Integer principal_query_arrangement; // 1 - Satisfied, 0 - Bad
     private Integer principal_query_grammar; // 1 - Satisfied, 0 - Bad
     private Integer principal_query_subjectmatter; // 1 - Satisfied, 0 - Bad
+    private Integer principal_query_incomplete;
     
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)

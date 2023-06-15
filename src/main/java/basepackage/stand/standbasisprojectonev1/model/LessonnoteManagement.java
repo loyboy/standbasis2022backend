@@ -37,7 +37,7 @@ public class LessonnoteManagement extends DateAudit{
     
     private Integer score; 
     
-    private String action; // submitted, resubmitted, reverted, launched, approved, closed
+    private String action; // submitted, resubmitted, reverted, launched, approved, closure, closed
     
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
