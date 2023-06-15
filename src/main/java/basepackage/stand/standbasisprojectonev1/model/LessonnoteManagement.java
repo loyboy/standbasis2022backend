@@ -25,7 +25,7 @@ public class LessonnoteManagement extends DateAudit{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long lsnmanId;
      
-    private Integer quality;
+    private Integer quality; //not used
     
     private Integer sub_perf_classwork; 
     
@@ -33,7 +33,7 @@ public class LessonnoteManagement extends DateAudit{
     
     private Integer sub_perf_test; 
     
-    private Integer management; 
+    private Integer management; //used for quality of Lessonnote
     
     private Integer score; 
     

@@ -26,10 +26,6 @@ public class LessonnoteRequest {
 	    @NotNull
 	    private String action; //submit,resubmit,revert, approval,launch, closure
 	    
-	    private Integer grammar; 
-	    
-	    private Integer arrangement; 
-	    
 	    private Integer classwork, homework, test, midterm, finalexam; 
 	    
 	    private String uploadFile; 

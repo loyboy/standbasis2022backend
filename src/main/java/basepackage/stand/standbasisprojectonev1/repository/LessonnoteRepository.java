@@ -49,8 +49,8 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     List<Lessonnote> filterAll( @Param("filter") String filter); 
     
     @Query(   "select lsn from Lessonnote lsn where lsn.teacher = :tea "
-    		+ "AND ( (lsn.delaythis = 1 AND lsn.week <= :week) "
-    		+ "OR (lsn.week = :week AND lsn.delaythis is null) ) "
+    		+ "AND ( (lsn.delaythis = 1 AND lsn.week <= :week) OR (lsn.week = :week AND lsn.delaythis is null) ) "
+    		+ "AND (submission is null OR revert is not null) "
     		+ "AND (lsn.calendar.status = 1) "
     	  )
     List<Lessonnote> findByTeacherWeekLessonnote(     		 

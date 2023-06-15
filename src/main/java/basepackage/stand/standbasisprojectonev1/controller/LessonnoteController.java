@@ -93,7 +93,13 @@ public class LessonnoteController {
 	 public ResponseEntity<?> getLessonnoteActivities() {
 		 List<LessonnoteActivity> list = serviceActivity.findAll();
 		 return ResponseEntity.ok().body(new ApiContentResponse<LessonnoteActivity>(true, "List of Lessonnotes Activity gotten successfully.", list));		
-	 }	
+	 }
+	 
+	 @GetMapping("/activity/lessonnote/{id}")
+	 public ResponseEntity<?> getLessonnoteActivity( @PathVariable(value = "id") Long id ) {
+		 LessonnoteActivity lsnact = serviceActivity.findLessonnoteActivityByLessonnote(id);
+		 return ResponseEntity.ok().body(new ApiDataResponse(true, "Lessonnote activity has been retrieved successfully.", lsnact));	
+	 }
 	 
 	 @GetMapping(value = {"/management", "/management/{lsn}"})
 	 public ResponseEntity<?> getLessonnoteManagements(@PathVariable(value = "lsn", required = false) Long lsn) {		
@@ -432,6 +438,8 @@ public class LessonnoteController {
 		 try {			 
 			 Lessonnote val = service.update(lsnRequest.getLessonnote(),id);
 			 
+			 LessonnoteActivity lsnact  = serviceActivity.findLessonnoteActivityByLessonnoteForTeacher(id);
+			 
 			 Optional<User> u = userRepository.findById( userDetails.getId() );				
 			 //------------------------------------
 			 saveEvent("lessonnote", "edit", "The User with name: " + u.get().getName() + "has submitted a lessonnote template with ID:  " + id + " done by the Teacher " + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
@@ -448,11 +456,12 @@ public class LessonnoteController {
 					 lsnactivity.setOwner(null);
 					 lsnactivity.setExpected( addDays( CommonActivity.parseTimestamp( CommonActivity.todayDate()),1) );//One day expected
 					 lsnactivity.setActivity("Expected to approve/revert this Lessonnote within (1) day");
-					 serviceActivity.saveOne(lsnactivity, val);	
+					 serviceActivity.saveOne(lsnactivity, val);
+					 
 					 saveEvent("lessonnoteactivity", "create", "The User with name: " + u.get().getName() + "has created a lessonnote activity template with Lsn ID:  " + id + " done by the Teacher after submitting a Lessonnote " + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
 							 new Date(), u.get(), u.get().getSchool()
 					 );
-					 serviceActivity.update(lsnRequest.getActivity(),lsnRequest.getActivity().getLsnactivityId() );
+					 serviceActivity.update(lsnRequest.getActivity(), lsnact.getLsnactId() );
 					 saveEvent("lessonnoteactivity", "edit", "The User with name: " + u.get().getName() + "has updated a lessonnote activity template with Lsn ID:  " + id + " done by the Teacher after submitting a Lessonnote " + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
 							 new Date(), u.get(), u.get().getSchool()
 					 );

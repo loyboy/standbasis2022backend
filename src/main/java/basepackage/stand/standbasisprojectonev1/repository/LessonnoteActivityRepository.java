@@ -42,6 +42,14 @@ public interface LessonnoteActivityRepository extends JpaRepository<LessonnoteAc
 	
 	@Query("select lsnactivity from LessonnoteActivity lsnactivity "
 			+ "JOIN Lessonnote lsn ON lsn = lsnactivity.lsn_id "
+    		+ "AND lsn.lessonnoteId = :lsnId "
+    		+ "AND lsnactivity.ownertype = 'Teacher' "
+			+ "ORDER BY lsn.lessonnoteId DESC "
+       	  )
+	Optional<LessonnoteActivity> findByLessonnoteForTeacher(@Param("lsnId") Long lsnId); 
+	
+	@Query("select lsnactivity from LessonnoteActivity lsnactivity "
+			+ "JOIN Lessonnote lsn ON lsn = lsnactivity.lsn_id "
     		+ "AND lsn.title like :filter "
        	 )
 	Page<LessonnoteActivity> filter( @Param("filter") String filter, Pageable pg );

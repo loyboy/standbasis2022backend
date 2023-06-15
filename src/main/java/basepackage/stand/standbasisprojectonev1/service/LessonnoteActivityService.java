@@ -87,6 +87,15 @@ public class LessonnoteActivityService {
 		return null;
 	}
 	
+	public LessonnoteActivity findLessonnoteActivityByLessonnoteForTeacher(Long id) {		
+		Optional<LessonnoteActivity> lsn = lsnactivityRepository.findByLessonnoteForTeacher(id);
+		if (lsn.isPresent()) {
+			LessonnoteActivity lsnval = lsn.get();			
+			return lsnval;
+		}
+		return null;
+	}
+	
 	public LessonnoteActivity update(LessonnoteActivityRequest lsnRequest, long id) {
 		Optional<LessonnoteActivity> existing = lsnactivityRepository.findById(id);
 		if (existing.isPresent()) {
