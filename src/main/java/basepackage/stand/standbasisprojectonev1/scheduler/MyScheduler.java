@@ -69,9 +69,9 @@ public class MyScheduler {
 	@Autowired
 	private EnrollmentRepository enrolRepository;
 	
-	@Scheduled(cron = "0 0/30 * * * *")
+	@Scheduled(cron = "0 0 0 * * *")
     public void switchToNewTerm() {
-		// get all the calendars that are active
+    // get all the calendars that are active
 	List<Calendar> calendars =	calservice.findByActive();
 	
 		for ( Calendar cal: calendars) {
