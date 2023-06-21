@@ -23,13 +23,14 @@ public class LessonnoteActivityRequest {
     
     private String activity; // Expected to approve Calendar activity
     
-    private String action; // revert/approved/re-submitted/submitted
+    private String action; // revert/approved/re-submitted/submit
     
     private String comment_query;
     
     private Integer principal_query_arrangement; // 1 - Satisfied, 0 - Bad
     private Integer principal_query_grammar; // 1 - Satisfied, 0 - Bad
     private Integer principal_query_subjectmatter;
+    private Integer principal_query_incomplete;
     
     private Long lsn_id;
 }

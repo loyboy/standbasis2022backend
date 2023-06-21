@@ -79,21 +79,15 @@ public class LessonnoteActivityService {
 	}
 	
 	public LessonnoteActivity findLessonnoteActivityByLessonnote(Long id) {		
-		Optional<LessonnoteActivity> lsn = lsnactivityRepository.findByLessonnote(id);
-		if (lsn.isPresent()) {
-			LessonnoteActivity lsnval = lsn.get();			
-			return lsnval;
-		}
-		return null;
+		LessonnoteActivity lsn = lsnactivityRepository.findByLessonnote(id).get(0);
+		
+		return lsn;
 	}
 	
 	public LessonnoteActivity findLessonnoteActivityByLessonnoteForTeacher(Long id) {		
-		Optional<LessonnoteActivity> lsn = lsnactivityRepository.findByLessonnoteForTeacher(id);
-		if (lsn.isPresent()) {
-			LessonnoteActivity lsnval = lsn.get();			
-			return lsnval;
-		}
-		return null;
+		LessonnoteActivity lsn = lsnactivityRepository.findByLessonnoteForTeacher(id).size() == 0 ? null : lsnactivityRepository.findByLessonnoteForTeacher(id).get(0);
+	
+		return lsn;
 	}
 	
 	public LessonnoteActivity update(LessonnoteActivityRequest lsnRequest, long id) {

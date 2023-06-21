@@ -21,7 +21,7 @@ public class LessonnoteManagementRequest {
     
     private Integer score;
     
-    private String action; //revert/approved/re-submitted/submitted
+    private String action; //revert/approved/re-submitted/submit
     
     private Long lsn_id;
 }

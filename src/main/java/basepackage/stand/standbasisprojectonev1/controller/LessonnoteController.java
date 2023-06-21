@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -438,6 +439,7 @@ public class LessonnoteController {
 		 try {			 
 			 Lessonnote val = service.update(lsnRequest.getLessonnote(),id);
 			 
+			 TimeUnit.SECONDS.sleep(2); 
 			 LessonnoteActivity lsnact  = serviceActivity.findLessonnoteActivityByLessonnoteForTeacher(id);
 			 
 			 Optional<User> u = userRepository.findById( userDetails.getId() );				
@@ -465,6 +467,8 @@ public class LessonnoteController {
 					 saveEvent("lessonnoteactivity", "edit", "The User with name: " + u.get().getName() + "has updated a lessonnote activity template with Lsn ID:  " + id + " done by the Teacher after submitting a Lessonnote " + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
 							 new Date(), u.get(), u.get().getSchool()
 					 );
+					 
+					 serviceManagement.update(lsnRequest.getManagement(),id);
 				 }
 				 
 				 else if ( lsnRequest.getLessonnote().getAction().equals("closure") ) {				 
@@ -500,7 +504,7 @@ public class LessonnoteController {
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Lessonnote has been edited successfully.", val));	
 		 }
 		 catch (Exception ex) {
-			 //ex.printStackTrace();
+			 ex.printStackTrace();
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set." + ex.getMessage()  ));
 	     }
 	 }
@@ -543,6 +547,8 @@ public class LessonnoteController {
 				 saveEvent("lessonnoteactivity", "edit", "The User with name: " + u.get().getName() + "has updated a lessonnote activity template with Lsn ID:  " + id + " done by the Principal after approving a Lessonnote" + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
 						 new Date(), u.get(), u.get().getSchool()
 				 );
+				 
+				 serviceManagement.update(lsnRequest.getManagement(),id);
 			 }
 			 
 			 else {				
@@ -557,7 +563,8 @@ public class LessonnoteController {
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Lessonnote has been updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set." + ex.getMessage() ));
+			  ex.printStackTrace();
+	          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."  ));
 	     }
 	 }
 	 

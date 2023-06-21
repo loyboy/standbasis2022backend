@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -25,6 +26,7 @@ import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
 import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
+import basepackage.stand.standbasisprojectonev1.repository.ClassStreamRepository;
 import basepackage.stand.standbasisprojectonev1.repository.EnrollmentRepository;
 import basepackage.stand.standbasisprojectonev1.repository.LessonnoteRepository;
 import basepackage.stand.standbasisprojectonev1.repository.TimetableRepository;
@@ -62,28 +64,51 @@ public class MyScheduler {
 	private CalendarRepository calRepository;
 	
 	@Autowired
-	EnrollmentRepository enrolRepository;
+	private ClassStreamRepository clsRepository;
 	
-	@Scheduled(cron = "0 0 0 * * *")
+	@Autowired
+	private EnrollmentRepository enrolRepository;
+	
+	@Scheduled(cron = "0 0/30 * * * *")
     public void switchToNewTerm() {
 		// get all the calendars that are active
 	List<Calendar> calendars =	calservice.findByActive();
 	
 		for ( Calendar cal: calendars) {
+			System.out.println("Time here is "+ cal.getEnddate() );
+			System.out.println("Time here 2 is "+ parseTimestamp( todayDate() ) );
+			
 			if ( parseTimestamp(todayDate()).compareTo(cal.getEnddate()) > 0 ) {
+				System.out.println("Im in the end date");
 				// the term has ended for that School
 				// then, get all the enrolments in that school
 				List<Enrollment> allEnrols = enrolservice.getEnrollmentsByCalendar(cal.getCalendarId());
 				// Create a new Calendar object
 				Calendar new_cal = new Calendar();
+				String myidcal = createUuid("calendar-", cal.getSchool().getSchId() );
 				new_cal.setSchool(cal.getSchool());
+				new_cal.setId(myidcal);
+				new_cal.setTerm(-99); //Moved over from active calendar
 				new_cal.setSession(null);
 				new_cal.setStatus(-1);// scheduled status, to be activated manually
 				Calendar savedCalendar = calRepository.save(new_cal);
-				
+				System.out.println("Im in the end line");
 				//old calendar, reset to inactive
 				cal.setStatus(0);
 				calRepository.save(cal);
+				
+				for ( Enrollment e: allEnrols) {
+					ClassStream csls = e.getClassstream();
+					
+					ClassStream clsstream = findNextClass( csls );
+					if (e.getStatus() == 1) {
+						e.setEnrolId(null);
+						e.setCalendar(savedCalendar);
+						e.setSession_count( e.getSession_count() != null ? (e.getSession_count() + 1) : 2 );
+						e.setClassstream( clsstream );
+						enrolRepository.save(e);
+					}
+				}				
 				
 				List<Enrollment> oldEnrols = allEnrols.stream().map(e ->  {
 					if (e.getStatus() == 1) {
@@ -91,21 +116,10 @@ public class MyScheduler {
 						return e;
 					}
 					return null;
-				}).collect(Collectors.toList());
-				
-				List<Enrollment> newEnrols = allEnrols.stream().map(e ->  {
-					if (e.getStatus() == 1) {
-						e.setEnrolId(null);
-						e.setCalendar(savedCalendar);
-						e.setSession_count( e.getSession_count()+1 );
-						e.setClassstream( findNextClass( e.getClassstream() ) );
-						return e;
-					}
-					return null;
-				}).collect(Collectors.toList());				
-				
+				}).collect(Collectors.toList());			
+								
 				enrolRepository.saveAll(oldEnrols);
-				enrolRepository.saveAll(newEnrols);
+				
 			}
 		}
 		
@@ -215,7 +229,7 @@ public class MyScheduler {
 	
 	private ClassStream findNextClass(ClassStream formerClass) {
 		//get all the classes in that school
-		List<ClassStream> allclasses = classservice.findAllBySchool( formerClass.getSchool().getSchId() );
+		List<ClassStream> allclasses = clsRepository.findBySchool( formerClass.getSchool() );
 		List<ClassStream> allclasses_filtered = allclasses.stream().filter(c -> (c.getClass_index() == formerClass.getClass_index() + 1) ).collect(Collectors.toList());
 		if (allclasses_filtered.size() > 0) {
 			return allclasses_filtered.get(0);
@@ -236,6 +250,13 @@ public class MyScheduler {
 		        throw new IllegalArgumentException(e);
 		    }
 	 }
+	 
+	 private String createUuid( String type, Long schId ) {
+	    	String uuid = UUID.randomUUID().toString();
+	    	String[] uniqueCode = uuid.split("-");    	
+	    	String baseId = type + schId.toString() + "-" + uniqueCode[4].substring(6);
+	    	return baseId;
+	    }
 	 
 	 
 	 /*

@@ -598,9 +598,10 @@ public class LessonnoteService {
 						
 						List<Enrollment> enrolData = enrolRepository.findByClassIndex( lsnval.getClass_index(), lsnval.getCalendar().getSchool() );
 						
-						if (lsnval.getClasswork().equals(1)) {
+						if (lsnRequest.getClasswork().equals(1)) {
 							for (Enrollment enr : enrolData) {	
 								Assessment assval = new Assessment();
+								assval.setTitle("CLW-"+ lsnval.getTitle() );
 								assval.setLsn(lsnval);
 								assval.setEnroll(enr);
 								assval.set_type("clw");
@@ -611,9 +612,10 @@ public class LessonnoteService {
 							}
 						}
 						
-						if (lsnval.getTest().equals(1)) {
+						if (lsnRequest.getTest().equals(1)) {
 							for (Enrollment enr : enrolData) {	
 								Assessment assval2 = new Assessment();
+								assval2.setTitle("TST-"+ lsnval.getTitle() );
 								assval2.setLsn(lsnval);
 								assval2.setEnroll(enr);
 								assval2.set_type("tst");
@@ -624,9 +626,10 @@ public class LessonnoteService {
 							}
 						}
 						
-						if (lsnval.getHomework().equals(1)) {						
+						if (lsnRequest.getHomework().equals(1)) {						
 							for (Enrollment enr : enrolData) {	
 								Assessment assval3 = new Assessment();
+								assval3.setTitle("HWK-"+ lsnval.getTitle() );
 								assval3.setLsn(lsnval);
 								assval3.setEnroll(enr);
 								assval3.set_type("hwk");
@@ -637,9 +640,10 @@ public class LessonnoteService {
 							}
 						}
 						
-						if (lsnval.getMidterm().equals(1)) {
+						if (lsnRequest.getMidterm().equals(1)) {
 							for (Enrollment enr : enrolData) {	
 								Assessment assval4 = new Assessment();
+								assval4.setTitle("MID-"+ lsnval.getTitle() );
 								assval4.setLsn(lsnval);
 								assval4.setEnroll(enr);
 								assval4.set_type("mid");
@@ -650,9 +654,10 @@ public class LessonnoteService {
 							}
 						}
 						
-						if (lsnval.getFinalexam().equals(1)) {
+						if (lsnRequest.getFinalexam().equals(1)) {
 							for (Enrollment enr : enrolData) {	
 								Assessment assval5 = new Assessment();
+								assval5.setTitle("FINAL-"+ lsnval.getTitle() );
 								assval5.setLsn(lsnval);
 								assval5.setEnroll(enr);
 								assval5.set_type("final");

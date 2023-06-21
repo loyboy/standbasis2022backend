@@ -93,27 +93,24 @@ public class LessonnoteManagementService {
 		if (existing.isPresent()) {
 			Lessonnote lsnval = existing.get();
 			Optional<LessonnoteManagement> lsnmanage = lsnmanageRepository.findByLessonnote(lsnval);
+			if (!attRequest.getAction().equals("closure") && !attRequest.getAction().equals("closed") ) {
+				if ( lsnval.getCycle_count() == 2) {
+					lsnmanage.get().setManagement(100);
+				}
+				else if ( lsnval.getCycle_count() == 3 || lsnval.getCycle_count() == 4) {
+					lsnmanage.get().setManagement(60);
+				}
+				else if ( lsnval.getCycle_count() == 5 || lsnval.getCycle_count() == 6) {
+					lsnmanage.get().setManagement(50);
+				}
+				else if ( lsnval.getCycle_count() > 6) {
+					lsnmanage.get().setManagement(30);
+				}
+				
+				CommonActivity.copyNonNullProperties(attRequest, lsnmanage.get());
+				return lsnmanageRepository.save(lsnmanage.get());
+			}
 			
-			if ( lsnval.getCycle_count() == 2) {
-				lsnmanage.get().setManagement(100);
-			}
-			else if ( lsnval.getCycle_count() == 3 || lsnval.getCycle_count() == 4) {
-				lsnmanage.get().setManagement(60);
-			}
-			else if ( lsnval.getCycle_count() == 5 || lsnval.getCycle_count() == 6) {
-				lsnmanage.get().setManagement(50);
-			}
-			else if ( lsnval.getCycle_count() > 6) {
-				lsnmanage.get().setManagement(30);
-			}
-			
-			/*if ( lsnval.getGrammar() != null && lsnval.getArrangement() != null) {
-				Integer quality = ( lsnval.getGrammar() + lsnval.getArrangement() ) <= 0 ? 0 : ( lsnval.getGrammar() + lsnval.getArrangement() )/2 ;
-				lsnmanage.get().setQuality( quality );	
-			}*/
-			
-			CommonActivity.copyNonNullProperties(attRequest, lsnmanage.get());
-			return lsnmanageRepository.save(lsnmanage.get());
 		} 
 		return null;
 	}

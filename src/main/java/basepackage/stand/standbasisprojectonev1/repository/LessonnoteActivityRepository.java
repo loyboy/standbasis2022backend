@@ -33,20 +33,22 @@ public interface LessonnoteActivityRepository extends JpaRepository<LessonnoteAc
 	List<LessonnoteActivity> filterAll( @Param("filter") String filter );
 	
 	@Query("select lsnactivity from LessonnoteActivity lsnactivity "
-			+ "JOIN Lessonnote lsn ON lsn = lsnactivity.lsn_id "
+			+ "JOIN Lessonnote lsn ON lsn = lsnactivity.lsn_id "    		
+    		+ "WHERE lsnactivity.ownertype = 'Principal' "
     		+ "AND lsn.lessonnoteId = :lsnId "
-    		+ "AND lsnactivity.ownertype = 'Principal' "
-			+ "ORDER BY lsn.lessonnoteId DESC "
+			+ "ORDER BY lsnactivity.lsnactId DESC "
+			
        	  )
-	Optional<LessonnoteActivity> findByLessonnote(@Param("lsnId") Long lsnId); 
+	List<LessonnoteActivity> findByLessonnote(@Param("lsnId") Long lsnId); 
 	
 	@Query("select lsnactivity from LessonnoteActivity lsnactivity "
 			+ "JOIN Lessonnote lsn ON lsn = lsnactivity.lsn_id "
-    		+ "AND lsn.lessonnoteId = :lsnId "
+    		+ "WHERE lsn.lessonnoteId = :lsnId "
     		+ "AND lsnactivity.ownertype = 'Teacher' "
-			+ "ORDER BY lsn.lessonnoteId DESC "
+			+ "ORDER BY lsnactivity.lsnactId DESC "
+			
        	  )
-	Optional<LessonnoteActivity> findByLessonnoteForTeacher(@Param("lsnId") Long lsnId); 
+	List<LessonnoteActivity> findByLessonnoteForTeacher(@Param("lsnId") Long lsnId); 
 	
 	@Query("select lsnactivity from LessonnoteActivity lsnactivity "
 			+ "JOIN Lessonnote lsn ON lsn = lsnactivity.lsn_id "
