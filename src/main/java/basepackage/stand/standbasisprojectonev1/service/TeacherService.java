@@ -1,6 +1,8 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -218,6 +220,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         List<Object[]> results = teaRepository.countTeachersCreatedPerDay(newStartDate, newEndDate);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
 
         // Create a map with all days in the range initialized with count 0
         Map<String, Integer> teachersCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
@@ -230,9 +233,9 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         
         // Update the counts for the days with actual results
         for (Object[] result : results) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            teachersCreatedPerDay.put(createdDate.format(formatter), count);
+            teachersCreatedPerDay.put(formatter2.format(createdDate), count);
         }
         
         int sumOfDone = sumMapValues(teachersCreatedPerDay);
