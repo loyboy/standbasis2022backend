@@ -1,13 +1,22 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,6 +185,59 @@ public class SchoolService {
 		}
 		return null;
 	}
+	
+	public Map<String, Object> getSchoolsCreatedWithinDays(int numberOfDays) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(numberOfDays);
+        
+        Timestamp newEndDate = convertLocalDateToTimestamp(endDate);
+        Timestamp newStartDate = convertLocalDateToTimestamp(startDate);
+
+        List<Object[]> results = schRepository.countSchoolsCreatedPerDay(newStartDate, newEndDate);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> schoolsCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Update the counts for the days with actual results
+        for (Object[] result : results) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            schoolsCreatedPerDay.put(createdDate.format(formatter), count);
+        }
+        
+        int sumOfDone = sumMapValues(schoolsCreatedPerDay);
+        Map<String, Object> response = new HashMap<>();
+        response.put("schools", sumOfDone);
+        response.put("schoolsData", convertMapValuesToList(schoolsCreatedPerDay) );
+
+        return response;
+    }
+	
+	private int sumMapValues  ( Map<String, Integer> map ) {
+	    int sum = 0;
+	    for (int value : map.values()) {
+	        sum += value;
+	    }
+	    return sum;
+	}
+	
+	private ArrayList<Integer> convertMapValuesToList(Map<String, Integer> map) {
+	    return new ArrayList<>(map.values());
+	}
+	
+	private static Timestamp convertLocalDateToTimestamp(LocalDate localDate) {
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MIDNIGHT);
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+        return Timestamp.from(zonedDateTime.toInstant());
+    }
 	
 	public static void copyNonNullProperties(Object src, Object target) {
 	    BeanUtils.copyProperties(src, target, getNullPropertyNames(src));

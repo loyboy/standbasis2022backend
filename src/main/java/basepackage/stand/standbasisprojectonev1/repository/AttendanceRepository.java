@@ -290,4 +290,34 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		@Param("datefrom") Timestamp datefrom,
     		@Param("dateto") Timestamp dateto
     	);
+    
+    //Super admin
+     @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM Attendance s " +
+	           "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate AND s.calendar.status = 1 AND s.done = 1 " +
+	           "GROUP BY DATE(s.createdAt)")
+	 List<Object[]> countAttendancesDoneCreatedPerDay(Timestamp startDate, Timestamp endDate);
+	 
+	 @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM Attendance s " +
+	           "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate AND s.calendar.status = 1 " +
+	           "GROUP BY DATE(s.createdAt)")
+	 List<Object[]> countAttendancesTotalCreatedPerDay(Timestamp startDate, Timestamp endDate);
+	 
+	 @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(DISTINCT t.teaId) AS count FROM Attendance s " +
+		       "JOIN Teacher t ON t = s.teacher " +
+		       "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate AND s.calendar.status = 1 AND s.done = 1 " +
+		       "GROUP BY DATE(s.createdAt)")
+	 List<Object[]> countUniqueTeachersAttendancesPerDay(Timestamp startDate, Timestamp endDate);
+	 
+	 @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM Attendance s " +
+	           "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate AND s.calendar.status = 1 AND s.done = 1 " +
+	           "AND (s.timetable.school.owner = :owner OR :owner is null) "
+	         + "AND (s.timetable.school = :sch OR :sch is null) "	         
+	         + "AND (s.timetable.teacher = :tea OR :tea is null) "
+	         + "GROUP BY DATE(s.createdAt) ")
+	 List<Object[]> countSchoolAttendancesDoneCreatedPerDay(
+			 Timestamp startDate, 
+			 Timestamp endDate,
+			  SchoolGroup owner, 
+	    	  School sch, 
+	    	  Teacher tea );
 }

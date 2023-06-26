@@ -1,13 +1,22 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +39,7 @@ import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.AttendanceRequest;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceActivityRepository;
+import basepackage.stand.standbasisprojectonev1.repository.AttendanceManagementRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
 import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
 import basepackage.stand.standbasisprojectonev1.repository.ClassStreamRepository;
@@ -64,6 +74,9 @@ public class AttendanceService {
 	
 	@Autowired		
     private AttendanceRepository attRepository;	
+	
+	@Autowired		
+    private AttendanceManagementRepository attmanagementRepository;	 
 	
 	@Autowired		
     private AttendanceActivityRepository attactivityRepository;	
@@ -632,6 +645,233 @@ public class AttendanceService {
 			return attRepository.save(attval);
 		}  
 		return null;
+	}
+
+	public Map<String, Object> getAttendancesForSchoolCreatedWithinDays(int numberOfDays, Optional<Long> schgroupId, Optional<Long> schId, Optional<Long> teacherId ) {
+		Long schgroup = schgroupId.orElse(null);
+        Long schowner = schId.orElse(null);
+        Long teacherowner = teacherId.orElse(null);
+        
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(numberOfDays);        
+        
+        Optional<SchoolGroup> schgroupobj = null;
+		Optional<School> schownerobj = null;
+		Optional<Teacher> teaownerobj = null ;
+		
+		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
+		if(schgroup != null) { schgroupobj = groupRepository.findById( schgroup );  } 
+		if(teacherowner != null) { teaownerobj = teaRepository.findById( teacherowner );  } 
+		
+		Timestamp newEndDate = convertLocalDateToTimestamp(endDate);
+        Timestamp newStartDate = convertLocalDateToTimestamp(startDate);
+
+        List<Object[]> results  =  attRepository.countSchoolAttendancesDoneCreatedPerDay(
+        		newStartDate, 
+        		newEndDate, 
+        		schgroupobj == null ? null : schgroupobj.get(), 
+        		schownerobj == null ? null : schownerobj.get() , 
+        		teaownerobj == null ? null : teaownerobj.get() 
+        );
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> attsCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        for (Object[] result : results) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            attsCreatedPerDay.put(createdDate.format(formatter), count);
+        }
+        
+        //Calculate the total done attendances
+        int sumOfDone = sumMapValues(attsCreatedPerDay);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("sessions", sumOfDone);
+        response.put("sessionsData", convertMapValuesToList(attsCreatedPerDay) );       
+
+        return response;
+        
+	}
+	
+	public Map<String, Object> getAttendancesCreatedWithinDays(int numberOfDays) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(numberOfDays);
+        
+        Timestamp newEndDate = convertLocalDateToTimestamp(endDate);
+        Timestamp newStartDate = convertLocalDateToTimestamp(startDate);
+
+        List<Object[]> results  =  attRepository.countAttendancesDoneCreatedPerDay(newStartDate, newEndDate);//sessions
+        List<Object[]> results2 = attRepository.countAttendancesTotalCreatedPerDay(newStartDate, newEndDate);//goals
+        List<Object[]> results3 = attRepository.countUniqueTeachersAttendancesPerDay(newStartDate, newEndDate);//teachers
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> attsCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> attTotalPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> attTeacherPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Update the counts for the days with actual results
+        for (Object[] result : results) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            attsCreatedPerDay.put(createdDate.format(formatter), count);
+        }
+        ///////////////////////////////////////////////////////////////
+              
+        // Update the counts for the days with actual results
+        for (Object[] result : results2) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            attTotalPerDay.put(createdDate.format(formatter), count);
+        }
+        
+     // Update the counts for the days with actual results
+        for (Object[] result : results3) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            attTeacherPerDay.put(createdDate.format(formatter), count);
+        }
+        
+        //Calculate the total done attendances
+        int sumOfDone = sumMapValues(attsCreatedPerDay);
+        int sumOfTotal = sumMapValues(attTotalPerDay);
+        int sumOfTeacher = sumMapValues(attTeacherPerDay);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("sessions", sumOfDone);
+        response.put("sessionsData", convertMapValuesToList(attsCreatedPerDay) );
+        response.put("goals", sumOfTotal);
+        response.put("teachers", sumOfTeacher);
+        response.put("retention", sumOfTotal != 0 ? ((sumOfDone/sumOfTotal) * 100) : 0 );
+
+        return response;
+    }
+	
+	public Map<String, Object> getAttendancesManagementCreatedWithinDays(int numberOfDays) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(numberOfDays);
+        
+        Timestamp newEndDate = convertLocalDateToTimestamp(endDate);
+        Timestamp newStartDate = convertLocalDateToTimestamp(startDate);
+
+        List<Object[]> results  = attmanagementRepository.countAttendancesManagementLatePerDay(newStartDate, newEndDate);//sessions
+        List<Object[]> results2 = attmanagementRepository.countAttendancesManagementNoAttachmentPerDay(newStartDate, newEndDate);//goals
+        List<Object[]> results3 = attactivityRepository.countAttendancesActivitySlipPerDay(newStartDate, newEndDate);//teachers
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> attsLatePerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> attNoAttachmentPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> attSlipPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Update the counts for the days with actual results
+        for (Object[] result : results) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            attsLatePerDay.put(createdDate.format(formatter), count);
+        }
+        ///////////////////////////////////////////////////////////////
+              
+        // Update the counts for the days with actual results
+        for (Object[] result : results2) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            attNoAttachmentPerDay.put(createdDate.format(formatter), count);
+        }
+        
+     // Update the counts for the days with actual results
+        for (Object[] result : results3) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            attSlipPerDay.put(createdDate.format(formatter), count);
+        }
+        
+        //Calculate the total done attendances
+        int sumOfLate = sumMapValues(attsLatePerDay);
+        int sumOfNoAttachment = sumMapValues(attNoAttachmentPerDay);
+        int sumOfSlip = sumMapValues(attSlipPerDay);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalFlags", (sumOfLate + sumOfNoAttachment));
+        response.put("late",sumOfLate );
+        response.put("noAttachment", sumOfNoAttachment);
+        response.put("responseTime", sumOfSlip);
+        response.put("principalData", new ArrayList<Integer>().set(0, 0) );
+
+        return response;
+    }
+	
+	private static Timestamp convertLocalDateToTimestamp(LocalDate localDate) {
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MIDNIGHT);
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+        return Timestamp.from(zonedDateTime.toInstant());
+    }
+	
+	private int sumMapValues  ( Map<String, Integer> map ) {
+	    int sum = 0;
+	    for (int value : map.values()) {
+	        sum += value;
+	    }
+	    return sum;
+	}
+	
+	private ArrayList<Integer> convertMapValuesToList(Map<String, Integer> map) {
+	    return new ArrayList<>(map.values());
 	}
 
 	

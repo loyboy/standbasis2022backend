@@ -511,6 +511,17 @@ public class OnboardingService {
         
         return schoolDefault;
     }
+    
+   /* ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    executor.submit(new Runnable() {
+        public void run() {
+            // Perform the JPA save operation here
+            entityManager.persist(yourModel); // Replace entityManager with your JPA entity manager
+        }
+    });
+
+    executor.shutdown(); // Shutdown the executor service after task completion*/
 }
 
 //username-b3522ba6 >>> 89226cc

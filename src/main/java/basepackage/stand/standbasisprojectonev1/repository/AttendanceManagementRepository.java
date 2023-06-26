@@ -131,4 +131,18 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	     		@Param("dateto") Timestamp dateto,
 	     		Pageable pg
 	     	);
+	 	 
+	 	 @Query("SELECT DATE(attmanage.createdAt) AS createdDate, COUNT(attmanage) AS count FROM AttendanceManagement attmanage " +
+			       "JOIN Attendance att ON att = attmanage.att_id " +
+			       "WHERE DATE(attmanage.createdAt) >= :startDate AND DATE(attmanage.createdAt) <= :endDate AND attmanage.att_id.calendar.status = 1 AND attmanage.timing = 50 " +
+			       "GROUP BY DATE(attmanage.createdAt)")
+		 List<Object[]> countAttendancesManagementLatePerDay(Timestamp startDate, Timestamp endDate);
+		 
+		 @Query("SELECT DATE(attmanage.createdAt) AS createdDate, COUNT(attmanage) AS count FROM AttendanceManagement attmanage " +
+			       "JOIN Attendance att ON att = attmanage.att_id " +
+			       "WHERE DATE(attmanage.createdAt) >= :startDate AND DATE(attmanage.createdAt) <= :endDate AND attmanage.att_id.calendar.status = 1 AND attmanage.completeness = 50 " +
+			       "GROUP BY DATE(attmanage.createdAt)")
+		 List<Object[]> countAttendancesManagementNoAttachmentPerDay(Timestamp startDate, Timestamp endDate);
+		 
+		 
 }

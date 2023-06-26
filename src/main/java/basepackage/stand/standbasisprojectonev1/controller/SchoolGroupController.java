@@ -107,6 +107,14 @@ public class SchoolGroupController {
 	     }
 	 }
 	 
+	 @GetMapping("/created-per-day")
+	 public ResponseEntity<Map<String, Integer>> getSchoolsCreatedPerDay( @RequestParam(value = "days", defaultValue = "7") int numberOfDays) {
+
+	        Map<String, Integer> schoolsCreatedPerDay = service.getSchoolsCreatedWithinDays(numberOfDays);
+
+	        return new ResponseEntity<>(schoolsCreatedPerDay, HttpStatus.OK);
+	 }
+	 
 	 private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 
 		 	
 		 	EventManager _event = new EventManager();

@@ -1,5 +1,6 @@
 package basepackage.stand.standbasisprojectonev1.repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,6 +59,10 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
        @Query("SELECT COUNT(t.teaId) from Teacher t where t.school.owner = :group ")
        long countBySchoolGroup(@Param("group") SchoolGroup group);
        
+       @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM Teacher s " +
+	           "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate " +
+	           "GROUP BY DATE(s.createdAt)")
+	 List<Object[]> countTeachersCreatedPerDay(Timestamp startDate, Timestamp endDate);
         
 
 }

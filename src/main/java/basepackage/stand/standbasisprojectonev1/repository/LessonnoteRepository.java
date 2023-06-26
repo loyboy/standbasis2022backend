@@ -295,5 +295,45 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		@Param("dateto") Timestamp dateto,
     		Pageable pg
     	);
+    
+    @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM Lessonnote s " +
+	       "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate AND s.calendar.status = 1 AND s.submission is not NULL AND s.revert is NULL " +
+	       "GROUP BY DATE(s.createdAt)")
+	 List<Object[]> countLessonnotesCreatedPerDay(Timestamp startDate, Timestamp endDate);
+	 
+	 @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM Lessonnote s " +
+		       "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate AND s.calendar.status = 1 " +
+		       "GROUP BY DATE(s.createdAt)")
+	 List<Object[]> countLessonnotesTotalCreatedPerDay(Timestamp startDate, Timestamp endDate);
+	 
+	 @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(DISTINCT t.teaId) AS count FROM Lessonnote s " +
+			 "JOIN Teacher t ON t = s.teacher " +  
+			 "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate AND s.calendar.status = 1 AND s.submission is not NULL AND s.revert is NULL " +
+		     "GROUP BY DATE(s.createdAt)")
+	 List<Object[]> countUniqueTeachersLessonnotesCreatedPerDay(Timestamp startDate, Timestamp endDate);
+	 
+	 @Query("SELECT DATE(s.revert) AS createdDate, COUNT(s) AS count FROM Lessonnote s " +
+		       "WHERE DATE(s.revert) >= :startDate AND DATE(s.revert) <= :endDate AND s.calendar.status = 1 AND s.revert is not null " +
+		       "GROUP BY DATE(s.revert)")
+	 List<Object[]> countLessonnotesManagementRevertedPerDay(Timestamp startDate, Timestamp endDate);
+	 
+	 @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM Lessonnote s " +
+		       "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate AND s.calendar.status = 1 AND s.submission is null " +
+		       "GROUP BY DATE(s.createdAt)")
+	 List<Object[]> countLessonnotesManagementNotSubmittedPerDay(Timestamp startDate, Timestamp endDate);
+	 
+	 @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM Lessonnote s " +
+		       "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate AND s.calendar.status = 1 " +
+		       "AND (s.calendar.school.owner = :owner OR :owner is null) "
+		       + "AND (s.calendar.school = :sch OR :sch is null) "	         
+		       + "AND (s.teacher = :tea OR :tea is null) "
+		       + "GROUP BY DATE(s.createdAt)")
+	 List<Object[]> countSchoolLessonnotesCreatedPerDay(
+			 Timestamp startDate, 
+			 Timestamp endDate, 
+			 SchoolGroup owner, 
+	    	  School sch, 
+	    	  Teacher tea
+	 );
 
 }

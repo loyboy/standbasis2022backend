@@ -71,15 +71,23 @@ public class MyScheduler {
 	
 	@Scheduled(cron = "0 0 0 * * *")
     public void switchToNewTerm() {
-    // get all the calendars that are active
-	List<Calendar> calendars =	calservice.findByActive();
+		
+	    // get all the calendars that are active
+		List<Calendar> calendars =	calservice.findByActive();
 	
 		for ( Calendar cal: calendars) {
-			System.out.println("Time here is "+ cal.getEnddate() );
-			System.out.println("Time here 2 is "+ parseTimestamp( todayDate() ) );
-			
+						
 			if ( parseTimestamp(todayDate()).compareTo(cal.getEnddate()) > 0 ) {
-				System.out.println("Im in the end date");
+				Timestamp enddate = null; 
+				Timestamp startdate = null;
+				try {
+					enddate = addDays(1,cal.getEnddate());
+					startdate = addDays(1 , cal.getStartdate());
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}				 
+				
 				// the term has ended for that School
 				// then, get all the enrolments in that school
 				List<Enrollment> allEnrols = enrolservice.getEnrollmentsByCalendar(cal.getCalendarId());
@@ -92,33 +100,41 @@ public class MyScheduler {
 				new_cal.setSession(null);
 				new_cal.setStatus(-1);// scheduled status, to be activated manually
 				Calendar savedCalendar = calRepository.save(new_cal);
-				System.out.println("Im in the end line");
+				
 				//old calendar, reset to inactive
 				cal.setStatus(0);
+				cal.setEnddate(enddate);
+				cal.setStartdate(startdate);
 				calRepository.save(cal);
 				
 				for ( Enrollment e: allEnrols) {
-					ClassStream csls = e.getClassstream();
+					ClassStream myclassroom = clsRepository.findById(e.getClassstream().getClsId()).get();
+					System.out.println(" Class stream schid is here: " + e.getClassstream().getClsId() );
+					ClassStream next_classroom = null; 
+										
+					List<ClassStream> allclasses = clsRepository.findBySchool( myclassroom.getSchool() );
+					List<ClassStream> allclasses_filtered = allclasses.stream().filter(c -> (c.getClass_index() == myclassroom.getClass_index() + 1) ).collect(Collectors.toList());
+					if (allclasses_filtered.size() > 0) {
+						next_classroom = allclasses_filtered.get(0);
+					}
 					
-					ClassStream clsstream = findNextClass( csls );
 					if (e.getStatus() == 1) {
-						e.setEnrolId(null);
-						e.setCalendar(savedCalendar);
-						e.setSession_count( e.getSession_count() != null ? (e.getSession_count() + 1) : 2 );
-						e.setClassstream( clsstream );
-						enrolRepository.save(e);
-					}
+						Enrollment newEnrol = new Enrollment();						
+						newEnrol.setCalendar(savedCalendar);
+						newEnrol.setSession_count( e.getSession_count() != null ? (e.getSession_count() + 1) : 2 );
+						newEnrol.setClassstream( next_classroom );
+						newEnrol.setStudent(e.getStudent());
+						newEnrol.setId(e.getId());
+						newEnrol.setStatus(1);
+						enrolRepository.save(newEnrol);
+					}	
+					
+					//Also roll over the timetable
+					
+					e.setStatus(-99);
+					enrolRepository.save(e);
 				}				
-				
-				List<Enrollment> oldEnrols = allEnrols.stream().map(e ->  {
-					if (e.getStatus() == 1) {
-						e.setStatus(-99);
-						return e;
-					}
-					return null;
-				}).collect(Collectors.toList());			
-								
-				enrolRepository.saveAll(oldEnrols);
+			
 				
 			}
 		}
@@ -251,12 +267,25 @@ public class MyScheduler {
 		    }
 	 }
 	 
-	 private String createUuid( String type, Long schId ) {
-	    	String uuid = UUID.randomUUID().toString();
-	    	String[] uniqueCode = uuid.split("-");    	
-	    	String baseId = type + schId.toString() + "-" + uniqueCode[4].substring(6);
-	    	return baseId;
-	    }
+		 private String createUuid( String type, Long schId ) {
+		    	String uuid = UUID.randomUUID().toString();
+		    	String[] uniqueCode = uuid.split("-");    	
+		    	String baseId = type + schId.toString() + "-" + uniqueCode[4].substring(6);
+		    	return baseId;
+		 }
+	 
+	 	private Long dayToMiliseconds(int days){
+		    Long result = Long.valueOf(days * 24 * 60 * 60 * 1000);
+		    return result;
+		}
+
+		private Timestamp addDays(int days, Timestamp t1) throws Exception{
+		    if(days < 0){
+		        throw new Exception("Day in wrong format.");
+		    }
+		    Long miliseconds = dayToMiliseconds(days);
+		    return new Timestamp(t1.getTime() + miliseconds);
+		}
 	 
 	 
 	 /*

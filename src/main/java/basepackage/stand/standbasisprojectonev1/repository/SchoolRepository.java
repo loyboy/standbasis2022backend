@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,5 +58,10 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
     
     @Query("SELECT COUNT(s.schId) from School s where s.status = :active")
     long countByStatus(@Param("active") Long active);
+    
+    @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM School s " +
+	           "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate " +
+	           "GROUP BY DATE(s.createdAt)")
+	 List<Object[]> countSchoolsCreatedPerDay(Timestamp startDate, Timestamp endDate);
 
 }

@@ -541,6 +541,35 @@ public class AttendanceController {
 	     }
 	 }
 	 
+	 @GetMapping("/created-per-day")
+	 public ResponseEntity<Map<String, Object>> getTeachersCreatedPerDay( @RequestParam(value = "days", defaultValue = "7") int numberOfDays) {
+
+	        Map<String, Object> attCreatedPerDay = service.getAttendancesCreatedWithinDays(numberOfDays);
+
+	        return new ResponseEntity<>(attCreatedPerDay, HttpStatus.OK);
+	 }
+	 
+	 @GetMapping("/created-per-day-2")
+	 public ResponseEntity<Map<String, Object>> getTeachersCreatedPerDayTwo( @RequestParam(value = "days", defaultValue = "7") int numberOfDays) {
+
+	        Map<String, Object> teachersCreatedPerDay = service.getAttendancesManagementCreatedWithinDays(numberOfDays);
+
+	        return new ResponseEntity<>(teachersCreatedPerDay, HttpStatus.OK);
+	 }
+	 
+	 @GetMapping("/created-per-day-generic")
+	 public ResponseEntity<Map<String, Object>> getSchoolsCreatedPerDayTwo( 
+			 @RequestParam(value = "days", defaultValue = "7") int numberOfDays, 
+			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
+			 @RequestParam(value = "school", required=false) Optional<Long> school,
+			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher
+	 ) {
+
+	        Map<String, Object> teachersCreatedPerDay = service.getAttendancesForSchoolCreatedWithinDays(numberOfDays, schoolgroup, school, teacher);
+
+	        return new ResponseEntity<>(teachersCreatedPerDay, HttpStatus.OK);
+	 }
+	 
 	 	 
 	 //------------------------------------------------------------------------------------------------------------------
 	 private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 

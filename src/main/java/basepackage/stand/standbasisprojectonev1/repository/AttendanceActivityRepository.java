@@ -148,5 +148,17 @@ public interface AttendanceActivityRepository extends JpaRepository<AttendanceAc
      		@Param("dateto") Timestamp dateto,
      		Pageable pg
      	);
+ 	 
+ 	@Query("SELECT DATE(attact.createdAt) AS createdDate, COUNT(attact) AS count FROM AttendanceActivity attact " +
+		       "JOIN Attendance att ON att = attact.att_id " +
+		       "WHERE DATE(attact.createdAt) >= :startDate AND DATE(attact.createdAt) <= :endDate AND attact.att_id.calendar.status = 1 AND attact.slip = 1 " +
+		       "GROUP BY DATE(attact.createdAt)")
+	 List<Object[]> countAttendancesActivitySlipPerDay(Timestamp startDate, Timestamp endDate);
+	 
+	 @Query("SELECT DATE(attact.createdAt) AS createdDate, COUNT(attact) AS count FROM AttendanceActivity attact " +
+		       "JOIN Attendance att ON att = attact.att_id " +
+		       "WHERE DATE(attact.createdAt) >= :startDate AND DATE(attact.createdAt) <= :endDate AND attact.att_id.calendar.status = 1 AND attact.actual is NOT NULL AND attact.ownertype = 'Principal' " +
+		       "GROUP BY DATE(attact.createdAt)")
+	 List<Object[]> countAttendancesActivityPrincipalAttendedPerDay(Timestamp startDate, Timestamp endDate);
     
 }

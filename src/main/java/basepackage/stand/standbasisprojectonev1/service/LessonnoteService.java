@@ -2,12 +2,21 @@ package basepackage.stand.standbasisprojectonev1.service;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,6 +42,7 @@ import basepackage.stand.standbasisprojectonev1.repository.AssessmentRepository;
 import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
 import basepackage.stand.standbasisprojectonev1.repository.ClassStreamRepository;
 import basepackage.stand.standbasisprojectonev1.repository.EnrollmentRepository;
+import basepackage.stand.standbasisprojectonev1.repository.LessonnoteActivityRepository;
 import basepackage.stand.standbasisprojectonev1.repository.LessonnoteManagementRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository;
@@ -73,6 +83,9 @@ public class LessonnoteService {
 	
 	@Autowired		
     private LessonnoteManagementRepository lsnmanageRepository;	
+	
+	@Autowired		
+    private LessonnoteActivityRepository lsnactivityRepository;	
 	
 	@Autowired		
     private CalendarRepository calRepository;
@@ -703,5 +716,250 @@ public class LessonnoteService {
 		}  
 		return null;
 	}
+	
+	public Map<String, Object> getLessonnotesForSchoolCreatedWithinDays(int numberOfDays, Optional<Long> schgroupId, Optional<Long> schId, Optional<Long> teacherId ) {
+		Long schgroup = schgroupId.orElse(null);
+        Long schowner = schId.orElse(null);
+        Long teacherowner = teacherId.orElse(null);
+        
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(numberOfDays);        
+        
+        Optional<SchoolGroup> schgroupobj = null;
+		Optional<School> schownerobj = null;
+		Optional<Teacher> teaownerobj = null ;
+		
+		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
+		if(schgroup != null) { schgroupobj = groupRepository.findById( schgroup );  } 
+		if(teacherowner != null) { teaownerobj = teaRepository.findById( teacherowner );  } 
+		
+		Timestamp newEndDate = convertLocalDateToTimestamp(endDate);
+        Timestamp newStartDate = convertLocalDateToTimestamp(startDate);
+
+        List<Object[]> results  =  lsnRepository.countSchoolLessonnotesCreatedPerDay(
+        		newStartDate, 
+        		newEndDate, 
+        		schgroupobj == null ? null : schgroupobj.get(), 
+        		schownerobj == null ? null : schownerobj.get() , 
+        		teaownerobj == null ? null : teaownerobj.get() 
+        );
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> lsnsCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        for (Object[] result : results) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            lsnsCreatedPerDay.put(createdDate.format(formatter), count);
+        }
+        
+        //Calculate the total done attendances
+        int sumOfDone = sumMapValues(lsnsCreatedPerDay);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("sessions", sumOfDone);
+        response.put("sessionsData", convertMapValuesToList(lsnsCreatedPerDay) );       
+
+        return response;
+        
+	}
+		
+	public Map<String, Object> getLessonnotesCreatedWithinDays(int numberOfDays) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(numberOfDays);
+        
+        Timestamp newEndDate = convertLocalDateToTimestamp(endDate);
+        Timestamp newStartDate = convertLocalDateToTimestamp(startDate);
+
+        List<Object[]> results = lsnRepository.countLessonnotesCreatedPerDay(newStartDate, newEndDate);
+        List<Object[]> results2 = lsnRepository.countLessonnotesTotalCreatedPerDay(newStartDate, newEndDate);
+        List<Object[]> results3 = lsnRepository.countUniqueTeachersLessonnotesCreatedPerDay(newStartDate, newEndDate);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> lsnsCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> lsnTotalCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        Map<String, Integer> lsnTeacherPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Update the counts for the days with actual results
+        for (Object[] result : results) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            lsnsCreatedPerDay.put(createdDate.format(formatter), count);
+        }
+        
+        for (Object[] result : results2) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            lsnTotalCreatedPerDay.put(createdDate.format(formatter), count);
+        }
+        
+        for (Object[] result : results3) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            lsnTeacherPerDay.put(createdDate.format(formatter), count);
+        }
+
+        //Calculate the total done lessonnotes
+        int sumOfCreated = sumMapValues(lsnsCreatedPerDay);
+        int sumOfTotal = sumMapValues(lsnTotalCreatedPerDay);
+        int sumOfTeacher = sumMapValues(lsnTeacherPerDay);
+     
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("sessions", sumOfCreated);
+        response.put("sessionsData", convertMapValuesToList(lsnsCreatedPerDay) );
+        response.put("goals", sumOfTotal);
+        response.put("teachers", sumOfTeacher);
+        response.put("retention", sumOfTotal != 0 ? ((sumOfCreated/sumOfTotal) * 100) : 0 );
+
+        return response;
+    }
+	
+	public Map<String, Object> getLessonnotesManagementCreatedWithinDays(int numberOfDays) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(numberOfDays);
+        
+        Timestamp newEndDate = convertLocalDateToTimestamp(endDate);
+        Timestamp newStartDate = convertLocalDateToTimestamp(startDate);
+
+        List<Object[]> results  = lsnRepository.countLessonnotesManagementRevertedPerDay(newStartDate, newEndDate);//
+        List<Object[]> results2 = lsnRepository.countLessonnotesManagementNotSubmittedPerDay(newStartDate, newEndDate);//
+        List<Object[]> results3 = lsnmanageRepository.countLessonnotesManagementBasicPerDay(newStartDate, newEndDate);//
+        List<Object[]> results4 = lsnactivityRepository.countLessonnotesActivitySlipPerDay(newStartDate, newEndDate);//
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> lsnsRevertPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> lsnNotSubmittedPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+       
+        //
+        Map<String, Integer> lsnslipPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Create a map with all days in the range initialized with count 0
+        Map<String, Integer> lsnManagementPerDay = startDate.datesUntil(endDate.plusDays(1))
+                .collect(Collectors.toMap(
+                        date -> date.format(formatter),
+                        date -> 0,
+                        (count1, count2) -> count1,
+                        LinkedHashMap::new
+                ));
+        
+        // Update the counts for the days with actual results
+        for (Object[] result : results) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            lsnsRevertPerDay.put(createdDate.format(formatter), count);
+        }
+        ///////////////////////////////////////////////////////////////
+              
+        // Update the counts for the days with actual results
+        for (Object[] result : results2) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            lsnManagementPerDay.put(createdDate.format(formatter), count);
+        }
+        
+        // Update the counts for the days with actual results
+        for (Object[] result : results3) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            lsnNotSubmittedPerDay.put(createdDate.format(formatter), count);
+        }
+        
+        //
+        for (Object[] result : results4) {
+            LocalDate createdDate = (LocalDate) result[0];
+            int count = ((Number) result[1]).intValue();
+            lsnslipPerDay.put(createdDate.format(formatter), count);
+        }
+        
+        //Calculate the total done lessonnotes
+        int sumOfRevert = sumMapValues(lsnsRevertPerDay);
+        int sumOfManagement = sumMapValues(lsnManagementPerDay);
+        int sumOfNotSubmitted = sumMapValues(lsnNotSubmittedPerDay);
+        int sumOfSlip = sumMapValues(lsnslipPerDay);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalFlags", (sumOfRevert + sumOfManagement + sumOfNotSubmitted ));
+        response.put("reverted", sumOfRevert );
+        response.put("management", sumOfManagement);
+        response.put("notsubmitted", sumOfNotSubmitted);
+        response.put("responseTime", sumOfSlip);
+        response.put("principalData", new ArrayList<Integer>().set(0, 0) ); //EDIT LATER PLEASE
+
+        return response;
+    }
+	
+	private static Timestamp convertLocalDateToTimestamp(LocalDate localDate) {
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MIDNIGHT);
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+        return Timestamp.from(zonedDateTime.toInstant());
+    }
+	
+	private int sumMapValues  ( Map<String, Integer> map ) {
+	    int sum = 0;
+	    for (int value : map.values()) {
+	        sum += value;
+	    }
+	    return sum;
+	}
+	
+	private ArrayList<Integer> convertMapValuesToList(Map<String, Integer> map) {
+	    return new ArrayList<>(map.values());
+	}
+
+	
 		
 }

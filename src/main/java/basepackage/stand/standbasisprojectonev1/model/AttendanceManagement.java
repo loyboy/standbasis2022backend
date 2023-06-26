@@ -28,13 +28,13 @@ public class AttendanceManagement extends DateAudit {
     private Long attmanId;
     
     @NotNull   
-    private Integer timing;
+    private Integer timing;//100 - good, 50 - late , 0 - voided
     
     @NotNull   
     private Integer class_perf;    
     
     @NotNull  
-    private Integer completeness; 
+    private Integer completeness; //100 - good, 50 incomplete
     
     @NotNull
     private Integer score;  

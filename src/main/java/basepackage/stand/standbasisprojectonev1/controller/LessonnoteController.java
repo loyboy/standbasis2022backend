@@ -629,7 +629,35 @@ public class LessonnoteController {
 	     }
 	 }
 	 
+	 @GetMapping("/created-per-day")
+	 public ResponseEntity<Map<String, Object>> getLessonnotesCreatedPerDay( @RequestParam(value = "days", defaultValue = "7") int numberOfDays) {
+
+	        Map<String, Object> lsnCreatedPerDay = service.getLessonnotesCreatedWithinDays(numberOfDays);
+
+	        return new ResponseEntity<>(lsnCreatedPerDay, HttpStatus.OK);
+	 }
 	 
+	 @GetMapping("/created-per-day-2")
+	 public ResponseEntity<Map<String, Object>> getLessonnotesManagementCreatedPerDay( @RequestParam(value = "days", defaultValue = "7") int numberOfDays) {
+
+	        Map<String, Object> lsnCreatedPerDay = service.getLessonnotesManagementCreatedWithinDays(numberOfDays);
+
+	        return new ResponseEntity<>(lsnCreatedPerDay, HttpStatus.OK);
+	 }
+	 
+	 //For all schools, proprietor, and teachers
+	 @GetMapping("/created-per-day-generic")
+	 public ResponseEntity<Map<String, Object>> getSchoolsLessonnotesCreatedPerDay( 
+			 @RequestParam(value = "days", defaultValue = "7") int numberOfDays,
+			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
+			 @RequestParam(value = "school", required=false) Optional<Long> school,
+			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher
+	) {
+
+	        Map<String, Object> lsnCreatedPerDay = service.getLessonnotesForSchoolCreatedWithinDays(numberOfDays,schoolgroup, school, teacher);
+
+	        return new ResponseEntity<>(lsnCreatedPerDay, HttpStatus.OK);
+	 }
 	 
 	 //---------------------------------------------------------------------------------------------
 	 private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 

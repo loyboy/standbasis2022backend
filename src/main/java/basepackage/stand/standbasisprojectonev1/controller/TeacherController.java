@@ -167,6 +167,15 @@ public class TeacherController {
 	 
 	 }
 	 
+	 @GetMapping("/created-per-day")
+	 public ResponseEntity<Map<String, Object>> getTeachersCreatedPerDay( @RequestParam(value = "days", defaultValue = "7") int numberOfDays) {
+
+	        Map<String, Object> teachersCreatedPerDay = service.getTeachersCreatedWithinDays(numberOfDays);
+
+	        return new ResponseEntity<>(teachersCreatedPerDay, HttpStatus.OK);
+	 }	 
+	
+	 
 	 private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 
 		 	
 		 	EventManager _event = new EventManager();

@@ -162,6 +162,13 @@ public interface LessonnoteManagementRepository extends JpaRepository<Lessonnote
 	    		@Param("datefrom") Timestamp datefrom,
 	    		@Param("dateto") Timestamp dateto
 	    );
+		
+		@Query("SELECT DATE(lsnmanage.updatedAt) AS createdDate, COUNT(lsnmanage) AS count FROM LessonnoteManagement lsnmanage " +
+			       "JOIN Lessonnote lsn ON lsn = lsnmanage.lsn_id " +
+			       "WHERE DATE(lsnmanage.updatedAt) >= :startDate AND DATE(lsnmanage.updatedAt) <= :endDate AND lsnmanage.lsn_id.calendar.status = 1 "
+			     + "AND lsnmanage.management < 50 " +
+			       "GROUP BY DATE(lsnmanage.updatedAt)")
+		List<Object[]> countLessonnotesManagementBasicPerDay(Timestamp startDate, Timestamp endDate);
 	 
 	 	
 	    
