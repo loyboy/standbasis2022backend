@@ -235,7 +235,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         for (Object[] result : results) {
         	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            teachersCreatedPerDay.put(formatter2.format(createdDate), count);
+            teachersCreatedPerDay.put( formatter2.format(createdDate), count);
         }
         
         int sumOfDone = sumMapValues(teachersCreatedPerDay);

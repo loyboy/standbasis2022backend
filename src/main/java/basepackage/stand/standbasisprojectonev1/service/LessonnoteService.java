@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -745,6 +746,7 @@ public class LessonnoteService {
         );
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
 
         // Create a map with all days in the range initialized with count 0
         Map<String, Integer> lsnsCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
@@ -756,9 +758,9 @@ public class LessonnoteService {
                 ));
         
         for (Object[] result : results) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            lsnsCreatedPerDay.put(createdDate.format(formatter), count);
+            lsnsCreatedPerDay.put( formatter2.format(createdDate) , count);
         }
         
         //Calculate the total done attendances
@@ -784,6 +786,7 @@ public class LessonnoteService {
         List<Object[]> results3 = lsnRepository.countUniqueTeachersLessonnotesCreatedPerDay(newStartDate, newEndDate);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
 
         // Create a map with all days in the range initialized with count 0
         Map<String, Integer> lsnsCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
@@ -813,21 +816,21 @@ public class LessonnoteService {
         
         // Update the counts for the days with actual results
         for (Object[] result : results) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            lsnsCreatedPerDay.put(createdDate.format(formatter), count);
+            lsnsCreatedPerDay.put( formatter2.format(createdDate) , count);
         }
         
         for (Object[] result : results2) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            lsnTotalCreatedPerDay.put(createdDate.format(formatter), count);
+            lsnTotalCreatedPerDay.put( formatter2.format(createdDate) , count);
         }
         
         for (Object[] result : results3) {
             LocalDate createdDate = (LocalDate) result[0];
             int count = ((Number) result[1]).intValue();
-            lsnTeacherPerDay.put(createdDate.format(formatter), count);
+            lsnTeacherPerDay.put( formatter2.format(createdDate) , count);
         }
 
         //Calculate the total done lessonnotes
@@ -859,6 +862,7 @@ public class LessonnoteService {
         List<Object[]> results4 = lsnactivityRepository.countLessonnotesActivitySlipPerDay(newStartDate, newEndDate);//
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
 
         // Create a map with all days in the range initialized with count 0
         Map<String, Integer> lsnsRevertPerDay = startDate.datesUntil(endDate.plusDays(1))
@@ -898,31 +902,31 @@ public class LessonnoteService {
         
         // Update the counts for the days with actual results
         for (Object[] result : results) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            lsnsRevertPerDay.put(createdDate.format(formatter), count);
+            lsnsRevertPerDay.put( formatter2.format(createdDate) , count);
         }
         ///////////////////////////////////////////////////////////////
               
         // Update the counts for the days with actual results
         for (Object[] result : results2) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            lsnManagementPerDay.put(createdDate.format(formatter), count);
+            lsnManagementPerDay.put( formatter2.format(createdDate) , count);
         }
         
         // Update the counts for the days with actual results
         for (Object[] result : results3) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            lsnNotSubmittedPerDay.put(createdDate.format(formatter), count);
+            lsnNotSubmittedPerDay.put( formatter2.format(createdDate) , count);
         }
         
         //
         for (Object[] result : results4) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            lsnslipPerDay.put(createdDate.format(formatter), count);
+            lsnslipPerDay.put( formatter2.format(createdDate) , count);
         }
         
         //Calculate the total done lessonnotes

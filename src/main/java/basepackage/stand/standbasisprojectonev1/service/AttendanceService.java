@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -675,6 +676,7 @@ public class AttendanceService {
         );
         
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
 
         // Create a map with all days in the range initialized with count 0
         Map<String, Integer> attsCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
@@ -686,9 +688,10 @@ public class AttendanceService {
                 ));
         
         for (Object[] result : results) {
-            LocalDate createdDate = (LocalDate) result[0];
+         //   LocalDate createdDate = (LocalDate) result[0];
+            Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            attsCreatedPerDay.put(createdDate.format(formatter), count);
+            attsCreatedPerDay.put( formatter2.format(createdDate) , count);
         }
         
         //Calculate the total done attendances
@@ -714,6 +717,7 @@ public class AttendanceService {
         List<Object[]> results3 = attRepository.countUniqueTeachersAttendancesPerDay(newStartDate, newEndDate);//teachers
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
 
         // Create a map with all days in the range initialized with count 0
         Map<String, Integer> attsCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
@@ -744,24 +748,24 @@ public class AttendanceService {
         
         // Update the counts for the days with actual results
         for (Object[] result : results) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	 Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            attsCreatedPerDay.put(createdDate.format(formatter), count);
+            attsCreatedPerDay.put( formatter2.format(createdDate) , count);
         }
         ///////////////////////////////////////////////////////////////
               
         // Update the counts for the days with actual results
         for (Object[] result : results2) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	 Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            attTotalPerDay.put(createdDate.format(formatter), count);
+            attTotalPerDay.put(formatter2.format(createdDate), count);
         }
         
      // Update the counts for the days with actual results
         for (Object[] result : results3) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	 Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            attTeacherPerDay.put(createdDate.format(formatter), count);
+            attTeacherPerDay.put(formatter2.format(createdDate), count);
         }
         
         //Calculate the total done attendances
@@ -791,6 +795,7 @@ public class AttendanceService {
         List<Object[]> results3 = attactivityRepository.countAttendancesActivitySlipPerDay(newStartDate, newEndDate);//teachers
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
 
         // Create a map with all days in the range initialized with count 0
         Map<String, Integer> attsLatePerDay = startDate.datesUntil(endDate.plusDays(1))
@@ -821,24 +826,24 @@ public class AttendanceService {
         
         // Update the counts for the days with actual results
         for (Object[] result : results) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            attsLatePerDay.put(createdDate.format(formatter), count);
+            attsLatePerDay.put( formatter2.format(createdDate) , count);
         }
         ///////////////////////////////////////////////////////////////
               
         // Update the counts for the days with actual results
         for (Object[] result : results2) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            attNoAttachmentPerDay.put(createdDate.format(formatter), count);
+            attNoAttachmentPerDay.put( formatter2.format(createdDate) , count);
         }
         
      // Update the counts for the days with actual results
         for (Object[] result : results3) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            attSlipPerDay.put(createdDate.format(formatter), count);
+            attSlipPerDay.put( formatter2.format(createdDate) , count);
         }
         
         //Calculate the total done attendances
