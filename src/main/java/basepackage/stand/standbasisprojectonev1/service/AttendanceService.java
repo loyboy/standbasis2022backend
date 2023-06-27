@@ -852,11 +852,13 @@ public class AttendanceService {
         int sumOfSlip = sumMapValues(attSlipPerDay);
         
         Map<String, Object> response = new HashMap<>();
+        ArrayList<Integer> myList = new ArrayList<>();
+        myList.add(0, 0);
         response.put("totalFlags", (sumOfLate + sumOfNoAttachment));
         response.put("late",sumOfLate );
         response.put("noAttachment", sumOfNoAttachment);
         response.put("responseTime", sumOfSlip);
-        response.put("principalData", new ArrayList<Integer>().set(0, 0) );
+        response.put("principalData", myList );
 
         return response;
     }

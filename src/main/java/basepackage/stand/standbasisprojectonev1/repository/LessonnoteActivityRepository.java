@@ -165,13 +165,13 @@ public interface LessonnoteActivityRepository extends JpaRepository<LessonnoteAc
     );
 	
 	@Query("SELECT DATE(lsnact.createdAt) AS createdDate, COUNT(lsnact) AS count FROM LessonnoteActivity lsnact " +
-		       "JOIN Lessonnote lsn ON att = lsnact.lsn_id " +
+		       "JOIN Lessonnote lsn ON lsn = lsnact.lsn_id " +
 		       "WHERE DATE(lsnact.createdAt) >= :startDate AND DATE(lsnact.createdAt) <= :endDate AND lsnact.lsn_id.calendar.status = 1 AND lsnact.slip = 1 " +
 		       "GROUP BY DATE(lsnact.createdAt)")
 	 List<Object[]> countLessonnotesActivitySlipPerDay(Timestamp startDate, Timestamp endDate);
 	 
 	 @Query("SELECT DATE(lsnact.createdAt) AS createdDate, COUNT(lsnact) AS count FROM LessonnoteActivity lsnact " +
-		       "JOIN Lessonnote lsn ON att = lsnact.lsn_id " +
+		       "JOIN Lessonnote lsn ON lsn = lsnact.lsn_id " +
 		       "WHERE DATE(lsnact.createdAt) >= :startDate AND DATE(lsnact.createdAt) <= :endDate AND lsnact.lsn_id.calendar.status = 1 AND lsnact.actual is NOT NULL AND lsnact.ownertype = 'Principal' " +
 		       "GROUP BY DATE(lsnact.createdAt)")
 	 List<Object[]> countLessonnotesActivityPrincipalAttendedPerDay(Timestamp startDate, Timestamp endDate);
