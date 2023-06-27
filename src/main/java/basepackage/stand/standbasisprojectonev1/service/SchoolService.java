@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -9,6 +10,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -196,6 +198,7 @@ public class SchoolService {
         List<Object[]> results = schRepository.countSchoolsCreatedPerDay(newStartDate, newEndDate);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
 
         // Create a map with all days in the range initialized with count 0
         Map<String, Integer> schoolsCreatedPerDay = startDate.datesUntil(endDate.plusDays(1))
@@ -208,9 +211,9 @@ public class SchoolService {
         
         // Update the counts for the days with actual results
         for (Object[] result : results) {
-            LocalDate createdDate = (LocalDate) result[0];
+        	Date createdDate = (Date) result[0];
             int count = ((Number) result[1]).intValue();
-            schoolsCreatedPerDay.put(createdDate.format(formatter), count);
+            schoolsCreatedPerDay.put( formatter2.format(createdDate) , count);
         }
         
         int sumOfDone = sumMapValues(schoolsCreatedPerDay);
