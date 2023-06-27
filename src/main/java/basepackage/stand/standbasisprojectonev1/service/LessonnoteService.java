@@ -936,12 +936,14 @@ public class LessonnoteService {
         int sumOfSlip = sumMapValues(lsnslipPerDay);
         
         Map<String, Object> response = new HashMap<>();
+        ArrayList<Integer> myList = new ArrayList<>();
+        myList.add(0, 0);
         response.put("totalFlags", (sumOfRevert + sumOfManagement + sumOfNotSubmitted ));
         response.put("reverted", sumOfRevert );
         response.put("management", sumOfManagement);
         response.put("notsubmitted", sumOfNotSubmitted);
         response.put("responseTime", sumOfSlip);
-        response.put("principalData", new ArrayList<Integer>().set(0, 0) ); //EDIT LATER PLEASE
+        response.put("principalData", myList ); //EDIT LATER PLEASE
 
         return response;
     }
