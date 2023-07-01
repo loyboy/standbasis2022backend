@@ -26,7 +26,7 @@ public interface EventManagerRepository extends JpaRepository<EventManager, Long
 	    Page<EventManager> filter( @Param("filter") String filter, Pageable pg);
 	    
 	    @Query(	"select evt from EventManager evt "
-	    		+ "WHERE evt.module = :module OR :module is null AND "
+	    		+ "WHERE (evt.module = :module OR :module is null) AND "
 	    		+ "(evt.user.teacher_id = :tea OR :tea is null) AND "
 	    		+ "(evt.school = :sch OR :sch is null) AND "
 	    		+ "(evt.school.owner = :group OR :group is null) "
@@ -40,7 +40,7 @@ public interface EventManagerRepository extends JpaRepository<EventManager, Long
 	    );
 	    
 	    @Query("select evt from EventManager evt "
-	    		+ "WHERE evt.module = :module OR :module is null AND "
+	    		+ "WHERE (evt.module = :module OR :module is null) AND "
 	    		+ "(evt.user.teacher_id = :tea OR :tea is null) AND "
 	    		+ "(evt.school = :sch OR :sch is null) AND "
 	    		+ "(evt.school.owner = :group OR :group is null) AND "
