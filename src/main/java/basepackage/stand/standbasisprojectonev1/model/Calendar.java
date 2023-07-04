@@ -33,7 +33,7 @@ public class Calendar extends DateAudit{
     private String id;    
 
     @NotNull   
-    private Integer term;
+    private Integer term; // -99 means it was switched to new term
     
     @Size(max = 500)
     private String holiday;

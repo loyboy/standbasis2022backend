@@ -72,7 +72,7 @@ public class UserController {
 			 Optional<User> u = userRepository.findById( userDetails.getId() );				
 			 //------------------------------------
 			 saveEvent("user", "edit", "The User with name: " + u.get().getName() + "has deleted a user with ID:  " + val.getUserId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "User has been updated successfully.", val));	
 		 }
@@ -89,7 +89,7 @@ public class UserController {
 				
 			 //------------------------------------
 			 saveEvent("user", "delete", "The User with name: " + u.get().getName() + "has deleted a user with ID:  " + val.getUserId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "User has been deleted successfully.", val));				 
 		 }

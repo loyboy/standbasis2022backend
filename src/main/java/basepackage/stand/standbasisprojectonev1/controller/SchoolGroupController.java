@@ -80,9 +80,9 @@ public class SchoolGroupController {
 			 Optional<User> u = userRepository.findById( userDetails.getId() );
 				
 			 //------------------------------------
-			 saveEvent("schoolgroup", "edit", "The User with name: " + u.get().getName() + "has updated a school group with ID:  " + val.getId(), 
+			/* saveEvent("schoolgroup", "edit", "The User with name: " + u.get().getName() + "has updated a school group with ID:  " + val.getId(), 
 					 new Date(), u.get(), u.get().getSchool()
-			 );
+			 );*/
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "School group has been updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
@@ -97,9 +97,9 @@ public class SchoolGroupController {
 			 Optional<User> u = userRepository.findById( userDetails.getId() );
 				
 			 //------------------------------------
-			 saveEvent("schoolgroup", "delete", "The User with name: " + u.get().getName() + "has deleted a school group with ID:  " + val.getId(), 
-					 new Date(), u.get(), u.get().getSchool()
-			 );
+			/* saveEvent("schoolgroup", "delete", "The User with name: " + u.get().getName() + "has deleted a school group with ID:  " + val.getId(), 
+					 new Date(), u.get(), u.get().getSchool() == null ? null : u.get().getSchool()
+			 );*/
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "School group has been deleted successfully.", val));				 
 		 }
 		 catch (Exception ex) {

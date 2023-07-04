@@ -34,6 +34,7 @@ import basepackage.stand.standbasisprojectonev1.service.AttendanceService;
 import basepackage.stand.standbasisprojectonev1.service.CalendarService;
 import basepackage.stand.standbasisprojectonev1.service.ClassService;
 import basepackage.stand.standbasisprojectonev1.service.EnrollmentService;
+import basepackage.stand.standbasisprojectonev1.service.TimetableService;
 
 @Component
 public class MyScheduler {
@@ -48,6 +49,9 @@ public class MyScheduler {
 	
 	@Autowired
 	CalendarService calservice;
+	
+	@Autowired
+	TimetableService timeservice;
 	
 	private final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
@@ -68,6 +72,7 @@ public class MyScheduler {
 	
 	@Autowired
 	private EnrollmentRepository enrolRepository;
+	
 	
 	@Scheduled(cron = "0 0 0 * * *")
     public void switchToNewTerm() {
@@ -91,6 +96,7 @@ public class MyScheduler {
 				// the term has ended for that School
 				// then, get all the enrolments in that school
 				List<Enrollment> allEnrols = enrolservice.getEnrollmentsByCalendar(cal.getCalendarId());
+				List<TimeTable> allTimetables = timeservice.getTimetablesByCalendar(cal.getCalendarId());
 				// Create a new Calendar object
 				Calendar new_cal = new Calendar();
 				String myidcal = createUuid("calendar-", cal.getSchool().getSchId() );
@@ -109,7 +115,7 @@ public class MyScheduler {
 				
 				for ( Enrollment e: allEnrols) {
 					ClassStream myclassroom = clsRepository.findById(e.getClassstream().getClsId()).get();
-					System.out.println(" Class stream schid is here: " + e.getClassstream().getClsId() );
+					//System.out.println(" Class stream schid is here: " + e.getClassstream().getClsId() );
 					ClassStream next_classroom = null; 
 										
 					List<ClassStream> allclasses = clsRepository.findBySchool( myclassroom.getSchool() );
@@ -133,7 +139,26 @@ public class MyScheduler {
 					
 					e.setStatus(-99);
 					enrolRepository.save(e);
-				}				
+				}
+				
+				for ( TimeTable tt: allTimetables) {
+					if (tt.getStatus() == 1) {
+						TimeTable newTime = new TimeTable();
+						newTime.setCalendar(savedCalendar);
+						newTime.setSchool(tt.getSchool());
+						newTime.setTeacher(tt.getTeacher());
+						newTime.setClass_stream(tt.getClass_stream());
+						newTime.setSubject(tt.getSubject());
+						newTime.setTime_of(tt.getTime_of());
+						newTime.setDay_of(tt.getDay_of());
+						newTime.setStatus(1);
+						timeRepository.save(newTime);
+					}
+					
+					tt.setStatus(-99);
+					timeRepository.save(tt);
+				}
+				
 			
 				
 			}

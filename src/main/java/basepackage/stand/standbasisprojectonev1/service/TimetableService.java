@@ -23,6 +23,7 @@ import basepackage.stand.standbasisprojectonev1.exception.BadRequestException;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
+import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Subject;
@@ -113,6 +114,16 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
 			return timeval;
 		}
 		return null;
+	}
+	
+	public List<TimeTable> getTimetablesByCalendar(Long cal){
+		Optional<Calendar> existing = calRepository.findById(cal);
+		if (existing.isPresent()) {
+			List<TimeTable> enc = timeRepository.findByCalendar(existing.get());
+			
+			return enc;
+		}
+		return null;		
 	}
 	
 	public Map<String, Object> getPaginatedTimeTables(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval, Optional<Long> teacherval) {

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
+import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
@@ -53,6 +54,12 @@ public interface TimetableRepository extends JpaRepository<TimeTable, Long> {
     		 + "AND (tt.school.owner = :group OR :group is null) "
     		)
      Page<TimeTable> findBySchoolAndTeacherPage( @Param("owner") School owner, @Param("group") SchoolGroup group, @Param("tea") Teacher tea, Pageable pg );
+     
+     @Query("select tt from TimeTable tt " 
+             + "JOIN Calendar cs ON cs = tt.calendar " 
+             + "WHERE cs = :cal AND cs.status = 1 AND tt.status = 1 "            
+    	   )
+     List<TimeTable> findByCalendar( @Param("cal") Calendar cal );
      
      //@Param("owner") School owner, @Param("group") SchoolGroup group,
      // + "OR (tt.school = :owner OR :owner is null) "

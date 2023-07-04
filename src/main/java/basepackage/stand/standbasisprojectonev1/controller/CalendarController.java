@@ -90,7 +90,7 @@ public class CalendarController {
 				
 			 //------------------------------------
 			 saveEvent("calendar", "edit", "The User with name: " + u.get().getName() + "has edited a Calendar instance with ID:  " + val.getId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Calendar has been updated successfully.", val));	
 		 }
@@ -107,7 +107,7 @@ public class CalendarController {
 				
 			 //------------------------------------
 			 saveEvent("calendar", "delete", "The User with name: " + u.get().getName() + "has deleted a Calendar instance with ID:  " + val.getId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Calendar has been deleted successfully.", val));				 
 		 }

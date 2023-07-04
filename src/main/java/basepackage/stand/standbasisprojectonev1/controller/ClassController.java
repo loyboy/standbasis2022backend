@@ -104,7 +104,7 @@ public class ClassController {
 				
 			 //------------------------------------
 			 saveEvent("classstream", "edit", "The User with name: " + u.get().getName() + "has updated a ClassStream instance with ID:  " + val.getId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "ClassStream has been updated successfully.", val));	
 		 }
@@ -122,7 +122,7 @@ public class ClassController {
 				
 			 //------------------------------------
 			 saveEvent("classstream", "delete", "The User with name: " + u.get().getName() + "has deleted a ClassStream instance with ID:  " + val.getId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "ClassStream has been deleted successfully.", val));				 
 		 }

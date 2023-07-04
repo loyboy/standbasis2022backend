@@ -103,7 +103,7 @@ public class StudentController {
 				
 			 //------------------------------------
 			 saveEvent("student", "edit", "The User with name: " + u.get().getName() + "has upDATED a pupil with ID:  " + val.getId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Student data has been updated successfully.", val));	
 		 }
@@ -121,7 +121,7 @@ public class StudentController {
 				
 			 //------------------------------------
 			 saveEvent("student", "delete", "The User with name: " + u.get().getName() + "has deleted a pupil with ID:  " + val.getId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Student data has been deleted successfully.", val));				 

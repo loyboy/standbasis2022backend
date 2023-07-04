@@ -84,11 +84,12 @@ public class TimetableController {
 				
 			 //------------------------------------
 			 saveEvent("timetable", "edit", "The User with name: " + u.get().getName() + "has updated a timetable with ID:  " + val.getTimeId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "TimeTable has been updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
+			 ex.printStackTrace();
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	 }
@@ -101,7 +102,7 @@ public class TimetableController {
 				
 			 //------------------------------------
 			 saveEvent("timetable", "delete", "The User with name: " + u.get().getName() + "has deleted a timetable with ID:  " + val.getTimeId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "TimeTable has been deleted successfully.", val));				 
 		 }

@@ -105,7 +105,7 @@ public class EnrollmentController {
 				
 			 //------------------------------------
 			 saveEvent("enrolment", "edit", "The User with name: " + u.get().getName() + "has edited a Enrolment instance with ID:  " + val.getId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getStudent().getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Enrollment has been updated successfully.", val));	
 		 }
@@ -123,7 +123,7 @@ public class EnrollmentController {
 				
 			 //------------------------------------
 			 saveEvent("enrolment", "delete", "The User with name: " + u.get().getName() + "has deleted a Enrolment instance with ID:  " + val.getId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getStudent().getSchool() : u.get().getSchool()
 			 );
 			 
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Enrollment has been deleted successfully.", val));				 

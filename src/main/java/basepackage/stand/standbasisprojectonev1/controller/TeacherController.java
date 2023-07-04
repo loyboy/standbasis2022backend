@@ -122,7 +122,7 @@ public class TeacherController {
 				
 			 //------------------------------------
 			 saveEvent("teacher", "edit", "The User with name: " + u.get().getName() + "has deleted a teacher with ID:  " + val.getTeaId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Teacher has been updated successfully.", val));	
 		 }
@@ -157,7 +157,7 @@ public class TeacherController {
 				
 			 //------------------------------------
 			 saveEvent("teacher", "delete", "The User with name: " + u.get().getName() + "has deleted a teacher with ID:  " + val.getTeaId(), 
-					 new Date(), u.get(), u.get().getSchool()
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
 			 );
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Teacher has been deleted successfully.", val));				 
 		 }
