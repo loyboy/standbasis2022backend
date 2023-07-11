@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.repository;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,7 +75,7 @@ public interface AttendanceActivityRepository extends JpaRepository<AttendanceAc
     		+ "AND (att.timetable.teacher = :tea OR :tea is null) "
     		+ "AND (att.timetable.calendar = :cal OR :cal is null) "
     		+ "AND (att._date >= :datefrom OR :datefrom is null) "
-    		+ "AND (att._date <= :dateto OR :dateto is null) "
+    		+ "AND ( DATE(att._date) = :dateto OR :dateto is null) "
       )	    
     List<AttendanceActivity> findByTeacherSchoolgroup(
     		@Param("owner") SchoolGroup owner, 
@@ -82,8 +83,8 @@ public interface AttendanceActivityRepository extends JpaRepository<AttendanceAc
     		@Param("cls") ClassStream cls, 
     		@Param("tea") Teacher tea,  
     		@Param("cal") Calendar cal,
-    		@Param("datefrom") Timestamp datefrom,
-    		@Param("dateto") Timestamp dateto
+    		@Param("datefrom") Date datefrom,
+    		@Param("dateto") Date dateto
     	);
  	
  	

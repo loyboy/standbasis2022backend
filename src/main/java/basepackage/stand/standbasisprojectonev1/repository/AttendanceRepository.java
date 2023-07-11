@@ -58,7 +58,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		+ "AND (att.timetable.calendar = :cal OR :cal is null) "
     		+ "AND (att.timetable.subject = :sub OR :sub is null) "
     		+ "AND (att._date >= :datefrom OR :datefrom is null) "
-    		+ "AND (att._date <= :dateto OR :dateto is null) "
+    		+ "AND ( DATE(att._date) = :dateto OR :dateto is null) "
     	   )
     List<Attendance> findByTeacherSchoolgroup( 
     		@Param("owner") SchoolGroup owner, 
@@ -67,8 +67,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		@Param("tea") Teacher tea,
     		@Param("cal") Calendar cal,
     		@Param("sub") Subject sub,
-    		@Param("datefrom") Timestamp datefrom,
-    		@Param("dateto") Timestamp dateto
+    		@Param("datefrom") Date datefrom,
+    		@Param("dateto") Date dateto
     );
    
     @Query("select att from Attendance att where att.timetable.school.owner = :owner "
@@ -164,7 +164,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		+ "AND (att.timetable.calendar = :cal OR :cal is null) "
     		+ "AND (rw.student = :pup OR :pup is null) "
     		+ "AND (att._date >= :datefrom OR :datefrom is null) "
-    		+ "AND (att._date <= :dateto OR :dateto is null) "
+    		+ "AND ( DATE(att._date) = :dateto OR :dateto is null) "
        	 )
     
     List<Rowcall> findByStudentSchoolgroup(
@@ -173,8 +173,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		@Param("cls") ClassStream cls, 
     		@Param("pup") Student pup,
     		@Param("cal") Calendar cal,
-    		@Param("datefrom") Timestamp datefrom,
-    		@Param("dateto") Timestamp dateto
+    		@Param("datefrom") Date datefrom,
+    		@Param("dateto") Date dateto
     	);
     
     @Query("select rw from Rowcall rw "

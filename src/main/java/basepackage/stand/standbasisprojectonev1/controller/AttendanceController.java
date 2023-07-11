@@ -216,35 +216,42 @@ public class AttendanceController {
 	 public ResponseEntity<?> getMNETeacherAttendances(
 			 @RequestParam(value = "q", required=false) String query,
 			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
-			 @RequestParam(value = "school", required=false) Optional<Long> school,
-			 @RequestParam(value = "class", required=false) Optional<Long> classid,
-			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
-			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
-			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
-			 
-			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
+			 @RequestParam(value = "school", required=false) Optional<Long> school,			 
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
-			 ) {
+	 ) {
 		 
-		 Map<String, Object> response = service.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, subject, datefrom, dateto  );
-		 Map<String, Object> attManageResponse = serviceManagement.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, subject, datefrom, dateto);
+		 Map<String, Object> response = service.getOrdinaryTeacherAttendances(query, schoolgroup, school, null, null, null, null, null, dateto  );
+		 Map<String, Object> attManageResponse = serviceManagement.getOrdinaryTeacherAttendances(query, schoolgroup, school, null, null, null, null, null, dateto);
+		 Map<String, Object> attStudent = service.getOrdinaryStudentAttendances(query, schoolgroup, school, null,  null, null, null, dateto);
+		 Map<String, Object> attActivityResponse = serviceActivity.getOrdinaryTeacherAttendances(query, schoolgroup, school, null, null, null, null, dateto);
+		
 		 
 		 List<Attendance> ordinaryArray = (List<Attendance>) response.get("attendances");
+		 List<Rowcall> ordinaryStudentArray = (List<Rowcall>) attStudent.get("attendances");
 		 List<AttendanceManagement> ordinaryArrayManagement = (List<AttendanceManagement>) attManageResponse.get("attendancemanagement");
+		 List<AttendanceActivity> ordinaryArrayActivity = (List<AttendanceActivity>) attActivityResponse.get("attendanceactivity");
+			
+		 
 		 Map<String, Object> newResponse = new HashMap<>();
 		 
 		 Integer max = ordinaryArray.size(); 
 		 Integer maxManage = ordinaryArrayManagement.size();
+		 Integer maxStudent = ordinaryStudentArray.size();
+		 Integer maxActivity = ordinaryArrayActivity.size();
 		 
-		 Long teacherAttendance = ordinaryArray.stream().filter(o -> o.getDone() == 1).count(); 
-		 Long classAttendance = ordinaryArrayManagement.stream().filter(o -> o.getClass_perf() > 0).count(); 
+		 Long studentAbsence = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0).count(); 
+		 Long incompleteAttendance = ordinaryArrayManagement.stream().filter(o -> o.getCompleteness() == 50 ).count(); 
 		 Long lateAttendance = ordinaryArrayManagement.stream().filter(o -> o.getTiming() == 50).count(); 
-		 Long completenessAttendance = ordinaryArrayManagement.stream().filter(o -> o.getCompleteness() == 100).count(); 
-			 
-		 newResponse.put("teacher_attendance", convertPercentage(teacherAttendance.intValue(),max) );
-		 newResponse.put("class_attendance", convertPercentage(classAttendance.intValue(),maxManage) );
+		 Long Approvalslip = ordinaryArrayActivity.stream().filter(o -> o.getSlip() == 1 && o.getOwnertype().equals("Principal")).count(); 
+		 Long teacherAbsent = ordinaryArray.stream().filter(o -> o.getDone() == 0 ).count(); 
+		// Long Approvalslip = ordinaryArray.stream().filter(o -> o.getSlip() == 1 ).count(); 
+			
+		 newResponse.put("student_absence", convertPercentage(studentAbsence.intValue(),maxStudent) );
+		 newResponse.put("incomplete_submission", convertPercentage(incompleteAttendance.intValue(),maxManage) );
 		 newResponse.put("late_attendance", convertPercentage(lateAttendance.intValue(),maxManage) );
-		 newResponse.put("completeness_attendance", convertPercentage(completenessAttendance.intValue(),maxManage) );
+		 newResponse.put("approval_delays", convertPercentage(Approvalslip.intValue(),maxActivity) );
+		 newResponse.put("teacher_absent", convertPercentage(teacherAbsent.intValue(),max) );
+		 newResponse.put("teacher_expected", max );
 			
 		 return new ResponseEntity<>(newResponse, HttpStatus.OK);	        
 	 }
