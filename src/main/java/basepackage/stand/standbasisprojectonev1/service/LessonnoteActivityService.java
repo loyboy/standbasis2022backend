@@ -224,11 +224,12 @@ public Map<String, Object> getPaginatedTeacherLessonnotes(int page,int size, Str
     }
 	
 	
-	public Map<String, Object> getOrdinaryTeacherLessonnotes(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Integer> classId, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
+	public Map<String, Object> getOrdinaryTeacherLessonnotes(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Integer> classId, Optional<Integer> week, Optional<Long> calendarId, Optional<Long> teacherId,  Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
         
         Long schgroup = schgroupId.orElse(null);
         Long schowner = schId.orElse(null);
         Integer classowner = classId.orElse(null);
+        Integer weeknow = week.orElse(null);
         Long teacherowner = teacherId.orElse(null);     
         Long calendarowner = calendarId.orElse(null);
         
@@ -251,7 +252,8 @@ public Map<String, Object> getPaginatedTeacherLessonnotes(int page,int size, Str
         		lessonnotes = lsnactivityRepository.findByTeacherSchoolgroup(        				
         				schgroupobj == null ? null : schgroupobj.get(), 
                         schownerobj == null ? null : schownerobj.get(), 
-                        classowner,                                
+                        classowner,  
+                        weeknow,
                         teacherownerobj == null ? null : teacherownerobj.get(),
                         calendarownerobj == null ? null : calendarownerobj.get(),
                         datefrom.isEmpty() ? null : datefrom.get(),

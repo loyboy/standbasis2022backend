@@ -216,14 +216,20 @@ public class AttendanceController {
 	 public ResponseEntity<?> getMNETeacherAttendances(
 			 @RequestParam(value = "q", required=false) String query,
 			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
-			 @RequestParam(value = "school", required=false) Optional<Long> school,			 
+			 @RequestParam(value = "school", required=false) Optional<Long> school,
+			 @RequestParam(value = "class", required=false) Optional<Long> classid,
+			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
+			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
+			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
+			 @RequestParam(value = "student", required=false) Optional<Long> student,
+			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
 	 ) {
 		 
-		 Map<String, Object> response = service.getOrdinaryTeacherAttendances(query, schoolgroup, school, null, null, null, null, null, dateto  );
-		 Map<String, Object> attManageResponse = serviceManagement.getOrdinaryTeacherAttendances(query, schoolgroup, school, null, null, null, null, null, dateto);
-		 Map<String, Object> attStudent = service.getOrdinaryStudentAttendances(query, schoolgroup, school, null,  null, null, null, dateto);
-		 Map<String, Object> attActivityResponse = serviceActivity.getOrdinaryTeacherAttendances(query, schoolgroup, school, null, null, null, null, dateto);
+		 Map<String, Object> response = service.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, subject, datefrom, dateto  );
+		 Map<String, Object> attManageResponse = serviceManagement.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, subject, datefrom, dateto);
+		 Map<String, Object> attStudent = service.getOrdinaryStudentAttendances(query, schoolgroup, school, classid,  calendar, student, datefrom, dateto);
+		 Map<String, Object> attActivityResponse = serviceActivity.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, datefrom, dateto);
 		
 		 
 		 List<Attendance> ordinaryArray = (List<Attendance>) response.get("attendances");
@@ -244,8 +250,7 @@ public class AttendanceController {
 		 Long lateAttendance = ordinaryArrayManagement.stream().filter(o -> o.getTiming() == 50).count(); 
 		 Long Approvalslip = ordinaryArrayActivity.stream().filter(o -> o.getSlip() == 1 && o.getOwnertype().equals("Principal")).count(); 
 		 Long teacherAbsent = ordinaryArray.stream().filter(o -> o.getDone() == 0 ).count(); 
-		// Long Approvalslip = ordinaryArray.stream().filter(o -> o.getSlip() == 1 ).count(); 
-			
+					
 		 newResponse.put("student_absence", convertPercentage(studentAbsence.intValue(),maxStudent) );
 		 newResponse.put("incomplete_submission", convertPercentage(incompleteAttendance.intValue(),maxManage) );
 		 newResponse.put("late_attendance", convertPercentage(lateAttendance.intValue(),maxManage) );

@@ -60,6 +60,7 @@ public interface LessonnoteActivityRepository extends JpaRepository<LessonnoteAc
 			+ "JOIN Lessonnote lsn ON lsn = lsnactivity.lsn_id "
 			+ "where lsn.calendar.school.owner = :owner "
     		+ "AND (lsn.calendar.school = :sch OR :sch is null) "
+    		+ "AND (lsn.week = :week OR :week is null) "
     		+ "AND (lsn.class_index = :cls OR :cls is null) "
     		+ "AND (lsn.teacher = :tea OR :tea is null) "
     		+ "AND (lsn.calendar = :cal OR :cal is null) "
@@ -70,6 +71,7 @@ public interface LessonnoteActivityRepository extends JpaRepository<LessonnoteAc
     		@Param("owner") SchoolGroup owner, 
     		@Param("sch") School sch, 
     		@Param("cls") Integer cls, 
+    		@Param("week") Integer week, 
     		@Param("tea") Teacher tea,
     		@Param("cal") Calendar cal,
     		@Param("datefrom") Timestamp datefrom,

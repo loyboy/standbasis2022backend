@@ -213,37 +213,31 @@ public class LessonnoteController {
 			 @RequestParam(value = "q", required=false) String query,
 			 @RequestParam(value = "schoolgroup" ) Optional<Long> schoolgroup,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
-			 @RequestParam(value = "class", required=false) Optional<Integer> classid,
-			 @RequestParam(value = "week", required=false) Optional<Integer> week,
 			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
+			 @RequestParam(value = "week", required=false) Optional<Integer> week,
+			 
 			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
+			 @RequestParam(value = "class", required=false) Optional<Integer> classid,
 			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
 			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
 			 ) {
 		 
-		 Map<String, Object> response = service.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, subject, datefrom, dateto  );
-		 Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, subject, datefrom, dateto);
-			 
+		 Map<String, Object> response = service.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, subject, datefrom, dateto );
+		 Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, subject, datefrom, dateto );
+		 Map<String, Object> lsnActivityResponse = serviceActivity.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week,  calendar, teacher, datefrom, dateto );
+				 
 		 List<Lessonnote> ordinaryArray = (List<Lessonnote>) response.get("lessonnotes");
 		 List<LessonnoteManagement> ordinaryArrayManagement = (List<LessonnoteManagement>) lsnManageResponse.get("lessonnotemanagement");
+		 List<LessonnoteActivity> ordinaryArrayLessonnote = (List<LessonnoteActivity>) lsnActivityResponse.get("Lessonnoteactivity");
+			
 		 Map<String, Object> newResponse = new HashMap<>();
 		 
 		 Integer max = ordinaryArray.size(); 
 		 Integer maxManage = ordinaryArrayManagement.size();
-		// Long expectedLessonnotes = null;
-		 
-		/* Long teacherExpectedLessonnote = ordinaryArray.stream().filter(o -> { 
-			 
-			 List<TimeTable> classesTaught = timeservice.findClassTaught( o.getTeacher().getTeaId() , o.getCalendar().getCalendarId() );
-			 Integer expectedclasses = classesTaught.size() * 12; // * 12 because you always have 12 weeks to teach
-			 
-			 
-			 
-			return false;
-		 } ).count(); */
-		 
-		 Long teacherLowQuality = ordinaryArrayManagement.stream().filter(o -> o.getQuality() < 50).count(); 
+		 Integer maxActivity = ordinaryArrayLessonnote.size();
+				 
+		 Long teacherTotalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null ).count(); 
 		 Long teacherLateClosure = ordinaryArray.stream().filter(o -> { 			 
 			 if (o.getLaunch() != null) {
 				 Date thedate = new Date( o.getLaunch().getTime() );
@@ -252,14 +246,15 @@ public class LessonnoteController {
 			 return false;			 
 		 }).count(); 
 		 Long teacherBadCycles = ordinaryArrayManagement.stream().filter(o -> o.getManagement() < 50).count(); 
-		 Long teacherNoApproval = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() == null && o.getRevert() == null ) ).count(); 
-			
+		 Long principalNoApproval = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() == null && o.getRevert() == null ) ).count(); 
+		 Long principalLateApproval = ordinaryArrayLessonnote.stream().filter(o -> o.getSlip() == 1 && o.getOwnertype().equals("Principal") ).count(); 				
 		 
-		 newResponse.put("teacher_low_quality", convertPercentage(teacherLowQuality.intValue(),maxManage) );
+		 newResponse.put("teacher_submitted", convertPercentage(teacherTotalLessonnotes.intValue(),max) );
 		 newResponse.put("teacher_late_closure", convertPercentage(teacherLateClosure.intValue(),max) );
 		 newResponse.put("teacher_bad_cycles", convertPercentage(teacherBadCycles.intValue(),maxManage) );
-		 newResponse.put("teacher_no_approval", convertPercentage(teacherNoApproval.intValue(),max) );
-			
+		 newResponse.put("principal_no_approval", convertPercentage(principalNoApproval.intValue(),max) );
+		 newResponse.put("principal_late_approval", convertPercentage(principalLateApproval.intValue(),maxActivity) );
+		 
 		 return new ResponseEntity<>(newResponse, HttpStatus.OK);	        
 	 }
 	 
@@ -312,7 +307,7 @@ public class LessonnoteController {
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
 			 ) {
 		 
-		 Map<String, Object> response = serviceActivity.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, calendar, teacher, datefrom, dateto  );
+		 Map<String, Object> response = serviceActivity.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, null, calendar, teacher, datefrom, dateto  );
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 
@@ -362,17 +357,14 @@ public class LessonnoteController {
 	 public ResponseEntity<?> getMNEStudentLessonnotes(
 			 @RequestParam(value = "q", required=false) String query,
 			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
-			 @RequestParam(value = "school", required=false) Optional<Long> school,
-			 @RequestParam(value = "class", required=false) Optional<Long> classid,
-			 @RequestParam(value = "week", required=false) Optional<Integer> week,
+			 @RequestParam(value = "school", required=false) Optional<Long> school,	
 			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
-			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
-			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
-			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
+			 @RequestParam(value = "week", required=false) Optional<Integer> week
+			
 			 ) 
 	 {
 		 
-		 Map<String, Object> response = serviceAssessment.getOrdinaryStudentlessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, datefrom, dateto  );
+		 Map<String, Object> response = serviceAssessment.getOrdinaryStudentlessonnotes(query, schoolgroup, school, null, week, calendar, null, null, null );
 		 
 		 @SuppressWarnings("unchecked")
 		 List<Assessment> ordinaryArray = (List<Assessment>) response.get("assessments");
@@ -692,5 +684,17 @@ public class LessonnoteController {
 	   boolean result = givenDate.getTime() < (currentMillis - millisInDays);
 	   return result;
 	 }
+	 
+	// Long expectedLessonnotes = null;
+	 
+			/* Long teacherExpectedLessonnote = ordinaryArray.stream().filter(o -> { 
+				 
+				 List<TimeTable> classesTaught = timeservice.findClassTaught( o.getTeacher().getTeaId() , o.getCalendar().getCalendarId() );
+				 Integer expectedclasses = classesTaught.size() * 12; // * 12 because you always have 12 weeks to teach
+				 
+				 
+				 
+				return false;
+			 } ).count(); */
 	 
 }
