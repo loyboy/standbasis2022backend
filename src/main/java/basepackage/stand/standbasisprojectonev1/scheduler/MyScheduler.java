@@ -217,7 +217,7 @@ public class MyScheduler {
 	// "0 0 0 * * 0" -- once a week
 	// 0 0 0 ? * WED
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "0 55 11 ? * TUE")
+	@Scheduled(cron = "0 15 12 ? * TUE")
     public void insertLessonnotes() {
 		
 		 Map<Integer, String> classMap = new HashMap<>();
@@ -251,10 +251,11 @@ public class MyScheduler {
 	    		for ( int i = 1 ; i < 13; i ++ ) { //Number of weeks
 	    			try {
 	    				int subDays = 7 * i;
-	    				int closDays = 14 * i;
+	    				int closDays = 21 * i;
+	    				int principalDays = 14 * i;
 						Timestamp lastSubmissionDate = addDays(subDays,lsn_start_date); // 48 hours after this date, it should block submission
 						Timestamp lastClosureDate = addDays(closDays,lsn_start_date);//48 hours after , it should be set as unclosed
-						Timestamp lastPrincipalApprovalDate = addDays(closDays,lsn_start_date);
+						Timestamp lastPrincipalApprovalDate = addDays(principalDays,lsn_start_date);
 						
 						Lessonnote lsn = new Lessonnote();
 						lsn.setTitle( "WEEK-"+ i + "_" + it.getSub_name() + "_" + it.getClass_name() );
