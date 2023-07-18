@@ -73,7 +73,16 @@ public class Lessonnote extends DateAudit{
     
     @Column(name="launch",columnDefinition="datetime")
     private Timestamp launch; // approved i done
-     
+    
+    @Column(name="expected_closure",columnDefinition="datetime")
+    private Timestamp expected_closure;
+    
+    @Column(name="expected_principal_approval",columnDefinition="datetime")
+    private Timestamp expected_principal_approval;
+    
+    @Column(name="expected_submission",columnDefinition="datetime")
+    private Timestamp expected_submission;     
+    
     private Integer cycle_count; 
  
     @NotNull

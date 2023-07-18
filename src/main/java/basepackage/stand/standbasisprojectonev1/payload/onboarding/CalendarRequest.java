@@ -19,4 +19,10 @@ public class CalendarRequest {
     
     private Integer term;
     
+    private String startdate;
+    
+    private String enddate;
+    
+    private String lsnstartdate;
+    
 }

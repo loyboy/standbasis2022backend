@@ -31,6 +31,7 @@ import basepackage.stand.standbasisprojectonev1.payload.onboarding.CalendarReque
 import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
+import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
 @Service
 public class CalendarService {
@@ -150,7 +151,18 @@ public List<Calendar> findByActive() {
 		Optional<Calendar> existing = calRepository.findById(id);
 		if (existing.isPresent()) {
 			Calendar calval = existing.get();
+			
 			copyNonNullProperties(calRequest, calval);
+			
+			if (calRequest.getStartdate() != null) {
+				calval.setStartdate( CommonActivity.parseTimestamp(calRequest.getStartdate() ) );
+			}
+			if (calRequest.getEnddate() != null) {
+				calval.setEnddate( CommonActivity.parseTimestamp(calRequest.getEnddate() ) );
+			}
+			if (calRequest.getLsnstartdate() != null) {
+				calval.setLsnstartdate( CommonActivity.parseTimestamp(calRequest.getLsnstartdate()) );
+			}
 			return calRepository.save(calval);
 		}   
 		

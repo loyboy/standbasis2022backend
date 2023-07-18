@@ -44,6 +44,9 @@ public class Calendar extends DateAudit{
     @Column(name="end_date",columnDefinition="date")
     private Timestamp enddate;
     
+    @Column(name="lsn_start_date",columnDefinition="date")
+    private Timestamp lsnstartdate;//The date when the official Lesson note processes will begin(2 week from startDate)
+    
     @NotNull
     private Integer status; // 0- inactive, 1- active 
     

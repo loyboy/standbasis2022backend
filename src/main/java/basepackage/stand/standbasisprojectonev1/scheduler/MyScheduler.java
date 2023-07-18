@@ -86,7 +86,7 @@ public class MyScheduler {
 				Timestamp enddate = null; 
 				Timestamp startdate = null;
 				try {
-					enddate = addDays(1,cal.getEnddate());
+					enddate = addDays(1, cal.getEnddate());
 					startdate = addDays(1 , cal.getStartdate());
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
@@ -217,7 +217,7 @@ public class MyScheduler {
 	// "0 0 0 * * 0" -- once a week
 	// 0 0 0 ? * WED
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "0 0 0 ? * WED")
+	@Scheduled(cron = "0 10 11 ? * TUE")
     public void insertLessonnotes() {
 		
 		 Map<Integer, String> classMap = new HashMap<>();
@@ -228,10 +228,10 @@ public class MyScheduler {
 		 classMap.put(11, "SS2");
 		 classMap.put(12, "SS3");
 		    
-		 //Get Timetable data for this day with Current calendar
+		 // Get Timetable data for this day with Current calendar
 	    List<TimeTable> tt = timeRepository.findByActiveCalendar(1);
 	    
-	  //  Predicate<TimeTable> distinctByKeysFor = distinctByKeys( t -> t.getSubject() , t -> t.getSubject() );
+	    // Get Unique timetable data based on subject and Teacher values
 	    List<TimeTable> ttnew = tt.stream()
 	            .collect(Collectors.toMap(
 	                    obj -> Arrays.asList(obj.getSubject(), obj.getTeacher()),  // Composite key
@@ -245,25 +245,37 @@ public class MyScheduler {
         
 	    for (TimeTable it : ttnew) {	    	
 	    	
-	    	if ( it.getCalendar().getEnddate().compareTo( parseTimestamp(todayDate()) ) > 0 ) {
-		    	System.out.println("Calendar Timetable ID >> " + it.getTimeId() );
-	    		// Today' date - Start date
-	    		long diff = parseTimestamp(todayDate()).getTime() - it.getCalendar().getStartdate().getTime();
-	    		int weeks = (int) ( diff / (7 * 24 * 60 * 60 * 1000 ) ) + 1 ;
+	    	 	//change, check if calendar is active and lsn_start is 0
+		    	//System.out.println("Calendar Timetable ID >> " + it.getTimeId() );
+	    		Timestamp lsn_start_date = it.getCalendar().getLsnstartdate();
+	    		for ( int i = 1 ; i < 13; i ++ ) { //Number of weeks
+	    			try {
+						Timestamp lastSubmissionDate = addDays(7 * i,lsn_start_date); // 48 hours after this date, it should block submission
+						Timestamp lastClosureDate = addDays(14 * i,lsn_start_date);//48 hours after , it should be set as unclosed
+						Timestamp lastPrincipalApprovalDate = addDays(14 * i,lsn_start_date);
+						
+						Lessonnote lsn = new Lessonnote();
+						lsn.setTitle( "WEEK-"+ i + "_" + it.getSub_name() + "_" + it.getClass_name() );
+						lsn.setClass_index( it.getClass_stream().getClass_index() );
+						lsn.setWeek(i);
+						lsn.setCycle_count(0);
+						lsn.setTeacher(it.getTeacher());
+						lsn.setCalendar(it.getCalendar());
+						lsn.setSubject(it.getSubject());
+						lsn.set_file("");
+						lsn.setExpected_submission(lastSubmissionDate);
+						lsn.setExpected_closure(lastClosureDate);
+						lsn.setExpected_principal_approval(lastPrincipalApprovalDate);
+						
+						lsnRepository.save(lsn);
+						
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	    		}
 				
-				Lessonnote lsn = new Lessonnote();
-				lsn.setTitle( "WEEK-"+ weeks + "_" + it.getSub_name() + "_" + it.getClass_name() );
-				lsn.setClass_index( it.getClass_stream().getClass_index() );
-				lsn.setWeek(weeks);
-				lsn.setCycle_count(0);
-				lsn.setTeacher(it.getTeacher());
-				lsn.setCalendar(it.getCalendar());
-				lsn.setSubject(it.getSubject());
-				lsn.set_file("");
-				
-				lsnRepository.save(lsn);
-				
-	    	}
+	    	
 	    }
 	    //
 	    System.out.println("Insert Lessonnotes with Cron job");
