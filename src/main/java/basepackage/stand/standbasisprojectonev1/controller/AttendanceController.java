@@ -179,9 +179,7 @@ public class AttendanceController {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	        Date parsedDate;
 			try {
-				 parsedDate = dateFormat.parse(today.get());				
-	         
-	        // System.out.print(timestampToday);
+				 parsedDate = dateFormat.parse(today.get());			
 	         
 				 Map<String, Object> response = service.getTeacherClassesToday( teacher, parsedDate );
 				 return new ResponseEntity<>(response, HttpStatus.OK);
@@ -237,7 +235,6 @@ public class AttendanceController {
 		 List<AttendanceManagement> ordinaryArrayManagement = (List<AttendanceManagement>) attManageResponse.get("attendancemanagement");
 		 List<AttendanceActivity> ordinaryArrayActivity = (List<AttendanceActivity>) attActivityResponse.get("attendanceactivity");
 			
-		 
 		 Map<String, Object> newResponse = new HashMap<>();
 		 
 		 Integer max = ordinaryArray.size(); 
@@ -246,17 +243,26 @@ public class AttendanceController {
 		 Integer maxActivity = ordinaryArrayActivity.size();
 		 
 		 Long studentAbsence = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0).count(); 
+		 Long studentExcusedAbsence = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0 && o.getRemark() != null ).count(); 
 		 Long incompleteAttendance = ordinaryArrayManagement.stream().filter(o -> o.getCompleteness() == 50 ).count(); 
 		 Long lateAttendance = ordinaryArrayManagement.stream().filter(o -> o.getTiming() == 50).count(); 
-		 Long Approvalslip = ordinaryArrayActivity.stream().filter(o -> o.getSlip() == 1 && o.getOwnertype().equals("Principal")).count(); 
+		 Long voidAttendance = ordinaryArrayManagement.stream().filter(o -> o.getTiming() == 0).count();
+		 Long Approvalslip  = ordinaryArrayActivity.stream().filter(o -> o.getSlip() == 1 && o.getOwnertype().equals("Principal")).count();
+		 Long Approvaldone  = ordinaryArrayActivity.stream().filter(o -> o.getOwnertype().equals("Principal") && o.getActual() != null ).count();
+		 Long ApprovalStatus  = ordinaryArrayActivity.stream().filter(o -> o.getOwnertype().equals("Principal") && o.getActual() != null && o.getAction().equals("queried") ).count();
 		 Long teacherAbsent = ordinaryArray.stream().filter(o -> o.getDone() == 0 ).count(); 
 					
-		 newResponse.put("student_absence", convertPercentage(studentAbsence.intValue(),maxStudent) );
-		 newResponse.put("incomplete_submission", convertPercentage(incompleteAttendance.intValue(),maxManage) );
-		 newResponse.put("late_attendance", convertPercentage(lateAttendance.intValue(),maxManage) );
-		 newResponse.put("approval_delays", convertPercentage(Approvalslip.intValue(),maxActivity) );
-		 newResponse.put("teacher_absent", convertPercentage(teacherAbsent.intValue(),max) );
+		 newResponse.put("student_absence", studentAbsence.intValue() );
+		 newResponse.put("student_excused_absence", studentExcusedAbsence.intValue() );
+		 newResponse.put("queried_attendance", ApprovalStatus.intValue() );
+		 newResponse.put("late_attendance", lateAttendance.intValue() );
+		 newResponse.put("void_attendance", voidAttendance.intValue() );
+		 newResponse.put("approval_delays", Approvalslip.intValue() );
+		 newResponse.put("approval_done", Approvaldone.intValue() );
+		 newResponse.put("teacher_absent", teacherAbsent.intValue() );
 		 newResponse.put("teacher_expected", max );
+		 newResponse.put("student_expected", maxStudent );
+		 newResponse.put("endorsement_expected", ordinaryArrayActivity.stream().filter(o -> o.getOwnertype().equals("Principal") ).count() );
 			
 		 return new ResponseEntity<>(newResponse, HttpStatus.OK);	        
 	 }

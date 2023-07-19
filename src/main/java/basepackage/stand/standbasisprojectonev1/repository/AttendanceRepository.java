@@ -42,12 +42,13 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     Rowcall findByRowcall(   @Param("att") Attendance att    );
     
     @Query( " select att from Attendance att where att.timetable.teacher = :tea "
-    		+ "AND ( DATE(att._date) = :today OR :today is null) "  
+    		+ "AND ( DATE(att._date) >= :monday AND DATE(att._date) <= :friday ) "  
     		+ "AND (att.done = 0) "
     	  )
     List<Attendance> findByTeacherTodayClass(     		 
     		@Param("tea") Teacher tea,    		
-    		@Param("today") Date today
+    		@Param("monday") Date monday,
+    		@Param("friday") Date friday
     );
     //-------------------------------------------------------------------------------------------------
     

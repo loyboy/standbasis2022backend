@@ -3,6 +3,7 @@ package basepackage.stand.standbasisprojectonev1.controller;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -237,24 +238,33 @@ public class LessonnoteController {
 		 Integer maxManage = ordinaryArrayManagement.size();
 		 Integer maxActivity = ordinaryArrayLessonnote.size();
 				 
-		 Long teacherTotalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null ).count(); 
-		 Long teacherLateClosure = ordinaryArray.stream().filter(o -> { 			 
+		 Long teacherTotalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null ).count();
+		 Long teacherLateLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() == null && parseTimestamp(todayDate()).compareTo( o.getExpected_submission() ) > 0 ).count();
+		 Long teacherLateApprovalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() == null && o.getRevert() == null ) && parseTimestamp(todayDate()).compareTo( o.getExpected_submission() ) > 0 ).count();
+		 Long teacherNoApprovalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() == null && o.getRevert() == null ) && parseTimestamp(todayDate()).compareTo( addDays(2,o.getExpected_submission()) ) > 0 ).count();
+		 Long teacherRevertedLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && o.getRevert() != null ).count();
+		 Long teacherBadCycles = ordinaryArrayManagement.stream().filter(o -> o.getManagement() < 50).count(); 
+		 
+		/* Long teacherLateClosure = ordinaryArray.stream().filter(o -> { 			 
 			 if (o.getLaunch() != null) {
 				 Date thedate = new Date( o.getLaunch().getTime() );
 				 return olderThanDays( thedate, 7 );
 			 }
 			 return false;			 
-		 }).count(); 
-		 Long teacherBadCycles = ordinaryArrayManagement.stream().filter(o -> o.getManagement() < 50).count(); 
-		 Long principalNoApproval = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() == null && o.getRevert() == null ) ).count(); 
-		 Long principalLateApproval = ordinaryArrayLessonnote.stream().filter(o -> o.getSlip() == 1 && o.getOwnertype().equals("Principal") ).count(); 				
+		 }).count();*/
+		 Long teacherLateClosure = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() != null ) && parseTimestamp(todayDate()).compareTo( o.getExpected_closure() ) > 0 ).count(); 
+		 Long teacherNoClosure   = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() != null ) && parseTimestamp(todayDate()).compareTo( addDays(2,o.getExpected_closure())  ) > 0 ).count();			
 		 
-		 newResponse.put("teacher_submitted", convertPercentage(teacherTotalLessonnotes.intValue(),max) );
-		 newResponse.put("teacher_late_closure", convertPercentage(teacherLateClosure.intValue(),max) );
-		 newResponse.put("teacher_bad_cycles", convertPercentage(teacherBadCycles.intValue(),maxManage) );
-		 newResponse.put("principal_no_approval", convertPercentage(principalNoApproval.intValue(),max) );
-		 newResponse.put("principal_late_approval", convertPercentage(principalLateApproval.intValue(),maxActivity) );
-		 
+		 newResponse.put("total_lessonnotes", max );
+		 newResponse.put("teacher_submitted", teacherTotalLessonnotes.intValue() );
+		 newResponse.put("teacher_late_submitted", teacherLateLessonnotes.intValue() );
+		 newResponse.put("teacher_late_approval", teacherLateApprovalLessonnotes.intValue() );
+		 newResponse.put("teacher_no_approval", teacherNoApprovalLessonnotes.intValue() );
+		 newResponse.put("teacher_queried", teacherRevertedLessonnotes.intValue() );
+		 newResponse.put("teacher_late_closure", teacherLateClosure.intValue() );
+		 newResponse.put("teacher_bad_cycles", teacherBadCycles.intValue() );
+		 newResponse.put("teacher_no_closure", teacherNoClosure.intValue() );
+				 
 		 return new ResponseEntity<>(newResponse, HttpStatus.OK);	        
 	 }
 	 
@@ -359,25 +369,32 @@ public class LessonnoteController {
 			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,	
 			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
-			 @RequestParam(value = "week", required=false) Optional<Integer> week
+			 @RequestParam(value = "week", required=false) Optional<Integer> week,
+			 
+			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
+			 @RequestParam(value = "class", required=false) Optional<Long> classid,
+			 @RequestParam(value = "student", required=false) Optional<Long> student,
+			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
+			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
 			
 			 ) 
 	 {
 		 
-		 Map<String, Object> response = serviceAssessment.getOrdinaryStudentlessonnotes(query, schoolgroup, school, null, week, calendar, null, null, null );
+		 Map<String, Object> response = serviceAssessment.getOrdinaryStudentlessonnotes(query, schoolgroup, school, classid, week, calendar, student, datefrom, dateto );
 		 
 		 @SuppressWarnings("unchecked")
 		 List<Assessment> ordinaryArray = (List<Assessment>) response.get("assessments");
 		 Map<String, Object> newResponse = new HashMap<>();
 		 
 		 Integer max = ordinaryArray.size();
-		 Long studentHomework = ordinaryArray.stream().filter( o -> o.getScore() != null && o.getScore() > 50 && o.get_type() == "hwk" ).count(); 
-		 Long studentTest = ordinaryArray.stream().filter(o -> o.getScore() != null && o.getScore() > 50 && o.get_type() == "tst").count(); 
-		 Long studentClasswork = ordinaryArray.stream().filter(o -> o.getScore() != null && o.getScore() > 50 && o.get_type() == "clw").count(); 
+		 Long studentHomework = ordinaryArray.stream().filter( o -> o.getScore() != null && o.getScore() < 50 && o.get_type().equals("hwk") ).count(); 
+		 Long studentTest = ordinaryArray.stream().filter(o -> o.getScore() != null && o.getScore() < 50 && o.get_type().equals("tst") ).count(); 
+		 Long studentClasswork = ordinaryArray.stream().filter(o -> o.getScore() != null && o.getScore() < 50 && o.get_type().equals("clw") ).count(); 
 			 
-		 newResponse.put("student_homework", convertPercentage(studentHomework.intValue(),max) );
-		 newResponse.put("student_test", convertPercentage(studentTest.intValue(),max) );
-		 newResponse.put("student_classwork", convertPercentage(studentClasswork.intValue(),max) );
+		 newResponse.put("student_homework", studentHomework.intValue() );
+		 newResponse.put("student_classwork", studentClasswork.intValue() );
+		 newResponse.put("student_test", studentTest.intValue() );
+		 newResponse.put("students", max );
 		 
 		 return new ResponseEntity<>(newResponse, HttpStatus.OK);	        
 	 }
@@ -683,6 +700,27 @@ public class LessonnoteController {
 	   long millisInDays = days * 24 * 60 * 60 * 1000;
 	   boolean result = givenDate.getTime() < (currentMillis - millisInDays);
 	   return result;
+	 }
+	 
+	 private java.sql.Timestamp parseTimestamp(String timestamp) {
+		    try {
+		        return new Timestamp(DATE_TIME_FORMAT.parse(timestamp).getTime());
+		    } catch (ParseException e) {
+		        throw new IllegalArgumentException(e);
+		    }
+	 }
+	 
+	 private String todayDate() {
+		Date d = new Date();
+	    String date = DATE_TIME_FORMAT.format(d);
+	    return date;
+	 }
+	 
+	 private Timestamp addDays(int days, Timestamp t1) {
+		    java.util.Calendar cal = java.util.Calendar.getInstance();
+	        cal.setTime(t1);
+	        cal.add(java.util.Calendar.DATE, days); //minus number would decrement the days
+	        return new Timestamp(cal.getTime().getTime());
 	 }
 	 
 	// Long expectedLessonnotes = null;

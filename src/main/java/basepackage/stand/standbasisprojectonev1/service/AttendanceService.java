@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -388,6 +389,8 @@ public class AttendanceService {
 	//For mobile app 
 	public Map<String, Object> getTeacherClassesToday( Optional<Long> teacherId, Date today ){
 		
+			
+		 	List<Date> datesList = getMondayAndFridayDates(today);
 			Long teacherowner = teacherId.orElse(null); 
 			Optional<Teacher> teacherownerobj = null;
 			List<Attendance> attendances = null;
@@ -398,7 +401,8 @@ public class AttendanceService {
 		
 			attendances = attRepository.findByTeacherTodayClass( 				
 				teacherownerobj == null ? null : teacherownerobj.get(),				
-				today.equals(null) ? null : today
+				today.equals(null) ? null : datesList.get(0),
+				today.equals(null) ? null : datesList.get(1)
 			);
 			
 			//System.out.println(teacherownerobj.get().getEmail() + " --- " + today.getDay());
@@ -877,10 +881,51 @@ public class AttendanceService {
 	    return sum;
 	}
 	
+	 private List<Date> getMondayAndFridayDates(Date date) {
+	        List<Date> resultDates = new ArrayList<>();
+
+	        // Create a calendar instance and set the supplied date
+	        java.util.Calendar calendar = new GregorianCalendar();
+	        calendar.setTime(date);
+
+	        // Calculate the day of the week (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
+	        int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
+
+	        // Calculate the number of days to subtract to get to Monday (Calendar.MONDAY is 2)
+	        int daysToMonday = (java.util.Calendar.MONDAY - dayOfWeek + 7) % 7;
+	        // Calculate the number of days to add to get to Friday (Calendar.FRIDAY is 6)
+	        int daysToFriday = (java.util.Calendar.FRIDAY - dayOfWeek + 7) % 7;
+
+	        // Get the Monday and Friday dates
+	        calendar.add(java.util.Calendar.DAY_OF_MONTH, daysToMonday);
+	        Date mondayDate = calendar.getTime();
+	        
+	        calendar.add(java.util.Calendar.DAY_OF_MONTH, daysToFriday - daysToMonday);
+	        Date fridayDate = calendar.getTime();
+
+	        // Reset the time to midnight for both dates
+	        resetTimeToMidnight(mondayDate);
+	        resetTimeToMidnight(fridayDate);
+
+	        // Add the dates to the result list
+	        resultDates.add(mondayDate);
+	        resultDates.add(fridayDate);
+
+	        return resultDates;
+	 }
+	
 	private ArrayList<Integer> convertMapValuesToList(Map<String, Integer> map) {
 	    return new ArrayList<>(map.values());
 	}
 
 	
-	
+	// Helper method to reset the time to midnight (00:00:00) for a given date
+    private static void resetTimeToMidnight(Date date) {
+    	java.util.Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        calendar.set(java.util.Calendar.MINUTE, 0);
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+    }
 }
