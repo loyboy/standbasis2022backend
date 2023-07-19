@@ -226,17 +226,17 @@ public class LessonnoteController {
 		 
 		 Map<String, Object> response = service.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, subject, datefrom, dateto );
 		 Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, subject, datefrom, dateto );
-		 Map<String, Object> lsnActivityResponse = serviceActivity.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week,  calendar, teacher, datefrom, dateto );
+		// Map<String, Object> lsnActivityResponse = serviceActivity.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week,  calendar, teacher, datefrom, dateto );
 				 
 		 List<Lessonnote> ordinaryArray = (List<Lessonnote>) response.get("lessonnotes");
 		 List<LessonnoteManagement> ordinaryArrayManagement = (List<LessonnoteManagement>) lsnManageResponse.get("lessonnotemanagement");
-		 List<LessonnoteActivity> ordinaryArrayLessonnote = (List<LessonnoteActivity>) lsnActivityResponse.get("Lessonnoteactivity");
+		 //List<LessonnoteActivity> ordinaryArrayLessonnote = (List<LessonnoteActivity>) lsnActivityResponse.get("Lessonnoteactivity");
 			
 		 Map<String, Object> newResponse = new HashMap<>();
 		 
 		 Integer max = ordinaryArray.size(); 
-		 Integer maxManage = ordinaryArrayManagement.size();
-		 Integer maxActivity = ordinaryArrayLessonnote.size();
+		// Integer maxManage = ordinaryArrayManagement.size();
+		 //Integer maxActivity = ordinaryArrayLessonnote.size();
 				 
 		 Long teacherTotalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null ).count();
 		 Long teacherLateLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() == null && parseTimestamp(todayDate()).compareTo( o.getExpected_submission() ) > 0 ).count();
