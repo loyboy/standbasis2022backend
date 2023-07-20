@@ -47,8 +47,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     	  )
     List<Attendance> findByTeacherTodayClass(     		 
     		@Param("tea") Teacher tea,    		
-    		@Param("monday") Date monday,
-    		@Param("friday") Date friday
+    		@Param("friday") Date friday,
+    		@Param("monday") Date monday
     );
     //-------------------------------------------------------------------------------------------------
     

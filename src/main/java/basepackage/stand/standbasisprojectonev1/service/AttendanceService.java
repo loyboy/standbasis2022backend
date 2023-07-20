@@ -407,8 +407,8 @@ public class AttendanceService {
 				today.equals(null) ? null : datesList.get(0)
 			);
 			
-			System.out.println( "Monday date: " + " --- " + datesList.get(1) );
-			System.out.println( "Friday date: " + " --- " + datesList.get(0) );
+			System.out.println( "Friday date: " + " --- " + datesList.get(1) );
+			System.out.println( "Monday date: " + " --- " + datesList.get(0) );
 			
 		 	List<Attendance> calarray = new ArrayList<Attendance>(attendances);
 	        
