@@ -3,6 +3,9 @@ package basepackage.stand.standbasisprojectonev1.util;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +24,23 @@ public class CommonActivity {
 			Date d = new Date();
 	        String date = DATE_TIME_FORMAT.format(d);
 	        return date;
-	  }
+	 }
+	 
+	 public static LocalDate dateToLocalDate(Date date) {
+	        // Convert Date to Instant
+	        Instant instant = date.toInstant();
+	        
+	        // Convert Instant to LocalDate
+	        return instant.atZone(ZoneId.systemDefault()).toLocalDate();
+	 }
+	 
+	 public static Date localDateToDate(LocalDate localDate) {
+	        // Convert LocalDate to Instant
+	        Instant instant = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+	        
+	        // Convert Instant to Date
+	        return Date.from(instant);
+	 }
 	 
 	 public static java.sql.Timestamp parseTimestamp(String timestamp) {
 		    try {
