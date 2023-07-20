@@ -139,8 +139,8 @@ public class LessonnoteService {
 				if( teacherowner != null ) { teacherownerobj = teaRepository.findById( teacherowner );  }
 			
 				lessonnotes = lsnRepository.findByTeacherWeekLessonnote( 				
-					teacherownerobj == null ? null : teacherownerobj.get(),				
-					week.isEmpty() ? null : week.get()
+					teacherownerobj == null ? null : teacherownerobj.get()			
+					//week is unused
 				);
 				
 			 	List<Lessonnote> calarray = new ArrayList<Lessonnote>(lessonnotes);
