@@ -90,6 +90,7 @@ public class AuthController {
 		        Long realId = null;	        
 		        
 		        LoginResponse lgres = new LoginResponse();
+		        
 		        if ( user.getRole() == RoleName.TEACHER) {
 		        	Calendar foundCal = calService.findAllByStatus( user.getSchool().getSchId() , 1).get();
 		        	
@@ -155,7 +156,21 @@ public class AuthController {
 		            lgres.setRole("evaluator");
 		            lgres.setData_id(null);
 		            lgres.setId(realId);
-		        }   
+		        } 
+		        
+		        if ( user.getRole() == RoleName.SUPERVISOR) {
+		        	realId = user.getUserId();//xxxx
+		        	
+		        	lgres.setPermissions(user.getPermissionsJSON());
+		        	lgres.setUsername(user.getUsername());
+		            lgres.setAccess_token(jwt);
+		            lgres.setEmail(user.getEmail());
+		            lgres.setSchool_id( null );
+		            lgres.setRole("supervisor");
+		            lgres.setData_id(null);
+		            lgres.setId(realId);
+		            lgres.setCode( user.getSupervisor_id() );
+		        } 
 		        
 		        System.out.println( " Ending >> " + lgres.getId() );
 		        return ResponseEntity.ok().body(lgres);        

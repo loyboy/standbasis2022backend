@@ -17,6 +17,7 @@ public class LoginResponse{
 	private Long data_id;
 	private String permissions;
 	private Long id;
+	private String code;
 	
 	public LoginResponse() {
 		

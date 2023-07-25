@@ -66,6 +66,7 @@ public class User extends DateAudit {
     private Long pupil_id;
     private Long principal_id;
     private Long proprietor_id;
+    private String supervisor_id;//01-SUBP-01-IKA
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sch_id", nullable = true)

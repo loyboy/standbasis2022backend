@@ -11,5 +11,6 @@ public enum  RoleName {
     PROPRIETOR,    
     SUPERADMIN,
     
-    EVALUATOR /// as an evaluator, you can edit, and create new school evaluations
+    EVALUATOR, /// as an evaluator, you can edit, and create new school evaluations
+    SUPERVISOR
 }
