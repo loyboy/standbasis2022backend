@@ -382,9 +382,9 @@ public class OnboardingService {
     		return false;
     	}
     	catch (Exception e) {
-    		e.printStackTrace();)
-    		//System.out.println( "Onboarding Error: " + e.getLocalizedMessage() );
-    		//return false;
+    		e.printStackTrace();
+    		System.out.println( "Onboarding Error: " + e.getLocalizedMessage() );
+    		return false;
     	}
     }
 
