@@ -172,6 +172,20 @@ public class AuthController {
 		            lgres.setCode( user.getSupervisor_id() );
 		        } 
 		        
+		        if ( user.getRole() == RoleName.GUARDIAN) {
+		        	realId = user.getUserId();//xxxx
+		        	
+		        	lgres.setPermissions(user.getPermissionsJSON());
+		        	lgres.setUsername(user.getUsername());
+		            lgres.setAccess_token(jwt);
+		            lgres.setEmail(user.getEmail());
+		            lgres.setSchool_id( null );
+		            lgres.setRole("guardian");
+		            lgres.setData_id(null);
+		            lgres.setId(realId);
+		            lgres.setCode( user.getGuardian_id() );
+		        } 
+		        
 		        System.out.println( " Ending >> " + lgres.getId() );
 		        return ResponseEntity.ok().body(lgres);        
         }

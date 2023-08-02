@@ -67,6 +67,16 @@ public class SchoolService {
 		return null;
 	}
 	
+	public List<School> findAllByLga(String lga) {
+		List<School> schval = schRepository.findByLga(lga);
+		return schval;
+	}
+	
+	public List<School> findAllByState(String state) {
+		List<School> schval = schRepository.findByState(state);
+		return schval;
+	}
+	
 	public School findSchool(long id) {
 		
 		Optional<School> sch = schRepository.findById(id);

@@ -37,6 +37,10 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
     
     List<School> findByOwner(SchoolGroup owner);
     
+    List<School> findByLga(String lga);
+    
+    List<School> findByState(String state);
+    
     @Query("select s from School s where s.name like :filter " 
             + "or s.lga like :filter " 
             + "or s.town like :filter " 

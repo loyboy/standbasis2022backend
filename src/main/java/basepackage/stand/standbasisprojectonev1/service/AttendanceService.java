@@ -645,6 +645,7 @@ public class AttendanceService {
 			if ( attval.getDone() == 1 ) {
 				return null;
 			}
+			
 			attval.set_date( new Date() );
 			System.out.println("Done value: " + attRequest.getDone() + " Att value: " + attval.getAttId() );
 			attval.setDone(attRequest.getDone());

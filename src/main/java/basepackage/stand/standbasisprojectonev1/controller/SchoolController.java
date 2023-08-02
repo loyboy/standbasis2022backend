@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.User;
@@ -71,6 +72,19 @@ public class SchoolController {
 		 list.add(count);
 		 return ResponseEntity.ok().body(new ApiContentResponse<Long>(true, "Count of schools by group gotten successfully.", list));		
 	 }
+	 
+	 @GetMapping(value = {"/state/{state}/lga/{lga}", "/state/{state}" })
+	 public ResponseEntity<?> getSchoolsByState( @PathVariable(value = "state") String state , @PathVariable(value = "lga", required = false) String lga  ) {
+		 if (lga != null) {
+			 List<School> list = service.findAllByLga(lga);
+			 return ResponseEntity.ok().body(new ApiContentResponse<School>(true, "List of Schools by state gotten successfully.", list));		
+		 }
+		 else {
+			 List<School> list = service.findAllByState(state);
+			 return ResponseEntity.ok().body(new ApiContentResponse<School>(true, "List of Schools by state and lga gotten successfully.", list));		
+		 }
+		 
+	}
 	 
 	 @GetMapping("/paginate")
 	 public ResponseEntity<?> getPaginatedSchools(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
