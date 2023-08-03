@@ -99,6 +99,7 @@ public class AuthController {
 		        	lgres.setUsername(user.getName());
 		            lgres.setAccess_token(jwt);
 		            lgres.setSchool_date( new Date( foundCal.getStartdate().getTime() ).toLocaleString() );
+		            lgres.setSchool_name( user.getSchool().getName() );
 		            
 		            //lgres.setSchool_date( "2023-01-01" );
 		            lgres.setEmail(user.getEmail());
@@ -112,6 +113,7 @@ public class AuthController {
 		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
 		        	lgres.setUsername(user.getName());
+		        	lgres.setSchool_name( user.getSchool().getName() );
 		            lgres.setAccess_token(jwt);
 		            lgres.setEmail(user.getEmail());
 		            lgres.setRole("principal");
