@@ -96,7 +96,7 @@ public class AuthController {
 		        	
 		        	realId = user.getUserId();		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
-		        	lgres.setUsername(user.getUsername());
+		        	lgres.setUsername(user.getName());
 		            lgres.setAccess_token(jwt);
 		            lgres.setSchool_date( new Date( foundCal.getStartdate().getTime() ).toLocaleString() );
 		            
@@ -111,7 +111,7 @@ public class AuthController {
 		        	realId = user.getUserId();
 		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
-		        	lgres.setUsername(user.getUsername());
+		        	lgres.setUsername(user.getName());
 		            lgres.setAccess_token(jwt);
 		            lgres.setEmail(user.getEmail());
 		            lgres.setRole("principal");
@@ -123,7 +123,7 @@ public class AuthController {
 		        	realId = user.getUserId();
 		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
-		        	lgres.setUsername(user.getUsername());
+		        	lgres.setUsername(user.getName());
 		            lgres.setAccess_token(jwt);
 		            lgres.setEmail(user.getEmail());
 		            lgres.setRole("proprietor");
@@ -149,7 +149,7 @@ public class AuthController {
 		        	realId = user.getUserId();//xxxx
 		        	
 		        	lgres.setPermissions(null);
-		        	lgres.setUsername(user.getUsername());
+		        	lgres.setUsername(user.getName());
 		            lgres.setAccess_token(jwt);
 		            lgres.setEmail(user.getEmail());
 		            lgres.setSchool_id( user.getSchool().getSchId() );
@@ -162,7 +162,7 @@ public class AuthController {
 		        	realId = user.getUserId();//xxxx
 		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
-		        	lgres.setUsername(user.getUsername());
+		        	lgres.setUsername(user.getName());
 		            lgres.setAccess_token(jwt);
 		            lgres.setEmail(user.getEmail());
 		            lgres.setSchool_id( null );
@@ -176,7 +176,7 @@ public class AuthController {
 		        	realId = user.getUserId();//xxxx
 		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
-		        	lgres.setUsername(user.getUsername());
+		        	lgres.setUsername(user.getName());
 		            lgres.setAccess_token(jwt);
 		            lgres.setEmail(user.getEmail());
 		            lgres.setSchool_id( null );
