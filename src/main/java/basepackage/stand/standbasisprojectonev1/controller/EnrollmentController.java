@@ -79,10 +79,15 @@ public class EnrollmentController {
 	 public ResponseEntity<?> getEnrollmentsByCalendar(
 			 @RequestParam(value = "calendar") Long calendar			 
 			 ) {
-		 
+		 try { 
 		 List<Enrollment> list = service.getEnrollmentsByCalendar( calendar );
 		 return ResponseEntity.ok().body(new ApiContentResponse<Enrollment>(true, "List of Enrollments by Calendar gotten successfully.", list));	        
-	 }
+		 }
+		 catch (Exception ex) {
+			 ex.printStackTrace();
+			 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	}
 	 
 	 @GetMapping("/{id}")
 	 public ResponseEntity<?> getEnrollment(@PathVariable(value = "id") Long id) {

@@ -103,8 +103,7 @@ public class EnrollmentService {
 	public List<Enrollment> getEnrollmentsByCalendar(Long cal){
 		Optional<Calendar> existing = calRepository.findById(cal);
 		if (existing.isPresent()) {
-			List<Enrollment> enc = enrollRepository.findByCalendar(existing.get());
-			
+			List<Enrollment> enc = enrollRepository.findByCalendar(existing.get());			
 			return enc;
 		}
 		return null;		
