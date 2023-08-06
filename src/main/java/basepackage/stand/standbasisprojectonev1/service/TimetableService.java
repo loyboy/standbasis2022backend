@@ -24,6 +24,7 @@ import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;
+import basepackage.stand.standbasisprojectonev1.model.Rowcall;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Subject;
@@ -216,6 +217,77 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         
         response.put("totalActive", activeTimeTables);
         response.put("totalInactive", inactiveTimeTables);
+        return response;
+    }
+	
+	public Map<String, Object> getOrdinaryTimeTables(String query, Optional<Long> ownerval, Optional<Long> groupval) {
+       // CommonActivity.validatePageNumberAndSize(page, size);
+        
+        Long owner = ownerval.orElse(null);
+        Long group = groupval.orElse(null);
+        
+        List<TimeTable> timetables = null;
+        
+        if ( query.equals("") || query == null ) {
+        	if ( group == null  ) {
+        		timetables = timeRepository.findAll();
+        	}
+        	else {
+        		//System.out.println("TImetable teachei is here" +  teacher);
+        		
+        		Optional<School> schownerobj = null;
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner );  } 
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group );  }
+        		
+        		//System.out.println("TImetable teachei is here 2" +  teacherownerobj.get() );
+        		
+        		timetables = timeRepository.findBySchoolAndGroupPage( 
+        				schownerobj == null ? null : schownerobj.get(), 
+        				schgroupobj == null ? null : schgroupobj.get()				
+        		);
+        	}        	
+        }
+        else {
+        	if ( group == null ) {
+        		timetables = timeRepository.filterAll("%"+ query + "%");
+        	}
+        	else {    
+        		Optional<School> schownerobj = null;
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner );  } 
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group );  }
+        		
+        		timetables = timeRepository.findFilterBySchoolAndGroupPage( 
+        				"%"+ query + "%", 
+        				schownerobj == null ? null : schownerobj.get(), 
+        				schgroupobj == null ? null : schgroupobj.get()
+        		);
+        	}
+        }
+
+        if(timetables.size() == 0) {
+        	Map<String, Object> responseEmpty = new HashMap<>();
+        	responseEmpty.put("timetables", Collections.emptyList());        	
+        	
+        	return responseEmpty;
+        }
+        
+        List<TimeTable> timearray = new ArrayList<TimeTable>(timetables);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("timetables", timearray);
+        
+       
+        
+       // long active = 1; long inactive = 0;
+      /*  long sriTimeTables = schRepository.countBySri(active);
+        long nonSriTimeTables = schRepository.countBySri(inactive);
+        long inactiveTimeTables = schRepository.countByStatus(inactive);*/
+        
+       
         return response;
     }
 	

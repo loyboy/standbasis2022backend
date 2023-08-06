@@ -10,12 +10,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
@@ -54,6 +57,12 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 	
 	@Autowired
     private TimetableRepository timeRepository;
+	
+	@Autowired
+	TimetableService serviceTimetable;
+	
+	@Autowired
+	AttendanceService attTimetable;
 	
 	public List<Teacher> findAll() {
 		
@@ -116,30 +125,54 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 		return null;
 	}
 	
-	public Map<String, Object> getPaginatedTeachers(int page, int size, String query, Optional<Long> ownerval) {
+	public Map<String, Object> getPaginatedTeachers(int page, int size, String query, Optional<Long> groupval, Optional<Long> ownerval) {
 		CommonActivity.validatePageNumberAndSize(page, size);
-        Long owner = ownerval.orElse(null);        
+        Long owner = ownerval.orElse(null);     
+        Long group = groupval.orElse(null);
+        int underdeployed = 0;
+		int deployed = 0; 
+		int overdeployed = 0;
+		int inactive = 0;
+		int active = 0;
         // Retrieve Teachers
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Teacher> schs = null;
       //  System.out.println("Long is set "+ owner);
         
         if ( query.equals("") || query == null ) {
-        	if ( owner == null ) {
+        	if ( group == null ) {
         		schs = teaRepository.findAll(pageable);
         	}
         	else {
-        		Optional<School> schobj = schRepository.findById( owner );
-        		schs = teaRepository.findBySchool( schobj.orElse(null), pageable);
-        	}        	
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		Optional<School> schownerobj = null;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner ); }
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }        		
+        		
+        			schs = teaRepository.findBySchool( 
+        					schownerobj == null ? null : schownerobj.get(), 
+        	        		schgroupobj == null ? null : schgroupobj.get()
+        					, pageable);
+        	}       	
         }
         else {
-        	if ( owner == null ) {
+        	if ( group == null ) {
         		schs = teaRepository.filter("%"+ query + "%",  pageable);
         	}
         	else {    
-        		Optional<School> schobj = schRepository.findById( owner );
-        		schs = teaRepository.findFilterBySchool( "%"+ query + "%", schobj.orElse(null), pageable);
+        		
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		Optional<School> schownerobj = null;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner ); }
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }
+        		
+        	// Optional<School> schobj = schRepository.findById( owner );
+        		schs = teaRepository.findFilterBySchool( "%"+ query + "%", 
+        				schownerobj == null ? null : schownerobj.get(), 
+    	        		schgroupobj == null ? null : schgroupobj.get(), 
+    	        pageable);
         	}
         }
 
@@ -164,16 +197,67 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         
-       // long active = 1; long inactive = 0;
-      /*  long sriTeachers = schRepository.countBySri(active);
-        long nonSriTeachers = schRepository.countBySri(inactive);
-        long inactiveTeachers = schRepository.countByStatus(inactive);*/
+        Map<String, Object> response2 = serviceTimetable.getOrdinaryTimeTables(query, ownerval, groupval);
         
-        long activeTeachers = teaarray.stream().filter(sch -> sch.getStatus() == 1).count();       
-        long inactiveTeachers = teaarray.stream().filter(sch -> sch.getStatus() == 0).count();
+        Map<String, Object> response3 = attTimetable.getOrdinaryTeacherAttendances(query, groupval, ownerval, null, null, null, null, null, null);
+		
+        @SuppressWarnings("unchecked")
+		List<TimeTable> listTimetable = (List<TimeTable>) response2.get("timetables");	
         
-        response.put("totalActive", activeTeachers);
-        response.put("totalInactive", inactiveTeachers);
+        @SuppressWarnings("unchecked")
+		List<Attendance> listAttendance = (List<Attendance>) response3.get("attendances");
+						  
+		for (Teacher teaT : teaarray) {
+			
+			 List<TimeTable> countTimetableTeacherHas = listTimetable.stream()
+					 	.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() )
+			            .collect(Collectors.toMap(
+			                    obj -> Arrays.asList( obj.getSubject(), obj.getTeacher(), obj.getClass_stream() ),  // Composite key
+			                    Function.identity(),  // Keep the original object
+			                    (obj1, obj2) -> obj1  // Merge function (in case of duplicate keys)
+			            ))
+			            .values()
+			            .stream()
+			            .collect(Collectors.toList());
+			
+			 List<Attendance> countAttendanceTeacherHas = listAttendance.stream()
+					 	.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() )
+			            .collect(Collectors.toMap(
+			                    obj -> Arrays.asList( obj.getTeacher(), obj.getTimetable().getClass_stream(), obj.getTimetable().getSubject()  ),  // Composite key
+			                    Function.identity(),  // Keep the original object
+			                    (obj1, obj2) -> obj1  // Merge function (in case of duplicate keys)
+			            ))
+			            .values()
+			            .stream()
+			            .collect(Collectors.toList());
+			 
+			if (countTimetableTeacherHas.size() > 0) {
+				deployed++;
+			}
+			
+			else if (countTimetableTeacherHas.size() > 0 && countTimetableTeacherHas.size() > 3) {
+				overdeployed++;
+			}
+			
+			else if (countTimetableTeacherHas.size() > 0 && countTimetableTeacherHas.size() <= 2) {
+				underdeployed++;
+			}
+			
+			else if ( countAttendanceTeacherHas != null && countAttendanceTeacherHas.size() == 0) {
+				inactive++;
+			}
+			
+			else if ( countAttendanceTeacherHas != null && countAttendanceTeacherHas.size() > 0) {
+				active++;
+			}
+		}
+		
+		  response.put("totalActive", active);
+		  response.put("totalInactive", inactive);
+		  response.put("totalUnder", underdeployed);
+		  response.put("totalDeploy", deployed);
+		  response.put("totalOver", overdeployed);
+      
         return response;
     }
 	
