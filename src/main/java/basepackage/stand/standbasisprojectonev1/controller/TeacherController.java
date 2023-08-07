@@ -97,9 +97,14 @@ public class TeacherController {
 			 @RequestParam(value = "school", required=false) Optional<Long> school
 			 ) {
 		// System.out.println("Long is set here "+ owner);
-		 
-		 Map<String, Object> response = service.getPaginatedTeachers( page, size, query, schoolgroup, school );
-		 return new ResponseEntity<>(response, HttpStatus.OK);	        
+		 try {
+			 Map<String, Object> response = service.getPaginatedTeachers( page, size, query, schoolgroup, school );
+			 return new ResponseEntity<>(response, HttpStatus.OK);
+		 }
+		 catch (Exception ex) {
+			 ex.printStackTrace();
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
 	 }
 	 
 	 @GetMapping("/{id}")
