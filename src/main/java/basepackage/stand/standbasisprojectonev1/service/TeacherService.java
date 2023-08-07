@@ -134,6 +134,8 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 		int overdeployed = 0;
 		int inactive = 0;
 		int active = 0;
+		Optional<Long> optionalValue = Optional.ofNullable(null);
+		Optional<Timestamp> optionalValueTimestamp = Optional.ofNullable(null);
         // Retrieve Teachers
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Teacher> schs = null;
@@ -199,7 +201,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         
         Map<String, Object> response2 = serviceTimetable.getOrdinaryTimeTables(query, ownerval, groupval);
         
-        Map<String, Object> response3 = attTimetable.getOrdinaryTeacherAttendances(query, groupval, ownerval, null, null, null, null, null, null);
+        Map<String, Object> response3 = attTimetable.getOrdinaryTeacherAttendances(query, groupval, ownerval, optionalValue, optionalValue, optionalValue, optionalValue, optionalValueTimestamp, optionalValueTimestamp);
 		
         @SuppressWarnings("unchecked")
 		List<TimeTable> listTimetable = (List<TimeTable>) response2.get("timetables");	
