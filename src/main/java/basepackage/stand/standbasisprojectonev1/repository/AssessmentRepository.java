@@ -17,6 +17,7 @@ import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Student;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
 
 
 @Repository
@@ -35,6 +36,15 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long>{
     		+ "AND lsn.title like :filter "
        	 )
 	Page<Assessment> filter( @Param("filter") String filter, Pageable pg); 
+	
+	@Query("select assess from Assessment assess "
+			+ "JOIN Lessonnote lsn ON lsn = assess.lsn "
+			+ "AND assess._type = :typeof " 
+			+ "AND (assess.enroll.student = :pup OR :pup is null) "
+			+ "AND (lsn.calendar = :cal OR :cal is null) "
+			+ "AND (lsn.week = :week OR :week is null) "
+       	  )
+	List<Assessment> findStudentMne( @Param("week") Integer week, @Param("pup") Student pup, @Param("cal") Calendar cal, @Param("typeof")  String typeof );
 	
 	@Query("select assess from Assessment assess "
     		+ "JOIN Lessonnote lsn ON lsn = assess.lsn "

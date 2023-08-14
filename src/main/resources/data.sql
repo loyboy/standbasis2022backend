@@ -15,7 +15,7 @@ INSERT IGNORE INTO `subjects` (`sub_id`, `id`, `name`, `category`, `sch_id`, `cr
 (14, 114, 'Security Education', 'PRIMARY', NULL, '2022-09-01 00:59:00', '2022-09-01 00:59:00'),
 (15, 115, 'Cultural and Creative Arts', 'PRIMARY', NULL, '2022-09-01 00:59:00', '2022-09-01 00:59:00'),
 (16, 116, 'Agriculture', 'SECONDARY', '1;', '2022-09-01 00:59:00', '2022-09-01 00:59:00'),
-(17, 117, 'Home Economics', 'SECONDARY', '1;', '2022-09-01 00:59:00', '2022-09-01 00:59:00'),
+(17, 117, 'H.Econs', 'SECONDARY', '1;', '2022-09-01 00:59:00', '2022-09-01 00:59:00'),
 (18, 118, 'Diction in English', 'SECONDARY', '1;', '2022-09-01 00:59:00', '2022-09-01 00:59:00'),
 (19, 119, 'Business Studies', 'SECONDARY', '1;', '2022-09-01 00:59:00', '2022-09-01 00:59:00'),
 (20, 120, 'Fine Arts', 'SECONDARY', '1;', '2022-09-01 00:59:00', '2022-09-01 00:59:00'),

@@ -53,9 +53,16 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		+ "AND (lsn.calendar.status = 1) "
     	  )
     List<Lessonnote> findByTeacherWeekLessonnote(     		 
-    		@Param("tea") Teacher tea   		
-    	
+    		@Param("tea") Teacher tea		
     );
+    
+    @Query("select lsn from Lessonnote lsn where "			
+			+ "(lsn.week = :week OR :week is null) "
+    		+ "AND (lsn.teacher = :tea OR :tea is null) "
+    		+ "AND (lsn.calendar = :cal OR :cal is null) "
+       	  )
+	List<Lessonnote> findTeacherMne( @Param("week") Integer week, @Param("tea") Teacher tea, @Param("cal") Calendar cal );
+	
     //+ "AND ( (lsn.delaythis = 1 AND lsn.week <= :week) OR (lsn.week = :week AND lsn.delaythis is null) OR (lsn.week = :week + 1 AND lsn.delaythis is null) )  "
     //------------------------------------------------------------------------------------------
     @Query("select lsn from Lessonnote lsn where lsn.calendar.school.owner = :owner "

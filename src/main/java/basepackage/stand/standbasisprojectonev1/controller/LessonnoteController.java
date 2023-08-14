@@ -209,7 +209,7 @@ public class LessonnoteController {
 	 }
 	 
 	 @SuppressWarnings("unchecked")
-	 @GetMapping("/mneTeachers")
+	 @GetMapping("/mneTeachers") //flags
 	 public ResponseEntity<?> getMNETeacherLessonnotes(
 			 @RequestParam(value = "q", required=false) String query,
 			 @RequestParam(value = "schoolgroup" ) Optional<Long> schoolgroup,
@@ -356,7 +356,7 @@ public class LessonnoteController {
 			 @RequestParam(value = "student", required=false) Optional<Long> student,
 			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
-			 ) 
+			 )     
 	 {
 		 
 		 Map<String, Object> response = service.getOrdinaryStudentLessonnotes(query, schoolgroup, school, classid, week, calendar, student, datefrom, dateto  );
