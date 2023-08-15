@@ -242,7 +242,7 @@ public class AttendanceController {
 		 Integer maxStudent = ordinaryStudentArray.size();
 		 Integer maxActivity = ordinaryArrayActivity.size();
 		 
-		 Long studentAbsence = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0).count(); 
+		 Long studentAbsence = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 1).count(); 
 		 Long studentExcusedAbsence = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0 && o.getRemark() != null ).count(); 
 		 Long incompleteAttendance = ordinaryArrayManagement.stream().filter(o -> o.getCompleteness() == 50 ).count(); 
 		 Long lateAttendance = ordinaryArrayManagement.stream().filter(o -> o.getTiming() == 50).count(); 
