@@ -17,6 +17,8 @@ public class AttendanceRequest {
     
     private Integer done;
     
+    private Integer principal_action;
+    
     private Integer delegated;
     
     private String _desc;

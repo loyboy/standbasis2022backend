@@ -47,6 +47,9 @@ public class Attendance extends DateAudit{
     @NotNull
     private Integer done; // 0- not done, 1- done, -1 voided, 2 - late
     
+    @NotNull
+    private Integer principal_action; //same with management
+    
     private Long delegated; // ID of teacher that is assigned to use this Attendance
     
     @Size(max = 500)

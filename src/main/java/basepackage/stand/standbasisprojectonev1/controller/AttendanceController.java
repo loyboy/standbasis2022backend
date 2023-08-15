@@ -370,6 +370,8 @@ public class AttendanceController {
 	 	{
 		 
 		 try {
+			 Attendance valAtt = service.update(attRequest.getAttendance(),id);
+			 
 			 AttendanceManagement val = serviceManagement.updateByAttendance(attRequest.getManagement(), id);
 			 //get Activity ID
 			 AttendanceActivity val2  = serviceActivity.findAttendanceActivityByAttendance(id);
