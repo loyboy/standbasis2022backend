@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceManagement;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
@@ -144,6 +145,20 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 			       "WHERE DATE(attmanage.createdAt) >= :startDate AND DATE(attmanage.createdAt) <= :endDate AND attmanage.att_id.calendar.status = 1 AND attmanage.completeness = 50 " +
 			       "GROUP BY DATE(attmanage.createdAt)")
 		 List<Object[]> countAttendancesManagementNoAttachmentPerDay(Timestamp startDate, Timestamp endDate);
+		 
+		 @Query("select att from AttendanceManagement attmanage "
+				 	+ "JOIN Attendance att ON att = attmanage.att_id " 
+		    		+ "WHERE (att.timetable.calendar.CalendarId = :cal OR :cal is null) "
+		    		+ "AND (att.teacher.teaId = :tea OR :tea is null) "
+		    		+ "AND ( DATE(att._date) >= :datefrom OR :datefrom is null) "
+		    		+ "AND ( DATE(att._date) <= :dateto OR :dateto is null) "
+		       	 )    
+		 List<AttendanceManagement> findByTeacherMne(    		
+		    		@Param("tea") Long tea,
+		    		@Param("cal") Long cal,
+		    		@Param("datefrom") Timestamp datefrom,
+		    		@Param("dateto") Timestamp dateto
+		    	);
 		 
 		 
 }

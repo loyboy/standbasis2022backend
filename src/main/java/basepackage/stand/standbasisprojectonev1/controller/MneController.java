@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import basepackage.stand.standbasisprojectonev1.model.Assessment;
 import basepackage.stand.standbasisprojectonev1.model.Attendance;
+import basepackage.stand.standbasisprojectonev1.model.AttendanceActivity;
+import basepackage.stand.standbasisprojectonev1.model.AttendanceManagement;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;
@@ -39,9 +41,13 @@ import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.TimetableRequest;
 import basepackage.stand.standbasisprojectonev1.repository.AssessmentRepository;
+import basepackage.stand.standbasisprojectonev1.repository.AttendanceManagementRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
 import basepackage.stand.standbasisprojectonev1.repository.LessonnoteRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
+import basepackage.stand.standbasisprojectonev1.service.AttendanceActivityService;
+import basepackage.stand.standbasisprojectonev1.service.AttendanceManagementService;
+import basepackage.stand.standbasisprojectonev1.service.AttendanceService;
 import basepackage.stand.standbasisprojectonev1.service.CalendarService;
 import basepackage.stand.standbasisprojectonev1.service.ClassService;
 import basepackage.stand.standbasisprojectonev1.service.EnrollmentService;
@@ -88,7 +94,19 @@ public class MneController {
 	 LessonnoteActivityService serviceActivity;
 	 
 	 @Autowired
+	 AttendanceManagementService serviceAttManagement;
+	 
+	 @Autowired
+	 AttendanceService serviceAtt;
+	 
+	 @Autowired
+	 AttendanceActivityService serviceAttActivity;
+	 
+	 @Autowired
 	 private AttendanceRepository attRepository;
+	 
+	 @Autowired
+	 private AttendanceManagementRepository attManageRepository;
 	 
 	 @Autowired
 	 private AssessmentRepository assRepository;
@@ -230,20 +248,20 @@ public class MneController {
 		 Teacher teaobj = teacherservice.findTeacher(teacher);
 		 LocalDate stDate = calobj.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
 		 LocalDate endDate = calobj.getEnddate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+		 Timestamp timestampWeekStart = null;
+		 Timestamp timestampWeekEnd = null;
 		 
-		 List<LocalDate> weekrange = getWeekdayRange(week, stDate, endDate);
-		 
-	// System.out.println("weekrange object: " + stDate.toString() + "  --- " + endDate.toString() );
-		 
-		 LocalDateTime localDateTime1 = weekrange.get(0).atStartOfDay();
-		 LocalDateTime localDateTime2 = weekrange.get(4).atStartOfDay();
+		 if (week != null) {
+			 List<LocalDate> weekrange = getWeekdayRange(week, stDate, endDate);
+			 LocalDateTime localDateTime1 = weekrange.get(0).atStartOfDay();
+			 LocalDateTime localDateTime2 = weekrange.get(4).atStartOfDay();
 
-	     Timestamp timestampWeekStart = Timestamp.valueOf(localDateTime1);
-	     Timestamp timestampWeekEnd = Timestamp.valueOf(localDateTime2);	     
-	     
-	   // System.out.println("myrowcall precall: " + enrolobj.getStudent().getPupId() + " --- " + calendar );
-	     
+		     timestampWeekStart = Timestamp.valueOf(localDateTime1);
+		     timestampWeekEnd = Timestamp.valueOf(localDateTime2);
+		 }
+		      
 	     List<Attendance> my_attendance = attRepository.findByTeacherMne( teaobj.getTeaId(), calendar, timestampWeekStart, timestampWeekEnd);    
+	     List<AttendanceManagement> my_attendancemanagement = attManageRepository.findByTeacherMne( teaobj.getTeaId(), calendar, timestampWeekStart, timestampWeekEnd);    
 	     
 	     List<TimeTable> teacherclasses = timetableservice.findClassTaught( teaobj.getTeaId(), calendar);
 	     
@@ -259,10 +277,17 @@ public class MneController {
 	     
 	     Map<String, Object> objectmnecolumn2 = new HashMap<>();
 	     objectmnecolumn2.put("key", "performance");
-	     objectmnecolumn2.put("label", "Performance");
+	     objectmnecolumn2.put("label", "Attendance");
 	     objectmnecolumn2.put("sortable", true);
 	     
 	     mnecolumn.add( objectmnecolumn2 );
+	     
+	     Map<String, Object> objectmnecolumn3 = new HashMap<>();
+	     objectmnecolumn3.put("key", "management");
+	     objectmnecolumn3.put("label", "Management");
+	     objectmnecolumn3.put("sortable", true);
+	     
+	     mnecolumn.add( objectmnecolumn3 );
 	     
 	     Map<String, Object> objectmnecolumndata = new HashMap<>();
 	     objectmnecolumndata.put("teacher_name", teaobj.getFname() + " " + teaobj.getLname() );
@@ -272,7 +297,7 @@ public class MneController {
 	     List<TimeTable> uniqueTimetables = findUniqueTimetables(teacherclasses);
 	     
 	     List<Double> allAverage = new ArrayList<>();
-	     
+	     List<Double> allAverageManagement = new ArrayList<>();
 	     //String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
 	     
 	     for (TimeTable subclass : uniqueTimetables) {	    	
@@ -280,26 +305,54 @@ public class MneController {
 	    	 System.out.println("Unique timetable seen: " + subclass.getTimeId() );
 	    	 
 		     List<Attendance> attcall = my_attendance.stream().filter(att -> att.getTimetable().getSubject().equals(subclass.getSubject()) && att.getTimetable().getClass_stream().equals( subclass.getClass_stream() ) ).collect(Collectors.toList());
+		     List<AttendanceManagement> attcall_manage = my_attendancemanagement.stream().filter(att -> att.getAtt_id().getTimetable().getSubject().equals(subclass.getSubject()) && att.getAtt_id().getTimetable().getClass_stream().equals( subclass.getClass_stream() ) ).collect(Collectors.toList());
 		       
 		     if (attcall.size() > 0) {
 		    	 
 		    	 double perf = 0.0;
 		    	 List<Attendance> attcallPresent = attcall.stream().filter(att -> att.getDone() == 1 ).collect(Collectors.toList());
+		    	 //same with upper
 		    	 List<Attendance> new_my_attendance = my_attendance.stream().filter(att -> att.getTimetable().getSubject().equals(subclass.getSubject()) && att.getTimetable().getClass_stream().equals( subclass.getClass_stream() ) ).collect(Collectors.toList());
-		    	 	    	
-		    	 
+		    	 	    
 		    	 if (attcallPresent.size() > 0) {		    		
 		    		 perf = ( (double) attcallPresent.size() / new_my_attendance.size() ) * 100;
 		    	 }    	
 		    	 
 			     Map<String, Object> objectmnecolumntemp = new HashMap<>();
 		    	 objectmnecolumntemp.put("key", "d"+j);
-		    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() );
+		    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Performance" );
 		    	 objectmnecolumntemp.put("sortable", true);
 		    	 
 			     mnecolumn.add( objectmnecolumntemp );
 			     
 			     allAverage.add(perf);
+			     
+			     objectmnecolumndata.put("d"+j, (int) perf  );		     
+			     
+			     j++;
+		     }
+		     
+		     if (attcall_manage.size() > 0) {
+		    	 
+		    	 double perf = 0.0;
+		    	 List<AttendanceManagement> attcallPresent = attcall_manage.stream().filter(att -> att.getScore() > 50 ).collect(Collectors.toList());
+		    	 //same with upper
+		    	 List<AttendanceManagement> new_my_attendance = my_attendancemanagement.stream().filter(att -> att.getAtt_id().getTimetable().getSubject().equals(subclass.getSubject()) && att.getAtt_id().getTimetable().getClass_stream().equals( subclass.getClass_stream() )).collect(Collectors.toList());
+		    	 	    
+		    	 if (attcallPresent.size() > 0) {		    		
+		    		 perf = ( (double) attcallPresent.size() / new_my_attendance.size() ) * 100;
+		    	 }    	
+		    	 
+		    	 j++;
+		    	 
+			     Map<String, Object> objectmnecolumntemp = new HashMap<>();
+		    	 objectmnecolumntemp.put("key", "d"+j);
+		    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Management" );
+		    	 objectmnecolumntemp.put("sortable", true);
+		    	 
+			     mnecolumn.add( objectmnecolumntemp );
+			     
+			     allAverageManagement.add(perf);	     
 			     
 			     objectmnecolumndata.put("d"+j, (int) perf  );		     
 			     
@@ -314,7 +367,15 @@ public class MneController {
 	                .orElse(0.0);
 	     
 	     objectmnecolumndata.put("performance", averagePerf);
-	     mnecolumndata.add( objectmnecolumndata ); 
+	     mnecolumndata.add( objectmnecolumndata );
+	     
+	     double averagePerfManagement = allAverageManagement.stream()
+	                .mapToInt(Double::intValue)
+	                .average()
+	                .orElse(0.0);
+	     
+	     objectmnecolumndata.put("management", averagePerfManagement);
+	     mnecolumndata.add( objectmnecolumndata );
 	     
 	     Map<String, Object> response = new HashMap<>();
 			
@@ -477,6 +538,71 @@ public class MneController {
 			 
 			 newResponse.put("teacher_management", (teacherBadCycles.intValue()/maxManagement) * 100 );
 			 newResponse.put("head_admin", (headBadAdministration.intValue()/maxActivity) * 100 );
+			 
+			 return new ResponseEntity<>(newResponse, HttpStatus.OK);
+				
+	 }
+	 
+	 @SuppressWarnings("unchecked")
+	 @GetMapping("/attendance/proprietors")
+	 public ResponseEntity<?> getProprietorAttendance(
+			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
+			 @RequestParam(value = "school", required=false) Optional<Long> school,
+			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
+			 @RequestParam(value = "week", required=false) Optional<Integer>  week
+	 ){
+		 
+		 	 Calendar calobj = calendarservice.findCalendar(calendar.get());
+		 	 Optional<Timestamp> WithStartValueTime = Optional.ofNullable(null);
+		 	 Optional<Timestamp> WithEndValueTime = Optional.ofNullable(null);
+		 	 
+		 	 if (calobj != null && week.isPresent()) {
+		 		LocalDate stDate = calobj.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+				LocalDate endDate = calobj.getEnddate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+				 
+				 List<LocalDate> weekrange = getWeekdayRange(week.get(), stDate, endDate);				 
+				 
+				 LocalDateTime localDateTime1 = weekrange.get(0).atStartOfDay();
+				 LocalDateTime localDateTime2 = weekrange.get(4).atStartOfDay();
+
+			     Timestamp timestampWeekStart = Timestamp.valueOf(localDateTime1);
+			     Timestamp timestampWeekEnd = Timestamp.valueOf(localDateTime2);
+			     
+			     WithStartValueTime = Optional.ofNullable(timestampWeekStart);
+			     WithEndValueTime = Optional.ofNullable(timestampWeekEnd);
+		 	 }
+		 
+			 Optional<Long> WithNullableValue = Optional.ofNullable(null);
+			 Optional<Integer> WithNullableValueInt = Optional.ofNullable(null);
+			 
+			 Map<String, Object> attResponse = serviceAtt.getOrdinaryTeacherAttendances("", schoolgroup, school, WithNullableValue, calendar, WithNullableValue, WithNullableValue, WithStartValueTime, WithEndValueTime );
+			 Map<String, Object> attManangeResponse = serviceAttManagement.getOrdinaryTeacherAttendances("", schoolgroup, school, WithNullableValue, calendar, WithNullableValue, WithNullableValue, WithStartValueTime, WithEndValueTime );
+			 Map<String, Object> attActivityResponse = serviceAttActivity.getOrdinaryTeacherAttendances( "", schoolgroup, school, WithNullableValue, calendar, WithNullableValue, WithStartValueTime, WithEndValueTime );
+			 Map<String, Object> attStudent = serviceAtt.getOrdinaryStudentAttendances("", schoolgroup, school, WithNullableValue,  calendar, WithNullableValue, WithStartValueTime, WithEndValueTime);
+			 
+			 List<Attendance> ordinaryArray = (List<Attendance>) attResponse.get("attendances");
+			 List<Rowcall> ordinaryStudentArray = (List<Rowcall>) attStudent.get("attendances");
+			 List<AttendanceManagement> ordinaryArrayManagement = (List<AttendanceManagement>) attManangeResponse.get("attendancemanagement");
+			 List<AttendanceActivity> ordinaryArrayActivity = (List<AttendanceActivity>) attActivityResponse.get("attendanceactivity");
+			 
+			 Map<String, Object> newResponse = new HashMap<>();
+			 
+			 Integer maxManagement = ordinaryArrayManagement.size(); 
+			 Integer max = ordinaryArray.size();
+			 Integer maxActivity = ordinaryArrayActivity.size();
+			 Integer maxStudent = ordinaryStudentArray.size();
+			 
+			 Long teacherAttendance = ordinaryArray.stream().filter(o -> o.getDone() == 1).count(); 
+			 Long teacherAttendanceManagement = ordinaryArrayManagement.stream().filter(o -> o.getScore() > 50).count();
+			 Long studentAttendance = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 1).count(); 
+			 Long studentExcusedAttendance = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0 && o.getRemark() != null).count(); 
+			 Long headAdministration = ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getOwnertype().equals("Principal") ).count(); 
+			 
+			 newResponse.put("teacher_attendance", (teacherAttendance.intValue()/max) * 100 );
+			 newResponse.put("teacher_management", (teacherAttendanceManagement.intValue()/maxManagement) * 100 );
+			 newResponse.put("student_att", (studentAttendance.intValue()/maxStudent) * 100 );
+			 newResponse.put("student_att_excused", (studentExcusedAttendance.intValue()/maxStudent) * 100 );
+			 newResponse.put("head_admin", (headAdministration.intValue()/maxActivity) * 100 );
 			 
 			 return new ResponseEntity<>(newResponse, HttpStatus.OK);
 				
