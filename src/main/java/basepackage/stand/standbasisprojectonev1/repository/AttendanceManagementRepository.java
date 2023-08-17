@@ -146,7 +146,7 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 			       "GROUP BY DATE(attmanage.createdAt)")
 		 List<Object[]> countAttendancesManagementNoAttachmentPerDay(Timestamp startDate, Timestamp endDate);
 		 
-		 @Query("select att from AttendanceManagement attmanage "
+		 @Query("select attmanage from AttendanceManagement attmanage "
 				 	+ "JOIN Attendance att ON att = attmanage.att_id " 
 		    		+ "WHERE (att.timetable.calendar.CalendarId = :cal OR :cal is null) "
 		    		+ "AND (att.teacher.teaId = :tea OR :tea is null) "
