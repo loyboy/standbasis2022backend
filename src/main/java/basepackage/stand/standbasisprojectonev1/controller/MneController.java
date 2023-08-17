@@ -39,6 +39,7 @@ import basepackage.stand.standbasisprojectonev1.model.Student;
 import basepackage.stand.standbasisprojectonev1.model.Subject;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
+import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.TimetableRequest;
 import basepackage.stand.standbasisprojectonev1.repository.AssessmentRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceManagementRepository;
@@ -243,7 +244,7 @@ public class MneController {
 		 
 		// Map<String, Object> response = service.getPaginatedCalendars( page, size, query, school );
 		// return new ResponseEntity<>(response, HttpStatus.OK);
-		 
+		try { 
 		 Calendar calobj = calendarservice.findCalendar(calendar);
 		 Teacher teaobj = teacherservice.findTeacher(teacher);
 		 LocalDate stDate = calobj.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
@@ -262,6 +263,8 @@ public class MneController {
 		      
 	     List<Attendance> my_attendance = attRepository.findByTeacherMne( teaobj.getTeaId(), calendar, timestampWeekStart, timestampWeekEnd);    
 	     List<AttendanceManagement> my_attendancemanagement = attManageRepository.findByTeacherMne( teaobj.getTeaId(), calendar, timestampWeekStart, timestampWeekEnd);    
+	     
+	     System.out.println("Inside the start :: " + my_attendance.size() + " >> " + my_attendancemanagement.size() + " << " );
 	     
 	     List<TimeTable> teacherclasses = timetableservice.findClassTaught( teaobj.getTeaId(), calendar);
 	     
@@ -306,7 +309,9 @@ public class MneController {
 	    	 
 		     List<Attendance> attcall = my_attendance.stream().filter(att -> att.getTimetable().getSubject().equals(subclass.getSubject()) && att.getTimetable().getClass_stream().equals( subclass.getClass_stream() ) ).collect(Collectors.toList());
 		     List<AttendanceManagement> attcall_manage = my_attendancemanagement.stream().filter(att -> att.getAtt_id().getTimetable().getSubject().equals(subclass.getSubject()) && att.getAtt_id().getTimetable().getClass_stream().equals( subclass.getClass_stream() ) ).collect(Collectors.toList());
-		       
+		     
+		     System.out.println("Inside the for loop : " + attcall.size() + " >> " + attcall_manage.size() + ">>" + j );
+		     
 		     if (attcall.size() > 0) {
 		    	 
 		    	 double perf = 0.0;
@@ -329,18 +334,18 @@ public class MneController {
 			     
 			     objectmnecolumndata.put("d"+j, (int) perf  );		     
 			     
-			     j++;
+			   //  j++;
 		     }
 		     
 		     if (attcall_manage.size() > 0) {
 		    	 
 		    	 double perf = 0.0;
-		    	 List<AttendanceManagement> attcallPresent = attcall_manage.stream().filter(att -> att.getScore() > 50 ).collect(Collectors.toList());
+		    	 List<AttendanceManagement> attcallPresent1 = attcall_manage.stream().filter(att -> att.getScore() > 50 ).collect(Collectors.toList());
 		    	 //same with upper
-		    	 List<AttendanceManagement> new_my_attendance = my_attendancemanagement.stream().filter(att -> att.getAtt_id().getTimetable().getSubject().equals(subclass.getSubject()) && att.getAtt_id().getTimetable().getClass_stream().equals( subclass.getClass_stream() )).collect(Collectors.toList());
+		    	 List<AttendanceManagement> new_my_attendance1 = my_attendancemanagement.stream().filter(att -> att.getAtt_id().getTimetable().getSubject().equals(subclass.getSubject()) && att.getAtt_id().getTimetable().getClass_stream().equals( subclass.getClass_stream() )).collect(Collectors.toList());
 		    	 	    
-		    	 if (attcallPresent.size() > 0) {		    		
-		    		 perf = ( (double) attcallPresent.size() / new_my_attendance.size() ) * 100;
+		    	 if (attcallPresent1.size() > 0) {		    		
+		    		 perf = ( (double) attcallPresent1.size() / new_my_attendance1.size() ) * 100;
 		    	 }    	
 		    	 
 		    	 j++;
@@ -354,10 +359,11 @@ public class MneController {
 			     
 			     allAverageManagement.add(perf);	     
 			     
-			     objectmnecolumndata.put("d"+j, (int) perf  );		     
+			     objectmnecolumndata.put("d"+j, (int) perf  );	     	     
 			     
-			     j++;
 		     }
+		     
+		     j++;
 		     
 		 }
 	     
@@ -382,7 +388,14 @@ public class MneController {
 		 response.put("mnecolumn", mnecolumn);
 		 response.put("mnecolumndata", mnecolumndata);
 	     
-		 return new ResponseEntity<>(response, HttpStatus.OK);		
+		 return new ResponseEntity<>(response, HttpStatus.OK);
+		 
+	 }
+	 catch (Exception ex) {
+		 ex.printStackTrace();
+         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
+     }
+	 
 	 }
 	
 	 @GetMapping("/lessonnote/students")
