@@ -170,7 +170,7 @@ public class MyScheduler {
 	
 	// "0 0/10 * * * *" - 10 minutes interval
 	// "0 0 0 * * *" - Everyday at 0:00
-	@Scheduled(cron = "0 0 0 * * *")
+	@Scheduled(cron = "0 13 05 18 8 *")
     public void insertAttendances() {       
 		
 		//Check what day of the week is this
