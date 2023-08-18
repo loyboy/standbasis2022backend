@@ -337,12 +337,15 @@ public class MneController {
 		     if (attcall_manage.size() > 0) {
 		    	 
 		    	 double perf = 0.0;
-		    	 List<AttendanceManagement> attcallPresent1 = attcall_manage.stream().filter(att -> att.getScore() >= 50 ).collect(Collectors.toList());
+		    	 List<AttendanceManagement> attcallPresent1 = attcall_manage.stream().filter(att -> att.getScore() >= 25 ).collect(Collectors.toList());
 		    	 //same with upper
 		    	 List<AttendanceManagement> new_my_attendance1 = my_attendancemanagement.stream().filter(att -> att.getAtt_id().getTimetable().getSubject().equals(subclass.getSubject()) && att.getAtt_id().getTimetable().getClass_stream().equals( subclass.getClass_stream() )).collect(Collectors.toList());
 		    	 	    
-		    	 if (attcallPresent1.size() > 0) {		    		
-		    		 perf = ( (double) attcallPresent1.size() / new_my_attendance1.size() ) * 100;
+		    	 if (attcallPresent1.size() > 0) {
+		    		 int sum = attcallPresent1.stream()
+	                            .mapToInt(att -> att.getScore())
+	                            .sum();
+		    		 perf = ( (double) sum / new_my_attendance1.size() * 100 ) * 100;
 		    	 }    	
 		    	 
 		    	 j++;
@@ -370,7 +373,7 @@ public class MneController {
 	                .orElse(0.0);
 	     
 	     objectmnecolumndata.put("performance", averagePerf);
-	     mnecolumndata.add( objectmnecolumndata );
+	  //   mnecolumndata.add( objectmnecolumndata );
 	     
 	     double averagePerfManagement = allAverageManagement.stream()
 	                .mapToInt(Double::intValue)
@@ -378,6 +381,7 @@ public class MneController {
 	                .orElse(0.0);
 	     
 	     objectmnecolumndata.put("management", averagePerfManagement);
+	     
 	     mnecolumndata.add( objectmnecolumndata );
 	     
 	     Map<String, Object> response = new HashMap<>();
