@@ -663,8 +663,9 @@ public class MneController {
 	            boolean isUnique = true;
 
 	            for (TimeTable uniqueTimetable : uniqueTimetables) {
-	                if (timetable.getSubject().getName().equals(uniqueTimetable.getSubject().getName()) &&
-	                        timetable.getClass_stream().getTitle().equals(uniqueTimetable.getClass_stream().getTitle())) {
+	                if ( ( timetable.getSubject().getSubId() == uniqueTimetable.getSubject().getSubId() ) &&
+	                     ( timetable.getClass_stream().getClsId() == uniqueTimetable.getClass_stream().getClsId() )  
+	                   ) {
 	                    isUnique = false;
 	                    break;
 	                }
