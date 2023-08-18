@@ -345,7 +345,7 @@ public class MneController {
 		    		 int sum = attcallPresent1.stream()
 	                            .mapToInt(att -> att.getScore())
 	                            .sum();
-		    		 perf = ( (double) sum / new_my_attendance1.size() * 100 ) * 100;
+		    		 perf = ( (double) sum / (new_my_attendance1.size() * 100) ) * 100;
 		    	 }    	
 		    	 
 		    	 j++;
