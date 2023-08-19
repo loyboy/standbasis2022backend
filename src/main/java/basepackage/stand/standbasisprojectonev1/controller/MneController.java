@@ -547,11 +547,11 @@ public class MneController {
 			 Integer maxManagement = ordinaryArrayManagement.size(); 
 			 Integer maxActivity = ordinaryArrayActivity.size(); 
 			 
-			 Long teacherBadCycles = ordinaryArrayManagement.stream().filter(o -> o.getManagement() < 50).count(); 
-			 Long headBadAdministration = ordinaryArrayActivity.stream().filter(o -> o.getActual() == null && o.getOwnertype().equals("Principal") ).count(); 
+			 Long teacherManagement = ordinaryArrayManagement.stream().filter(o -> o.getManagement() >= 50).count(); 
+			 Long headAdministration = ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getOwnertype().equals("Principal") ).count(); 
 			 
-			 newResponse.put("teacher_management", (teacherBadCycles.intValue()/maxManagement) * 100 );
-			 newResponse.put("head_admin", (headBadAdministration.intValue()/maxActivity) * 100 );
+			 newResponse.put("teacher_management", (teacherManagement.intValue()/maxManagement) * 100 );
+			 newResponse.put("head_admin", (headAdministration.intValue()/maxActivity) * 100 );
 			 
 			 return new ResponseEntity<>(newResponse, HttpStatus.OK);
 				
@@ -565,7 +565,7 @@ public class MneController {
 			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
 			 @RequestParam(value = "week", required=false) Optional<Integer>  week
 	 ){
-		 
+		 try { 
 		 	 Calendar calobj = calendarservice.findCalendar(calendar.get());
 		 	 Optional<Timestamp> WithStartValueTime = Optional.ofNullable(null);
 		 	 Optional<Timestamp> WithEndValueTime = Optional.ofNullable(null);
@@ -606,8 +606,8 @@ public class MneController {
 			 Integer maxActivity = ordinaryArrayActivity.size();
 			 Integer maxStudent = ordinaryStudentArray.size();
 			 
-			 Long teacherAttendance = ordinaryArray.stream().filter(o -> o.getDone() == 1).count(); 
-			 Long teacherAttendanceManagement = ordinaryArrayManagement.stream().filter(o -> o.getScore() > 50).count();
+			 Long teacherAttendance = ordinaryArray.stream().filter(o -> ( o.getDone() == 1 || o.getDone() == 2 ) ).count(); 
+			 Long teacherAttendanceManagement = ordinaryArrayManagement.stream().filter(o -> o.getScore() >= 50).count();
 			 Long studentAttendance = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 1).count(); 
 			 Long studentExcusedAttendance = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0 && o.getRemark() != null).count(); 
 			 Long headAdministration = ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getOwnertype().equals("Principal") ).count(); 
@@ -619,6 +619,11 @@ public class MneController {
 			 newResponse.put("head_admin", (headAdministration.intValue()/maxActivity) * 100 );
 			 
 			 return new ResponseEntity<>(newResponse, HttpStatus.OK);
+		 }
+		 catch (Exception ex) {
+			 ex.printStackTrace();
+		     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
+		 }
 				
 	 }
 	 
