@@ -566,11 +566,13 @@ public class MneController {
 			 @RequestParam(value = "week", required=false) Optional<Integer>  week
 	 ){
 		 try { 
-		 	 Calendar calobj = calendarservice.findCalendar(calendar.get());
+		 	 
+			
 		 	 Optional<Timestamp> WithStartValueTime = Optional.ofNullable(null);
 		 	 Optional<Timestamp> WithEndValueTime = Optional.ofNullable(null);
 		 	 
-		 	 if (calobj != null && week.isPresent()) {
+		 	 if (calendar.isPresent() && week.isPresent()) {
+		 		Calendar calobj = calendarservice.findCalendar(calendar.get());
 		 		LocalDate stDate = calobj.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
 				LocalDate endDate = calobj.getEnddate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
 				 
