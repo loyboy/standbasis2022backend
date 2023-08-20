@@ -65,13 +65,13 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	 	@Query("select attmanage from AttendanceManagement attmanage "
 	    		+ "JOIN Attendance att ON att = attmanage.att_id "
 	 			+ "WHERE att.timetable.school.owner = :owner "
-	    		+ "AND (att.timetable.school = :sch OR :sch is null) "
-	    		+ "AND (att.timetable.class_stream = :cls OR :cls is null) "
-	    		+ "AND (att.timetable.teacher = :tea OR :tea is null) "
-	    		+ "AND (att.timetable.calendar = :cal OR :cal is null) "
-	    		+ "AND (att.timetable.subject = :sub OR :sub is null) "
-	    		+ "AND (DATE(att._date) >= :datefrom OR :datefrom is null) "
-	    		+ "AND (DATE(att._date) = :dateto OR :dateto is null) "
+	    		+ "AND ( :sch is null OR att.timetable.school = :sch ) "
+	    		+ "AND ( :cls is null OR att.timetable.class_stream = :cls ) "
+	    		+ "AND ( :tea is null OR att.timetable.teacher = :tea ) "
+	    		+ "AND ( :cal is null OR att.timetable.calendar = :cal ) "
+	    		+ "AND ( :sub is null OR att.timetable.subject = :sub ) "
+	    		+ "AND ( :datefrom is null OR DATE(att._date) >= :datefrom ) "
+	    		+ "AND ( :dateto is null OR DATE(att._date) = :dateto ) "
 	      )	    
 	    List<AttendanceManagement> findByTeacherSchoolgroup(
 	    		@Param("owner") SchoolGroup owner, 
