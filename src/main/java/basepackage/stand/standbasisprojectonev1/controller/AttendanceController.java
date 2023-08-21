@@ -149,7 +149,7 @@ public class AttendanceController {
 			 @RequestParam(value = "datefrom", required=false) Optional<String> datefrom,
 			 @RequestParam(value = "dateto", required=false) Optional<String> dateto
 			 ) {
-		 
+		 try {
 		 	 Date datefrom1 = null;  
 		 	 Date dateto1 = null;
 		 				 
@@ -169,6 +169,11 @@ public class AttendanceController {
 			 }
 			 Map<String, Object> response = service.getPaginatedTeacherAttendances( page, size, query, schoolgroup, school, classid, calendar, teacher, subject, status, datefrom1, dateto1  );
 			 return new ResponseEntity<>(response, HttpStatus.OK);	        
+	 		
+	 		} catch (Exception e) {
+	 			e.printStackTrace();
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
+	 		}
 	 }
 	 
 	 @GetMapping("/classToday")
