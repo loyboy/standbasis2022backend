@@ -279,10 +279,16 @@ public class AttendanceService {
       /*  long sriAttendances = schRepository.countBySri(active);
         long nonSriAttendances = schRepository.countBySri(inactive);
         long inactiveAttendances = schRepository.countByStatus(inactive);*/
-        Timestamp timestampFrom = new Timestamp(datefrom.getTime());
-        Timestamp timestampTo = new Timestamp(dateto.getTime());
-        Optional<Timestamp> WithStartValueTime = Optional.ofNullable(timestampFrom);
-        Optional<Timestamp> WithEndValueTime = Optional.ofNullable(timestampTo);
+        Optional<Timestamp> WithStartValueTime = Optional.ofNullable(null);
+	 	Optional<Timestamp> WithEndValueTime = Optional.ofNullable(null);
+	 	
+	 	if ( datefrom != null && dateto != null ) {
+	 		Timestamp timestampFrom = new Timestamp(datefrom.getTime());
+	        Timestamp timestampTo = new Timestamp(dateto.getTime());
+	        WithStartValueTime = Optional.ofNullable(timestampFrom);
+	        WithEndValueTime = Optional.ofNullable(timestampTo);
+	 	}
+        
         Map<String, Object> response2 = getOrdinaryTeacherAttendances(query, schgroupId, schId, classId, calendarId, teacherId, subject, WithStartValueTime, WithEndValueTime  );
         List<Attendance> ordinaryArray = (List<Attendance>) response2.get("attendances");
         
