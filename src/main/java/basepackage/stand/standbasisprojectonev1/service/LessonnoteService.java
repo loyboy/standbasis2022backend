@@ -265,11 +265,14 @@ public class LessonnoteService {
         response.put("totalPages", Lessonnotes.getTotalPages());
         response.put("isLast", Lessonnotes.isLast());
         
-        long submitLess = calarray.stream().filter(o -> o.getSubmission() != null).count();       
-        long notsubmitLess = calarray.stream().filter(o -> o.getSubmission() == null).count();
+        Map<String, Object> response2 = getOrdinaryTeacherLessonnotes(query, schgroupId, schId, classId, week, calendarId, teacherId, subjectId, datefrom, dateto );
+        List<Lessonnote> ordinaryArray = (List<Lessonnote>) response2.get("lessonnotes");
+        
+        long submitLess = ordinaryArray.stream().filter(o -> o.getSubmission() != null).count();       
+        long notsubmitLess = ordinaryArray.stream().filter(o -> o.getClosure() != null).count();
         
         response.put("totalSubmitted", submitLess);
-        response.put("totalNotSubmitted", notsubmitLess);
+        response.put("totalClosed", notsubmitLess);
      
         return response;
     }
