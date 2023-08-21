@@ -279,13 +279,23 @@ public class AttendanceService {
       /*  long sriAttendances = schRepository.countBySri(active);
         long nonSriAttendances = schRepository.countBySri(inactive);
         long inactiveAttendances = schRepository.countByStatus(inactive);*/
+        Timestamp timestampFrom = new Timestamp(datefrom.getTime());
+        Timestamp timestampTo = new Timestamp(dateto.getTime());
+        Optional<Timestamp> WithStartValueTime = Optional.ofNullable(timestampFrom);
+        Optional<Timestamp> WithEndValueTime = Optional.ofNullable(timestampTo);
+        Map<String, Object> response2 = getOrdinaryTeacherAttendances(query, schgroupId, schId, classId, calendarId, teacherId, subject, WithStartValueTime, WithEndValueTime  );
+        List<Attendance> ordinaryArray = (List<Attendance>) response2.get("attendances");
         
-        long doneAttendances = calarray.stream().filter(sch -> sch.getDone() == 1).count();       
-        long notdoneAttendances = calarray.stream().filter(sch -> sch.getDone() == 0).count();
+        Long doneNotDoneAttendances = ordinaryArray.stream().filter(o -> o.getDone() == 0 ).count(); 
+        long doneAttendances = ordinaryArray.stream().filter(sch -> sch.getDone() == 1).count();       
+        long voidedAttendances = ordinaryArray.stream().filter(sch -> sch.getDone() == -1).count();
+        long lateAttendances = ordinaryArray.stream().filter(sch -> sch.getDone() == 2).count();
         //collect(Collectors.toList());
         
-        response.put("totalDone", doneAttendances);
-        response.put("totalNotDone", notdoneAttendances);
+        response.put("totalGood", doneAttendances);
+        response.put("totalLate", lateAttendances);
+        response.put("totalVoid", voidedAttendances);
+        response.put("totalNotDone", doneNotDoneAttendances);
         return response;
     }
 	
