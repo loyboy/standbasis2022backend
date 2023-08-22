@@ -127,6 +127,67 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 		return null;
 	}
 	
+	public Map<String, Object> getOrdinaryTeachers( String query, Optional<Long> groupval, Optional<Long> ownerval) {
+		
+        Long owner = ownerval.orElse(null);     
+        Long group = groupval.orElse(null);
+        
+		// Retrieve Teachers
+        
+        List<Teacher> teas = null;
+      //  System.out.println("Long is set "+ owner);
+        
+        if ( query.equals("") || query == null ) {
+        	if ( group == null ) {
+        		teas = teaRepository.findAll();
+        	}
+        	else {
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		Optional<School> schownerobj = null;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner ); }
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }        		
+        		
+        			teas = teaRepository.findBySchoolAndGroup( 
+        					schownerobj == null ? null : schownerobj.get(), 
+        	        		schgroupobj == null ? null : schgroupobj.get()
+        			);
+        	}       	
+        }
+        else {
+        	if ( group == null ) {
+        		teas = teaRepository.filterAll("%"+ query + "%");
+        	}
+        	else {    
+        		
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		Optional<School> schownerobj = null;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner ); }
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }
+        		
+        		teas = teaRepository.findFilterBySchool( "%"+ query + "%", 
+        				schownerobj == null ? null : schownerobj.get(), 
+    	        		schgroupobj == null ? null : schgroupobj.get() 
+    	         );
+        	}
+        }
+
+        if(teas.size() == 0) {
+        	Map<String, Object> responseEmpty = new HashMap<>();
+        	responseEmpty.put("teachers", Collections.emptyList());
+        	
+        	return responseEmpty;
+        }
+        
+        List<Teacher> calarray = new ArrayList<Teacher>(teas);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("teachers", calarray);      
+        
+        return response;
+    }
+	
 	public Map<String, Object> getPaginatedTeachers(int page, int size, String query, Optional<Long> groupval, Optional<Long> ownerval) {
 		CommonActivity.validatePageNumberAndSize(page, size);
         Long owner = ownerval.orElse(null);     
@@ -203,7 +264,12 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         
         Map<String, Object> response2 = serviceTimetable.getOrdinaryTimeTables(query, ownerval, groupval);
         
+        Map<String, Object> response4 = getOrdinaryTeachers(query, groupval, ownerval);
+        
         Map<String, Object> response3 = attTimetable.getOrdinaryTeacherAttendances(query, groupval, ownerval, optionalValue, optionalValue, optionalValue, optionalValue, optionalValueTimestamp, optionalValueTimestamp);
+		
+        @SuppressWarnings("unchecked")
+		List<Teacher> listTeacher = (List<Teacher>) response4.get("teachers");
 		
         @SuppressWarnings("unchecked")
 		List<TimeTable> listTimetable = (List<TimeTable>) response2.get("timetables");	
@@ -211,7 +277,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         @SuppressWarnings("unchecked")
 		List<Attendance> listAttendance = (List<Attendance>) response3.get("attendances");
 						  
-		for (Teacher teaT : teaarray) {
+		for (Teacher teaT : listTeacher) {
 			
 			 /*List<TimeTable> countTimetableTeacherHas = listTimetable.stream()
 					 	.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() )

@@ -400,6 +400,7 @@ public class AttendanceController {
 			
 		 }
 		 catch (Exception ex) {
+			 ex.printStackTrace();
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	 }
