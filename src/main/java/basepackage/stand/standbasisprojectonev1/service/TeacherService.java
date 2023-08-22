@@ -318,7 +318,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 				deployed++;
 			}
 			
-			else if (countTimetableTeacherHas.size() > 0 && countTimetableTeacherHas.size() > 3) {
+			else if (countTimetableTeacherHas.size() > 0 && countTimetableTeacherHas.size() >= 3) {
 				overdeployed++;
 			}
 			

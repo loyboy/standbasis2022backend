@@ -662,6 +662,12 @@ public class AttendanceService {
 				return null;
 			}
 			
+			if ( attRequest.getPrincipal_action() != null ) {
+				attval.setPrincipal_action(attRequest.getPrincipal_action());
+				attRepository.save(attval);
+				return null;
+			}
+			
 			attval.set_date( new Date() );
 			System.out.println("Done value: " + attRequest.getDone() + " Att value: " + attval.getAttId() );
 			attval.setDone(attRequest.getDone());
