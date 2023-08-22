@@ -17,7 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -211,7 +213,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 						  
 		for (Teacher teaT : teaarray) {
 			
-			 List<TimeTable> countTimetableTeacherHas = listTimetable.stream()
+			 /*List<TimeTable> countTimetableTeacherHas = listTimetable.stream()
 					 	.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() )
 			            .collect(Collectors.toMap(
 			                    obj -> Arrays.asList( obj.getSubject(), obj.getTeacher(), obj.getClass_stream() ),  // Composite key
@@ -220,9 +222,15 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 			            ))
 			            .values()
 			            .stream()
-			            .collect(Collectors.toList());
+			            .collect(Collectors.toList());*/
+			 List<TimeTable> countTimetableTeacherHas = listTimetable.stream()
+					.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() )
+			        .filter(distinctByKey(pr -> Arrays.asList(pr.getSubject(), pr.getTeacher(), pr.getClass_stream() )))
+			        .collect(Collectors.toList());
+			 
+			 System.out.println("countTimetableTeacherHas >> " + teaT.getTeaId() + " : " + countTimetableTeacherHas.size() );
 			
-			 List<Attendance> countAttendanceTeacherHas = listAttendance.stream()
+			/* List<Attendance> countAttendanceTeacherHas = listAttendance.stream()
 					 	.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() )
 			            .collect(Collectors.toMap(
 			                    obj -> Arrays.asList( obj.getTeacher(), obj.getTimetable().getClass_stream(), obj.getTimetable().getSubject()  ),  // Composite key
@@ -231,7 +239,14 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 			            ))
 			            .values()
 			            .stream()
-			            .collect(Collectors.toList());
+			            .collect(Collectors.toList());*/
+			 
+			 List<Attendance> countAttendanceTeacherHas = listAttendance.stream()
+					 	.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() )
+				        .filter(distinctByKey(pr -> Arrays.asList(pr.getTimetable().getSubject(), pr.getTeacher(), pr.getTimetable().getClass_stream() )))
+				        .collect(Collectors.toList());
+			 
+			 System.out.println("countAttendanceTeacherHas >> " + teaT.getTeaId() + " : " + countAttendanceTeacherHas.size() );	
 			 
 			if (countTimetableTeacherHas.size() > 0) {
 				deployed++;
@@ -342,6 +357,11 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 	
 	private ArrayList<Integer> convertMapValuesToList(Map<String, Integer> map) {
 	    return new ArrayList<>(map.values());
+	}
+	
+	private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+	    Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+	    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
 	}
 	
 	private static Timestamp convertLocalDateToTimestamp(LocalDate localDate) {
