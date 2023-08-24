@@ -34,8 +34,7 @@ public class LessonnoteActivity extends DateAudit{
     
     @NotNull  
     private Timestamp expected;     
-    
-    private Timestamp actual;  
+     private Timestamp actual;  
     
     private Integer slip; // 0 - No, 1 - Yes
     

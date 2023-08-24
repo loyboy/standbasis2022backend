@@ -83,7 +83,9 @@ public class Lessonnote extends DateAudit{
     @Column(name="expected_submission",columnDefinition="datetime")
     private Timestamp expected_submission;     
     
-    private Integer cycle_count; 
+    private Integer cycle_count;
+    
+    private Boolean can_close; 
  
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)

@@ -93,7 +93,10 @@ public class AuthController {
 		        
 		        if ( user.getRole() == RoleName.TEACHER) {
 		        	Calendar foundCal = calService.findAllByStatus( user.getSchool().getSchId() , 1).get();
-		        	
+		        	if (foundCal == null) {
+		        		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse(false, "Login has failed due to Calendar expiration."));
+		        	      
+		        	}
 		        	realId = user.getUserId();		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
 		        	lgres.setUsername(user.getName());

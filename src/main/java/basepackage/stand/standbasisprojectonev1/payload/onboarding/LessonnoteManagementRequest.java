@@ -9,6 +9,8 @@ public class LessonnoteManagementRequest {
 
 	private Long lsnmanagementId;
 	
+	private Integer submission; // used to tell if the lsn is submitted on time/not    
+	
 	private Integer quality;
     
     private Integer sub_perf_classwork; 

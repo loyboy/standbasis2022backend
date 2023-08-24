@@ -18,22 +18,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import basepackage.stand.standbasisprojectonev1.model.Assessment;
 import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
+import basepackage.stand.standbasisprojectonev1.model.LessonnoteManagement;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
+import basepackage.stand.standbasisprojectonev1.repository.AssessmentRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
 import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
 import basepackage.stand.standbasisprojectonev1.repository.ClassStreamRepository;
 import basepackage.stand.standbasisprojectonev1.repository.EnrollmentRepository;
+import basepackage.stand.standbasisprojectonev1.repository.LessonnoteManagementRepository;
 import basepackage.stand.standbasisprojectonev1.repository.LessonnoteRepository;
 import basepackage.stand.standbasisprojectonev1.repository.TimetableRepository;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceService;
 import basepackage.stand.standbasisprojectonev1.service.CalendarService;
 import basepackage.stand.standbasisprojectonev1.service.ClassService;
 import basepackage.stand.standbasisprojectonev1.service.EnrollmentService;
+import basepackage.stand.standbasisprojectonev1.service.LessonnoteManagementService;
 import basepackage.stand.standbasisprojectonev1.service.TimetableService;
 
 @Component
@@ -53,6 +58,9 @@ public class MyScheduler {
 	@Autowired
 	TimetableService timeservice;
 	
+	@Autowired
+	LessonnoteManagementService serviceManagement;	 
+	
 	private final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	@Autowired		
@@ -64,6 +72,12 @@ public class MyScheduler {
 	@Autowired		
     private LessonnoteRepository lsnRepository;
 	
+	@Autowired		
+    private LessonnoteManagementRepository lsnmanageRepository;	
+	
+	@Autowired		
+    private AssessmentRepository assRepository;
+	
 	@Autowired
 	private CalendarRepository calRepository;
 	
@@ -73,6 +87,90 @@ public class MyScheduler {
 	@Autowired
 	private EnrollmentRepository enrolRepository;
 	
+	// every 
+	@Scheduled(cron = "0 59 * * * *")
+    public void switchLessonnoteToClose() {
+		
+		// check the current calendars from schools by active ones
+		// get the lessonnotes and assessments
+		// check if assessments are filled in each approved lessonnote for all 3 assessment types
+		// then change the lsn note "can_close" to  if it is so
+		
+		List<Calendar> calendars = calservice.findByActive();
+		
+		for ( Calendar cal: calendars) {
+						
+			if ( parseTimestamp(todayDate()).compareTo(cal.getEnddate()) > 0 ) {
+				
+				List<Lessonnote> allLessonnote = lsnRepository.findByCalendar(cal);
+			    List<Assessment> allAssessment = assRepository.findByCalendar(cal);
+				
+				for ( Lessonnote lsn : allLessonnote ) {					
+					if ( (lsn.getCan_close() == null || lsn.getCan_close() == false) && ( lsn.getApproval() != null ) ) {
+						
+						List<Assessment> allClswork = allAssessment.stream().filter(a -> ( a.getLsn().getLessonnoteId() == lsn.getLessonnoteId() && a.get_type().equals("clw") ) ).collect(Collectors.toList() );
+						List<Assessment> allHomework = allAssessment.stream().filter(a -> (a.getLsn().getLessonnoteId() == lsn.getLessonnoteId() && a.get_type().equals("tst") ) ).collect(Collectors.toList() );
+						List<Assessment> allTest = allAssessment.stream().filter(a -> (a.getLsn().getLessonnoteId() == lsn.getLessonnoteId() && a.get_type().equals("hwk") ) ).collect(Collectors.toList() );
+						
+						int allclasworksize = allClswork.size();
+						int allhomeworksize = allHomework.size();
+						int alltestsize = allTest.size();
+						
+						List<Assessment> allClsworkCheck = allAssessment.stream().filter(a -> ( a.getLsn().getLessonnoteId() == lsn.getLessonnoteId() && a.get_type().equals("clw") && a.getScore() != null ) ).collect(Collectors.toList() );
+						List<Assessment> allHomeworkCheck = allAssessment.stream().filter(a -> (a.getLsn().getLessonnoteId() == lsn.getLessonnoteId() && a.get_type().equals("tst") && a.getScore() != null ) ).collect(Collectors.toList() );
+						List<Assessment> allTestCheck = allAssessment.stream().filter(a -> (a.getLsn().getLessonnoteId() == lsn.getLessonnoteId() && a.get_type().equals("hwk") && a.getScore() != null ) ).collect(Collectors.toList() );
+						
+						int allclasworksizeCheck = allClsworkCheck.size();
+						int allhomeworksizeCheck = allHomeworkCheck.size();
+						int alltestsizeCheck = allTestCheck.size();
+						
+						boolean classworkCheck = allclasworksizeCheck == allclasworksize;
+						boolean homeworkCheck = allhomeworksizeCheck == allhomeworksize;
+						boolean testCheck = alltestsizeCheck == alltestsize;
+						
+						if ( classworkCheck && homeworkCheck && testCheck ) {
+							List<LessonnoteManagement> list = serviceManagement.findByLessonnote(lsn.getLessonnoteId());
+							LessonnoteManagement lsnmanage = list.get(0);
+							lsn.setCan_close(true);
+							lsnRepository.save(lsn);
+							
+							int averageClasswork = (int) allClsworkCheck.stream()
+						                .mapToInt(Assessment::getScore)
+						                .average()
+						                .orElse(0.0);
+							int averageHomework = (int) allHomeworkCheck.stream()
+					                .mapToInt(Assessment::getScore)
+					                .average()
+					                .orElse(0.0);
+							int averageTest = (int) allTestCheck.stream()
+					                .mapToInt(Assessment::getScore)
+					                .average()
+					                .orElse(0.0);//
+							lsnmanage.setSub_perf_classwork(averageClasswork);
+							lsnmanage.setSub_perf_homework(averageHomework);
+							lsnmanage.setSub_perf_test(averageTest);
+							int averageAssessment = (averageClasswork+averageHomework+averageTest)/3;
+							int totalScore = (averageAssessment + (lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0) + (lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + (lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/4;
+							lsnmanage.setScore(totalScore);
+							
+							lsnmanageRepository.save(lsnmanage);
+						}
+						else {
+							 List<LessonnoteManagement> list = serviceManagement.findByLessonnote(lsn.getLessonnoteId());
+							 LessonnoteManagement lsnmanage = list.get(0);
+							 int totalScore = ( (lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0) + (lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + (lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/4;
+							 lsnmanage.setScore(totalScore);
+								
+							 lsnmanageRepository.save(lsnmanage);
+							 
+						}
+					}
+				}			
+					
+			}
+		}
+		
+	}
 	
 	@Scheduled(cron = "0 0 0 * * *")
     public void switchToNewTerm() {

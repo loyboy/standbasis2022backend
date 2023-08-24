@@ -45,6 +45,7 @@ import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.AssessmentRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteActivityRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteComposite;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteManagementRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteRequest;
 import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
@@ -499,7 +500,22 @@ public class LessonnoteController {
 					 lsnRequest.getActivity().setExpected( addDays( CommonActivity.parseTimestamp( CommonActivity.todayDate()),2) );//Two days expected
 					 
 					 serviceActivity.saveOne(lsnRequest.getActivity(), val);
-					 serviceManagement.saveOne(lsnRequest.getManagement(), val);
+					 LessonnoteManagementRequest lsnManage = lsnRequest.getManagement();
+					 Timestamp todayDate = CommonActivity.parseTimestamp( CommonActivity.todayDate());
+					 Timestamp expectedSubmissionDate = val.getExpected_submission();
+					 Timestamp expectedLateSubmissionDate = addDays( expectedSubmissionDate, 2);
+					 
+					 if (todayDate.compareTo(expectedSubmissionDate) <= 0) {
+						 lsnManage.setSubmission(100);
+					 }
+					 else if ( todayDate.compareTo(expectedSubmissionDate) > 0 && ( todayDate.compareTo(expectedLateSubmissionDate) <= 0 ) ) {
+						 lsnManage.setSubmission(50);
+					 }
+					 else {
+						 lsnManage.setSubmission(0);
+					 }
+					 
+					 serviceManagement.saveOne(lsnManage, val);
 					 
 					 saveEvent("lessonnoteactivity", "create", "The User with name: " + u.get().getName() + "has created a lessonnote activity template with Lsn ID:  " + id + " done by the Teacher after submitting a Lessonnote" + val.getTeacher().getFname() + " " + val.getTeacher().getLname(), 
 							 new Date(), u.get(), u.get().getSchool()

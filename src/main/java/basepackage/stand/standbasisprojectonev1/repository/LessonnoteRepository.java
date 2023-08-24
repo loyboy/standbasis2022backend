@@ -39,7 +39,7 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
 			@Param("calId") Calendar calId, 
 			@Param("classIndex") Integer classIndex
 	);
-    
+	 
     List<Lessonnote> findByCalendar(Calendar c);
     
     @Query(" select lsn from Lessonnote lsn where lsn.title like :filter ")

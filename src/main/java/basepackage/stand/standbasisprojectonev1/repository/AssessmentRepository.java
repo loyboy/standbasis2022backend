@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import basepackage.stand.standbasisprojectonev1.model.Assessment;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
+import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Student;
@@ -30,6 +31,12 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long>{
     		+ "AND lsn.title like :filter "
        	 )
 	List<Assessment> filterAll( @Param("filter") String filter );
+	
+	@Query("select assess from Assessment assess "
+			+ "JOIN Lessonnote lsn ON lsn = assess.lsn "
+    		+ "AND lsn.calendar = :cal "
+       	  )
+	List<Assessment> findByCalendar( @Param("cal") Calendar c);
 	
 	@Query("select assess from Assessment assess "
 			+ "JOIN Lessonnote lsn ON lsn = assess.lsn "

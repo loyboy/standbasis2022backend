@@ -25,7 +25,9 @@ public class LessonnoteManagement extends DateAudit{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long lsnmanId;
      
-    private Integer quality; //not used
+    private Integer submission; // used to tell if the lsn is submitted on time/not
+    
+    private Integer quality; //used to check if the "Grammar", "Subject_Matter", "Arrangement" & "Incomplete upload" is 400%
     
     private Integer sub_perf_classwork; 
     
@@ -33,9 +35,11 @@ public class LessonnoteManagement extends DateAudit{
     
     private Integer sub_perf_test; 
     
-    private Integer management; //used for quality of Lessonnote
+    private Integer management; //used for quality of Lessonnote i.e cycles/trips of Lessonnote
     
-    private Integer score; 
+    private Integer score;
+    
+    //Check if the closure is done by checking "sub_perf_classwork" & "sub_perf_homework" & "sub_perf_test"
     
     private String action; // submitted, resubmitted, reverted, launched, approved, closure, closed
     
