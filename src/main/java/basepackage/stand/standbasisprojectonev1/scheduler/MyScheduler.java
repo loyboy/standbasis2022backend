@@ -105,7 +105,14 @@ public class MyScheduler {
 				List<Lessonnote> allLessonnote = lsnRepository.findByCalendar(cal);
 			    List<Assessment> allAssessment = assRepository.findByCalendar(cal);
 				
-				for ( Lessonnote lsn : allLessonnote ) {					
+				for ( Lessonnote lsn : allLessonnote ) {
+					List<LessonnoteManagement> list = serviceManagement.findByLessonnote(lsn.getLessonnoteId());
+					LessonnoteManagement lsnmanage = list.get(0);
+					int totalScore = ( (lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0) + (lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + (lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/4;
+					lsnmanage.setScore(totalScore);
+						
+					lsnmanageRepository.save(lsnmanage);
+					
 					if ( (lsn.getCan_close() == null || lsn.getCan_close() == false) && ( lsn.getApproval() != null ) ) {
 						
 						List<Assessment> allClswork = allAssessment.stream().filter(a -> ( a.getLsn().getLessonnoteId() == lsn.getLessonnoteId() && a.get_type().equals("clw") ) ).collect(Collectors.toList() );
@@ -129,8 +136,8 @@ public class MyScheduler {
 						boolean testCheck = alltestsizeCheck == alltestsize;
 						
 						if ( classworkCheck && homeworkCheck && testCheck ) {
-							List<LessonnoteManagement> list = serviceManagement.findByLessonnote(lsn.getLessonnoteId());
-							LessonnoteManagement lsnmanage = list.get(0);
+							List<LessonnoteManagement> listdd = serviceManagement.findByLessonnote(lsn.getLessonnoteId());
+							LessonnoteManagement lsnmanagedd = listdd.get(0);
 							lsn.setCan_close(true);
 							lsnRepository.save(lsn);
 							
@@ -146,22 +153,17 @@ public class MyScheduler {
 					                .mapToInt(Assessment::getScore)
 					                .average()
 					                .orElse(0.0);//
-							lsnmanage.setSub_perf_classwork(averageClasswork);
-							lsnmanage.setSub_perf_homework(averageHomework);
-							lsnmanage.setSub_perf_test(averageTest);
+							lsnmanagedd.setSub_perf_classwork(averageClasswork);
+							lsnmanagedd.setSub_perf_homework(averageHomework);
+							lsnmanagedd.setSub_perf_test(averageTest);
 							int averageAssessment = (averageClasswork+averageHomework+averageTest)/3;
-							int totalScore = (averageAssessment + (lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0) + (lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + (lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/4;
-							lsnmanage.setScore(totalScore);
+							int totalScoredd = (averageAssessment + (lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0) + (lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + (lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/4;
+							lsnmanage.setScore(totalScoredd);
 							
 							lsnmanageRepository.save(lsnmanage);
 						}
 						else {
-							 List<LessonnoteManagement> list = serviceManagement.findByLessonnote(lsn.getLessonnoteId());
-							 LessonnoteManagement lsnmanage = list.get(0);
-							 int totalScore = ( (lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0) + (lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + (lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/4;
-							 lsnmanage.setScore(totalScore);
-								
-							 lsnmanageRepository.save(lsnmanage);
+							 
 							 
 						}
 					}

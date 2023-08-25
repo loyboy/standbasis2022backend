@@ -290,7 +290,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 			            .stream()
 			            .collect(Collectors.toList());*/
 			 List<TimeTable> countTimetableTeacherHas = listTimetable.stream()
-					.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() )
+					.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() && tt.getStatus() == 1 )
 			        .filter(distinctByKey(pr -> Arrays.asList(pr.getSubject(), pr.getTeacher(), pr.getClass_stream() )))
 			        .collect(Collectors.toList());
 			 
