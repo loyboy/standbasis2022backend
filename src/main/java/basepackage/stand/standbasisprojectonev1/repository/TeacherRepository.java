@@ -28,7 +28,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
       
       List<Teacher> findBySchool(School sch);
       
-      @Query("SELECT t from Teacher t where t.school.owner = :group AND ( t.school = :sch OR :sch is null )" )
+      @Query("SELECT t from Teacher t where t.school.owner = :group AND t.office = 'Teacher' AND ( t.school = :sch OR :sch is null )" )
       List<Teacher> findBySchoolAndGroup(@Param("sch") School owner, @Param("group") SchoolGroup group);
     
       @Query("select t from Teacher t where t.fname like :filter " 
@@ -41,47 +41,47 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
          	)
       List<Teacher> filterAll(@Param("filter") String filter);
       
-      @Query("select t from Teacher t where t.fname like :filter " 
+      @Query("select t from Teacher t where t.office = 'Teacher' AND ( t.fname like :filter " 
             + "or t.lname like :filter " 
             + "or t.bias like :filter " 
             + "or t.coursetype like :filter " 
             + "or t.email like :filter "
             + "or t.office like :filter "
-            + "or t.qualification like :filter "
+            + "or t.qualification like :filter ) "
             
        		)
        Page<Teacher> filter(@Param("filter") String filter, Pageable pg);    
       
-       @Query("SELECT t from Teacher t where t.school.owner = :group AND ( t.school = :sch OR :sch is null )" )
+       @Query("SELECT t from Teacher t where t.school.owner = :group AND t.office = 'Teacher' AND ( t.school = :sch OR :sch is null )" )
        Page<Teacher> findBySchool( @Param("sch") School owner, @Param("group") SchoolGroup group, Pageable pg);
        
-       @Query("select t from Teacher t where t.fname like :filter " 
+       @Query("select t from Teacher t where t.office = 'Teacher' AND ( t.fname like :filter " 
                + "or t.lname like :filter " 
                + "or t.bias like :filter " 
                + "or t.coursetype like :filter " 
                + "or t.email like :filter "
                + "or t.office like :filter "
                + "or t.qualification like :filter "
-               + "and t.school.owner = :group AND ( t.school = :owner OR :owner is null ) "
+               + "and t.school.owner = :group AND ( t.school = :owner OR :owner is null ) )"
           	)       
        List<Teacher> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group);
        
        
-       @Query("select t from Teacher t where t.fname like :filter " 
+       @Query("select t from Teacher t where t.office = 'Teacher' AND ( t.fname like :filter " 
                + "or t.lname like :filter " 
                + "or t.bias like :filter " 
                + "or t.coursetype like :filter " 
                + "or t.email like :filter "
                + "or t.office like :filter "
                + "or t.qualification like :filter "
-               + "and t.school.owner = :group AND ( t.school = :owner OR :owner is null ) "
+               + "and t.school.owner = :group AND ( t.school = :owner OR :owner is null ) ) "
           	)       
        Page<Teacher> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group, Pageable pg);
        
-       @Query("SELECT COUNT(t.teaId) from Teacher t where t.school = :sch ")
+       @Query("SELECT COUNT(t.teaId) from Teacher t where t.office = 'Teacher' AND t.school = :sch ")
        long countBySchool(@Param("sch") School sch);
        
-       @Query("SELECT COUNT(t.teaId) from Teacher t where t.school.owner = :group ")
+       @Query("SELECT COUNT(t.teaId) from Teacher t where t.office = 'Teacher' AND t.school.owner = :group ")
        long countBySchoolGroup(@Param("group") SchoolGroup group);
        
        @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM Teacher s " +

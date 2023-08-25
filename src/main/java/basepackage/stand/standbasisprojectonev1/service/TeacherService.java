@@ -290,7 +290,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 			            .stream()
 			            .collect(Collectors.toList());*/
 			 List<TimeTable> countTimetableTeacherHas = listTimetable.stream()
-					.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() && tt.getStatus() == 1 )
+					.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() && tt.getStatus() == 1 && tt.getCalendar().getStatus() == 1 )
 			        .filter(distinctByKey(pr -> Arrays.asList(pr.getSubject(), pr.getTeacher(), pr.getClass_stream() )))
 			        .collect(Collectors.toList());
 			 
@@ -318,19 +318,19 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 				deployed++;
 			}
 			
-			else if (countTimetableTeacherHas.size() > 0 && countTimetableTeacherHas.size() >= 3) {
+			if (countTimetableTeacherHas.size() > 0 && countTimetableTeacherHas.size() >= 3) {
 				overdeployed++;
 			}
 			
-			else if (countTimetableTeacherHas.size() > 0 && countTimetableTeacherHas.size() <= 2) {
+			if (countTimetableTeacherHas.size() > 0 && countTimetableTeacherHas.size() < 2) {
 				underdeployed++;
 			}
 			
-			else if ( countAttendanceTeacherHas != null && countAttendanceTeacherHas.size() == 0) {
+			if ( countAttendanceTeacherHas != null && countAttendanceTeacherHas.size() == 0) {
 				inactive++;
 			}
 			
-			else if ( countAttendanceTeacherHas != null && countAttendanceTeacherHas.size() > 0) {
+			if ( countAttendanceTeacherHas != null && countAttendanceTeacherHas.size() > 0) {
 				active++;
 			}
 		}
