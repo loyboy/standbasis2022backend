@@ -50,7 +50,14 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
             + "JOIN Student st ON st = e.student " 
             + "WHERE cs.title like :filter or st.name like :filter "            
        	  )
-       Page<Enrollment> filter(@Param("filter") String filter, Pageable pg);    
+       Page<Enrollment> filter(@Param("filter") String filter, Pageable pg);
+    	
+    	@Query("select e from Enrollment e " 
+                + "JOIN ClassStream cs ON cs = e.classstream " 
+                + "JOIN Student st ON st = e.student " 
+                + "WHERE cs.title like :filter or st.name like :filter "            
+           	  )
+        List<Enrollment> filterAll(@Param("filter") String filter);
       
     	@Query("select e from Enrollment e "
           + "WHERE (e.classstream.school = :owner OR :owner = null) " 
@@ -66,5 +73,20 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
           	 )
        
        Page<Enrollment> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group, Pageable pg);
+
+       @Query("select e from Enrollment e "
+    	          + "WHERE (e.classstream.school = :owner OR :owner = null) " 
+    	    	  + "OR (e.classstream.school.owner = :group OR :group = null) "
+    	       	   )
+       List<Enrollment> findBySchool( @Param("owner") School owner,@Param("group") SchoolGroup group);
+    	       
+       @Query("select e from Enrollment e " 
+    	               + "JOIN ClassStream cs ON cs = e.classstream " 
+    	               + "JOIN Student st ON st = e.student " 
+    	               + "WHERE cs.title like :filter or st.name like :filter "
+    	               + "and ( e.classstream.school = :owner OR :owner = null) OR ( e.classstream.school.owner = :group OR :group = null ) "
+    	          	 )
+    	       
+    	List<Enrollment> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group);
 
 }

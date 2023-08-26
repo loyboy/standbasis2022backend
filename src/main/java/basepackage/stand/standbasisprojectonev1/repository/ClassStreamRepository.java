@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.School;
+import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
 
 /**
@@ -33,17 +34,32 @@ public interface ClassStreamRepository extends JpaRepository<ClassStream, Long> 
        @Query("select cs from ClassStream cs where cs.title like :filter " 
                + "or cs.ext like :filter "            
        	 )
-       Page<ClassStream> filter(@Param("filter") String filter, Pageable pg);    
-      
-       @Query("select cs from ClassStream cs where cs.school = :owner " )
-       Page<ClassStream> findBySchoolPage( @Param("owner") School owner, Pageable pg);
+       Page<ClassStream> filter(@Param("filter") String filter, Pageable pg);  
        
        @Query("select cs from ClassStream cs where cs.title like :filter " 
-               + "or cs.ext like :filter " 
-               + "and cs.school = :owner "
+               + "or cs.ext like :filter "            
+       	 )
+       List<ClassStream> filterAll(@Param("filter") String filter);
+      
+       @Query("select cs from ClassStream cs where cs.school.owner = :group AND ( cs.school = :sch OR :sch is null ) " )
+       Page<ClassStream> findBySchoolPage( @Param("sch") School owner, @Param("group") SchoolGroup group, Pageable pg);
+       
+       @Query("select cs from ClassStream cs where cs.school.owner = :group AND ( cs.school = :sch OR :sch is null ) " )
+       List<ClassStream> findBySchoolPage( @Param("sch") School owner, @Param("group") SchoolGroup group);
+       
+       @Query("select cs from ClassStream cs where cs.school.owner = :group AND ( cs.title like :filter " 
+               + "or cs.ext like :filter ) " 
+               + "AND ( cs.school = :sch OR :sch is null ) "
           	 )
        
-       Page<ClassStream> findFilterBySchoolPage(@Param("filter") String filter, @Param("owner") School ownerId, Pageable pg);
+       Page<ClassStream> findFilterBySchoolPage(@Param("filter") String filter, @Param("sch") School ownerId, @Param("group") SchoolGroup group, Pageable pg);
+       
+       @Query("select cs from ClassStream cs where cs.school.owner = :group AND ( cs.title like :filter " 
+               + "or cs.ext like :filter ) " 
+               + "AND ( cs.school = :sch OR :sch is null ) "
+          	 )
+       
+       List<ClassStream> findFilterBySchoolPage(@Param("filter") String filter, @Param("sch") School ownerId, @Param("group") SchoolGroup group);
        
        @Query("SELECT COUNT(cs.id) from ClassStream cs where cs.school = :sch ")
        long countBySchool(@Param("sch") School sch);

@@ -31,7 +31,17 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
          + "or s.gender like :filter "
          + "or s.operator like :filter "
     		)
-    Page<School> filter(@Param("filter") String filter, Pageable pg);    
+    Page<School> filter(@Param("filter") String filter, Pageable pg);  
+    
+    @Query("select s from School s where s.name like :filter " 
+            + "or s.lga like :filter " 
+            + "or s.town like :filter " 
+            + "or s.state like :filter " 
+            + "or s.faith like :filter "
+            + "or s.gender like :filter "
+            + "or s.operator like :filter "
+       		)
+    List<School> filterAll(@Param("filter") String filter );  
    
     Page<School> findByOwner(SchoolGroup owner, Pageable pg);
     
@@ -52,7 +62,17 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
        		)
     
     Page<School> findFilterByOwner(@Param("filter") String filter, @Param("owner") SchoolGroup ownerId, Pageable pg);
-   // List<School> findByNameOrTownOrLgaOrStateOrFaithOrGenderOrOperator( String n,  String t, String l, String s, String f, String g, String o);
+    
+    @Query("select s from School s where s.name like :filter " 
+            + "or s.lga like :filter " 
+            + "or s.town like :filter " 
+            + "or s.state like :filter " 
+            + "or s.faith like :filter "
+            + "or s.gender like :filter "
+            + "or s.operator like :filter "
+            + "and s.owner = :owner "
+       	  )    
+    List<School> findFilterByOwner(@Param("filter") String filter, @Param("owner") SchoolGroup ownerId);
     
     @Query("SELECT COUNT(s.schId) from School s where s.sri = :active ")
     long countBySri(@Param("active") Long active);

@@ -77,10 +77,11 @@ public class ClassController {
 	 public ResponseEntity<?> getPaginatedClasss(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
 			 @RequestParam(value = "q") String query,
-			 @RequestParam(value = "school", required=false) Optional<Long> school
+			 @RequestParam(value = "school", required=false) Optional<Long> school,
+			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> group
 			 ) {
 		 
-		 Map<String, Object> response = service.getPaginatedClassStreams( page, size, query, school );
+		 Map<String, Object> response = service.getPaginatedClassStreams( page, size, query, group, school );
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 

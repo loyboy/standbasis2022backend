@@ -9,6 +9,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,8 +34,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import basepackage.stand.standbasisprojectonev1.exception.BadRequestException;
+import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.SchoolRequest;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository;
@@ -100,6 +103,59 @@ public class SchoolService {
 		return null;
 	}
 	
+	public Map<String, Object> getOrdinarySchools( String query, Optional<Long> groupval) {
+		    
+        Long group = groupval.orElse(null);
+        
+		// Retrieve Teachers
+        
+        List<School> schs = null;
+        
+        if ( query.equals("") || query == null ) {
+        	if ( group == null ) {
+        		schs = schRepository.findAll();
+        	}
+        	else {
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		 
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }        		
+        		
+        			schs = schRepository.findByOwner(
+        	        	schgroupobj == null ? null : schgroupobj.get()
+        			);
+        	}       	
+        }
+        else {
+        	if ( group == null ) {
+        		schs = schRepository.filterAll("%"+ query + "%");
+        	}
+        	else {    
+        		
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }
+        		
+        		schs = schRepository.findFilterByOwner( "%"+ query + "%", 
+    	        		schgroupobj == null ? null : schgroupobj.get() 
+    	         );
+        	}
+        }
+
+        if(schs.size() == 0) {
+        	Map<String, Object> responseEmpty = new HashMap<>();
+        	responseEmpty.put("schools", Collections.emptyList());
+        	
+        	return responseEmpty;
+        }
+        
+        List<School> calarray = new ArrayList<School>(schs);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("schools", calarray);      
+        
+        return response;
+    }
+	
 	public Map<String, Object> getPaginatedSchools(int page, int size, String query, Optional<Long> ownerval) {
         validatePageNumberAndSize(page, size);
         Long owner = ownerval.orElse(null);        
@@ -148,18 +204,21 @@ public class SchoolService {
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         
-       // long active = 1; long inactive = 0;
-      /*  long sriSchools = schRepository.countBySri(active);
-        long nonSriSchools = schRepository.countBySri(inactive);
-        long inactiveSchools = schRepository.countByStatus(inactive);*/
+        Map<String, Object> response2 = getOrdinarySchools(query, ownerval);
         
-        long sriSchools = scharray.stream().filter(sch -> sch.getSri() == 1).count();
-        long nonSriSchools = scharray.stream().filter(sch -> sch.getSri() == 0).count();
-        long inactiveSchools = scharray.stream().filter(sch -> sch.getStatus() == 0).count();
+        @SuppressWarnings("unchecked")
+		List<School> listSchool = (List<School>) response2.get("schools");
         
-        response.put("totalSri", sriSchools);
-        response.put("totalNonSri", nonSriSchools);
-        response.put("totalInactive", inactiveSchools);
+        List<School> countSecondary = listSchool.stream()
+			 	.filter(ss -> ss.getType_of() == "secondary" )
+		        .collect(Collectors.toList());
+        List<School> countPrimary = listSchool.stream()
+			 	.filter(ss -> ss.getType_of() == "primary" )
+		        .collect(Collectors.toList());
+        
+        response.put("totalSecondary", countSecondary.size());
+		response.put("totalPrimary", countPrimary.size());
+        
         return response;
     }
 	
@@ -167,8 +226,7 @@ public class SchoolService {
 		Optional<School> existing = schRepository.findById(id);
 		if (existing.isPresent()) {
 			School schval = existing.get();
-			copyNonNullProperties(schRequest, schval);
-			//schval.setLogo(fn);
+			copyNonNullProperties(schRequest, schval);			
 			return schRepository.save(schval);
 		}	   
 		

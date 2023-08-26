@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,8 @@ import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Student;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
+import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.EnrollmentRequest;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository;
@@ -109,6 +113,65 @@ public class EnrollmentService {
 		return null;		
 	}
 	
+	public Map<String, Object> getOrdinaryEnrollments( String query, Optional<Long> groupval, Optional<Long> ownerval) {
+		
+        Long owner = ownerval.orElse(null);     
+        Long group = groupval.orElse(null);        
+		 
+        List<Enrollment> nrols = null;
+          
+        if ( query.equals("") || query == null ) {
+        	if ( group == null ) {
+        		nrols = enrollRepository.findAll();
+        	}
+        	else {
+        		Optional<SchoolGroup> schgroupobj = null;
+        		Optional<School> schownerobj = null;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner ); }
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }        		
+        		
+        			nrols = enrollRepository.findBySchool( 
+        					schownerobj == null ? null : schownerobj.get(), 
+        	        		schgroupobj == null ? null : schgroupobj.get()
+        			);
+        	}       	
+        }
+        else {
+        	if ( group == null ) {
+        		nrols = enrollRepository.filterAll("%"+ query + "%");
+        	}
+        	else {    
+        		
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		Optional<School> schownerobj = null;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner ); }
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }
+        		
+        		nrols = enrollRepository.findFilterBySchool( "%"+ query + "%", 
+        				schownerobj == null ? null : schownerobj.get(), 
+    	        		schgroupobj == null ? null : schgroupobj.get() 
+    	         );
+        	}
+        }
+
+        if(nrols.size() == 0) {
+        	Map<String, Object> responseEmpty = new HashMap<>();
+        	responseEmpty.put("enrollments", Collections.emptyList());
+        	
+        	return responseEmpty;
+        }
+        
+        List<Enrollment> calarray = new ArrayList<Enrollment>(nrols);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("enrollments", calarray);      
+        
+        return response;
+    }
+	
+	
 	public Map<String, Object> getPaginatedEnrollments(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval) {
         CommonActivity.validatePageNumberAndSize(page, size);
         
@@ -179,11 +242,42 @@ public class EnrollmentService {
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
          
-        long activeEnrollments = enrolarray.stream().filter(sch -> sch.getStatus() == 1).count();       
-        long inactiveEnrollments = enrolarray.stream().filter(sch -> sch.getStatus() == 0).count();
+        Map<String, Object> response2 = getOrdinaryEnrollments(query, groupval, ownerval);
         
-        response.put("totalActive", activeEnrollments);
-        response.put("totalInactive", inactiveEnrollments);
+        @SuppressWarnings("unchecked")
+		List<Enrollment> listEnrollment = (List<Enrollment>) response2.get("enrollments");
+        
+        List<Enrollment> countPrimaryMale = listEnrollment.stream()
+		.filter(en -> en.getStatus() == 1 && en.getStudent().getGender().equals("M") && en.getClassstream().getSchool().getType_of().equals("primary") )
+		.collect(Collectors.toList());
+        
+        List<Enrollment> countPrimaryFemale = listEnrollment.stream()
+        		.filter(en -> en.getStatus() == 1 && en.getStudent().getGender().equals("F") && en.getClassstream().getSchool().getType_of().equals("primary") )
+        		.collect(Collectors.toList());
+        
+        List<Enrollment> countJuniorFemale = listEnrollment.stream()
+        		.filter(en -> en.getStatus() == 1 && en.getStudent().getGender().equals("F") && en.getClassstream().getClass_index() <= 9 && en.getClassstream().getClass_index() >= 7 )
+        		.collect(Collectors.toList());
+        
+        List<Enrollment> countJuniorMale = listEnrollment.stream()
+        		.filter(en -> en.getStatus() == 1 && en.getStudent().getGender().equals("M") && en.getClassstream().getClass_index() <= 9 && en.getClassstream().getClass_index() >= 7 )
+        		.collect(Collectors.toList());
+        
+        List<Enrollment> countSeniorMale = listEnrollment.stream()
+        		.filter(en -> en.getStatus() == 1 && en.getStudent().getGender().equals("M") && en.getClassstream().getClass_index() <= 12 && en.getClassstream().getClass_index() >= 10 )
+        		.collect(Collectors.toList());
+        
+        List<Enrollment> countSeniorFemale = listEnrollment.stream()
+        		.filter(en -> en.getStatus() == 1 && en.getStudent().getGender().equals("F") && en.getClassstream().getClass_index() <= 12 && en.getClassstream().getClass_index() >= 10 )
+        		.collect(Collectors.toList());
+        
+        response.put("totalPMale", countPrimaryMale.size());
+        response.put("totalPFemale", countPrimaryFemale.size());
+        response.put("totalJunSecMale", countJuniorMale.size());
+        response.put("totalJunSecFemale", countJuniorFemale.size());
+        response.put("totalSenSecMale", countSeniorMale.size());
+        response.put("totalSenSecFemale", countSeniorFemale.size());
+        
         return response;
     }
 	
