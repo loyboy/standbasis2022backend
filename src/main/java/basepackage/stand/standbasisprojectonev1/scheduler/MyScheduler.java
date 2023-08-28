@@ -177,7 +177,7 @@ public class MyScheduler {
 		
 	}
 	
-	@Scheduled(cron = "0 50 15 * * *")
+	@Scheduled(cron = "0 0 1 * * *")
     public void switchToNewTerm() {
 		
 	try {
@@ -255,6 +255,9 @@ public class MyScheduler {
 						newTime.setSubject(tt.getSubject());
 						newTime.setTime_of(tt.getTime_of());
 						newTime.setDay_of(tt.getDay_of());
+						newTime.setTea_name( tt.getTeacher().getFname() + " " + tt.getTeacher().getLname() );
+						newTime.setSub_name( tt.getSubject().getName() );
+						newTime.setClass_name( tt.getClass_stream().getTitle() + " " + tt.getClass_stream().getExt() );
 						newTime.setStatus(1);
 						timeRepository.save(newTime);
 					}
@@ -279,7 +282,7 @@ public class MyScheduler {
 	
 	// "0 0/10 * * * *" - 10 minutes interval
 	// "0 0 0 * * *" - Everyday at 0:00
-	@Scheduled(cron = "15 0 0 * * *")
+	@Scheduled(cron = "0 25 16 * * *")
     public void insertAttendances() {       
 		
 		//Check what day of the week is this
@@ -326,7 +329,7 @@ public class MyScheduler {
 	// "0 0 0 * * 0" -- once a week
 	// 0 0 0 ? * WED
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "15 0 0 * * *")
+	@Scheduled(cron = "15 25 16 * * *")
     public void insertLessonnotes() {
 		
 		 Map<Integer, String> classMap = new HashMap<>();
