@@ -282,7 +282,7 @@ public class MyScheduler {
 	
 	// "0 0/10 * * * *" - 10 minutes interval
 	// "0 0 0 * * *" - Everyday at 0:00
-	@Scheduled(cron = "0 40 16 * * *")
+	@Scheduled(cron = "0 0 1 * * *")
     public void insertAttendances() {       
 		
 		//Check what day of the week is this
@@ -329,7 +329,7 @@ public class MyScheduler {
 	// "0 0 0 * * 0" -- once a week
 	// 0 0 0 ? * WED
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "15 40 16 * * *")
+	@Scheduled(cron = "15 * * 31 12 *")
     public void insertLessonnotes() {
 		
 		 Map<Integer, String> classMap = new HashMap<>();
