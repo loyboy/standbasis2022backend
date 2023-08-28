@@ -177,7 +177,7 @@ public class MyScheduler {
 		
 	}
 	
-	@Scheduled(cron = "0 02 12 * * *")
+	@Scheduled(cron = "0 10 * * * *")
     public void switchToNewTerm() {
 		
 	try {
