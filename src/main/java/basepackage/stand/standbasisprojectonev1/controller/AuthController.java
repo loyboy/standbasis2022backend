@@ -94,8 +94,7 @@ public class AuthController {
 		        if ( user.getRole() == RoleName.TEACHER) {
 		        	Calendar foundCal = calService.findAllByStatus( user.getSchool().getSchId() , 1).get();
 		        	if (foundCal == null) {
-		        		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse(false, "Login has failed due to Calendar expiration."));
-		        	      
+		        		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse(false, "Login has failed due to Calendar expiration."));   
 		        	}
 		        	realId = user.getUserId();		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
@@ -103,6 +102,7 @@ public class AuthController {
 		            lgres.setAccess_token(jwt);
 		            lgres.setSchool_date( new Date( foundCal.getStartdate().getTime() ).toLocaleString() );
 		            lgres.setSchool_name( user.getSchool().getName() );
+		            lgres.setCalendar_id( foundCal.getCalendarId() );
 		            
 		            //lgres.setSchool_date( "2023-01-01" );
 		            lgres.setEmail(user.getEmail());
@@ -112,11 +112,14 @@ public class AuthController {
 		        }
 		        
 		        if ( user.getRole() == RoleName.PRINCIPAL) {
+		        	Calendar foundCal = calService.findAllByStatus( user.getSchool().getSchId() , 1).get();
 		        	realId = user.getUserId();
 		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
 		        	lgres.setUsername(user.getName());
 		        	lgres.setSchool_name( user.getSchool().getName() );
+		        	lgres.setCalendar_id( foundCal == null ? null : foundCal.getCalendarId() );
+		        	
 		            lgres.setAccess_token(jwt);
 		            lgres.setEmail(user.getEmail());
 		            lgres.setRole("principal");

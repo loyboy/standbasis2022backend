@@ -13,6 +13,7 @@ public class LoginResponse{
 	private String access_token;
 	private String school_date;
 	private Long school_id;
+	private Long calendar_id;
 	private String school_name;
 	private String role;
 	private Long data_id;

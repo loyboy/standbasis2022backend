@@ -15,6 +15,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,7 @@ import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteManagement;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
+import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.repository.AssessmentRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
 import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
@@ -174,9 +177,10 @@ public class MyScheduler {
 		
 	}
 	
-	@Scheduled(cron = "0 0 0 * * *")
+	@Scheduled(cron = "0 02 12 * * *")
     public void switchToNewTerm() {
 		
+	try {
 	    // get all the calendars that are active
 		List<Calendar> calendars =	calservice.findByActive();
 	
@@ -235,8 +239,7 @@ public class MyScheduler {
 						enrolRepository.save(newEnrol);
 					}	
 					
-					//Also roll over the timetable
-					
+					//Also roll over the timetable					
 					e.setStatus(-99);
 					enrolRepository.save(e);
 				}
@@ -262,7 +265,12 @@ public class MyScheduler {
 			
 				
 			}
-		}
+		}		
+		
+	 }
+	 catch (Exception ex) {
+		ex.printStackTrace();
+     }
 		
 	}
 	//@Autowired	
@@ -270,7 +278,7 @@ public class MyScheduler {
 	
 	// "0 0/10 * * * *" - 10 minutes interval
 	// "0 0 0 * * *" - Everyday at 0:00
-	@Scheduled(cron = "0 0 1 * * *")
+	@Scheduled(cron = "0 30 11 29 08 *")
     public void insertAttendances() {       
 		
 		//Check what day of the week is this
@@ -317,7 +325,7 @@ public class MyScheduler {
 	// "0 0 0 * * 0" -- once a week
 	// 0 0 0 ? * WED
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "0 0 0 31 12 *")
+	@Scheduled(cron = "0 30 11 29 08 *")
     public void insertLessonnotes() {
 		
 		 Map<Integer, String> classMap = new HashMap<>();
