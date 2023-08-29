@@ -70,7 +70,7 @@ public class EnrollmentService {
 	}
 	
 	public Enrollment findEnrollment(long id) {		
-		Optional<Enrollment> enc = enrollRepository.findById(id);
+		Optional<Enrollment> enc = enrollRepository.findByPupilId(id);
 		if (enc.isPresent()) {
 			Enrollment enrolval = enc.get();			
 			return enrolval;
