@@ -103,7 +103,7 @@ public class MyScheduler {
 		
 		for ( Calendar cal: calendars) {
 						
-			if ( parseTimestamp(todayDate()).compareTo(cal.getEnddate()) > 0 ) {
+			if ( parseTimestamp(todayDate()).compareTo(cal.getEnddate()) < 0 ) {
 				
 				List<Lessonnote> allLessonnote = lsnRepository.findByCalendar(cal);
 			    List<Assessment> allAssessment = assRepository.findByCalendar(cal);
