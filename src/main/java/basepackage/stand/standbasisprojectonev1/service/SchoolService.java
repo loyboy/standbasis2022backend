@@ -210,10 +210,10 @@ public class SchoolService {
 		List<School> listSchool = (List<School>) response2.get("schools");
         
         List<School> countSecondary = listSchool.stream()
-			 	.filter(ss -> ss.getType_of() == "secondary" )
+			 	.filter(ss -> ss.getType_of().equals("secondary") )
 		        .collect(Collectors.toList());
         List<School> countPrimary = listSchool.stream()
-			 	.filter(ss -> ss.getType_of() == "primary" )
+			 	.filter(ss -> ss.getType_of().equals("primary") )
 		        .collect(Collectors.toList());
         
         response.put("totalSecondary", countSecondary.size());
