@@ -269,9 +269,9 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
 			}
         }
         
-        	response.put("totalPrimary", countPrimary);
-        	response.put("totalSJunior", countSecondaryJunior);
-        	response.put("totalSSenior", countSecondarySenior);
+        	response.put("totalPrimary", countPrimary.size() );
+        	response.put("totalSJunior", countSecondaryJunior.size() );
+        	response.put("totalSSenior", countSecondarySenior.size());
         	response.put("totalSUndeployed", undeployedSeconday);
         	response.put("totalPUndeployed", undeployedPrimary);
         	//
