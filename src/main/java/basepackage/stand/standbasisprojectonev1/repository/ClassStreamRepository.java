@@ -41,20 +41,20 @@ public interface ClassStreamRepository extends JpaRepository<ClassStream, Long> 
        	 )
        List<ClassStream> filterAll(@Param("filter") String filter);
       
-       @Query("select cs from ClassStream cs where cs.school.owner = :group AND ( cs.school = :sch OR :sch is null ) " )
+       @Query("select cs from ClassStream cs where ( cs.school.owner = :group OR :group is null ) AND ( cs.school = :sch OR :sch is null ) " )
        Page<ClassStream> findBySchoolPage( @Param("sch") School owner, @Param("group") SchoolGroup group, Pageable pg);
        
-       @Query("select cs from ClassStream cs where cs.school.owner = :group AND ( cs.school = :sch OR :sch is null ) " )
+       @Query("select cs from ClassStream cs where ( cs.school.owner = :group OR :group is null ) AND ( cs.school = :sch OR :sch is null ) " )
        List<ClassStream> findBySchoolPage( @Param("sch") School owner, @Param("group") SchoolGroup group);
        
-       @Query("select cs from ClassStream cs where cs.school.owner = :group AND ( cs.title like :filter " 
+       @Query("select cs from ClassStream cs where ( cs.school.owner = :group OR :group is null ) AND ( cs.title like :filter " 
                + "or cs.ext like :filter ) " 
                + "AND ( cs.school = :sch OR :sch is null ) "
           	 )
        
        Page<ClassStream> findFilterBySchoolPage(@Param("filter") String filter, @Param("sch") School ownerId, @Param("group") SchoolGroup group, Pageable pg);
        
-       @Query("select cs from ClassStream cs where cs.school.owner = :group AND ( cs.title like :filter " 
+       @Query("select cs from ClassStream cs where ( cs.school.owner = :group OR :group is null ) AND ( cs.title like :filter " 
                + "or cs.ext like :filter ) " 
                + "AND ( cs.school = :sch OR :sch is null ) "
           	 )
