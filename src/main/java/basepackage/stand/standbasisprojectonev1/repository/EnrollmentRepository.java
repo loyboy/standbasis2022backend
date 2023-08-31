@@ -66,7 +66,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
       
     	@Query("select e from Enrollment e "
           + "WHERE (e.classstream.school = :owner OR :owner = null) " 
-    	  + "OR (e.classstream.school.owner = :group OR :group = null) "
+    	  + "AND (e.classstream.school.owner = :group OR :group = null) "
        	   )
        Page<Enrollment> findBySchool( @Param("owner") School owner,@Param("group") SchoolGroup group, Pageable pg);
        
@@ -74,14 +74,14 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
                + "JOIN ClassStream cs ON cs = e.classstream " 
                + "JOIN Student st ON st = e.student " 
                + "WHERE cs.title like :filter or st.name like :filter "
-               + "and ( e.classstream.school = :owner OR :owner = null) OR ( e.classstream.school.owner = :group OR :group = null ) "
+               + "and ( e.classstream.school = :owner OR :owner = null) AND ( e.classstream.school.owner = :group OR :group = null ) "
           	 )
        
        Page<Enrollment> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group, Pageable pg);
 
        @Query("select e from Enrollment e "
     	          + "WHERE (e.classstream.school = :owner OR :owner = null) " 
-    	    	  + "OR (e.classstream.school.owner = :group OR :group = null) "
+    	    	  + "AND (e.classstream.school.owner = :group OR :group = null) "
     	       	   )
        List<Enrollment> findBySchool( @Param("owner") School owner,@Param("group") SchoolGroup group);
     	       
@@ -89,7 +89,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     	               + "JOIN ClassStream cs ON cs = e.classstream " 
     	               + "JOIN Student st ON st = e.student " 
     	               + "WHERE cs.title like :filter or st.name like :filter "
-    	               + "and ( e.classstream.school = :owner OR :owner = null) OR ( e.classstream.school.owner = :group OR :group = null ) "
+    	               + "and ( e.classstream.school = :owner OR :owner = null) AND ( e.classstream.school.owner = :group OR :group = null ) "
     	          	 )
     	       
     	List<Enrollment> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group);
