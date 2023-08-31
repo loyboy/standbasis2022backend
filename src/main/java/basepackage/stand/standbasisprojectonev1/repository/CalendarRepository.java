@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.School;
+import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 
 @Repository
 public interface CalendarRepository extends JpaRepository<Calendar, Long>{
@@ -33,14 +34,30 @@ public interface CalendarRepository extends JpaRepository<Calendar, Long>{
 	      @Query("select cal from Calendar cal where cal.holiday like :filter " 
 	               + "or cal.session like :filter "            
 	       	 )
-	       Page<Calendar> filter(@Param("filter") String filter, Pageable pg);    
+	       Page<Calendar> filter(@Param("filter") String filter, Pageable pg);
 	      
-	       @Query("select cal from Calendar cal where cal.school = :owner " )
-	       Page<Calendar> findBySchoolPage( @Param("owner") School owner, Pageable pg);
+	      @Query("select cal from Calendar cal where cal.holiday like :filter " 
+	               + "or cal.session like :filter "            
+	       	 )
+	       List<Calendar> filterAll(@Param("filter") String filter);
+	      
+	       @Query("select cal from Calendar cal where (cal.school.owner = :group OR :group is null) AND ( cal.school = :owner OR :owner is null ) " )
+	       Page<Calendar> findBySchoolPage( @Param("owner") School owner, @Param("group") SchoolGroup group, Pageable pg);
 	       
-	       @Query("select cal from Calendar cal where cal.holiday like :filter " 
-	               + "or cal.session like :filter "
-	               + "and cal.school = :owner "
+	       @Query("select cal from Calendar cal where ( cal.holiday like :filter " 
+	               + "OR cal.session like :filter ) "
+	               + "AND (cal.school.owner = :group OR :group is null) AND ( cal.school = :owner OR :owner is null ) "
 	          	 )	       
-	       Page<Calendar> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, Pageable pg);
+	       Page<Calendar> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group, Pageable pg);
+	       
+	       @Query("select cal from Calendar cal where (cal.school.owner = :group OR :group is null) AND ( cal.school = :owner OR :owner is null ) " )
+	       List<Calendar> findBySchoolPage( @Param("owner") School owner, @Param("group") SchoolGroup group);
+	       
+	       @Query("select cal from Calendar cal where ( cal.holiday like :filter " 
+	               + "OR cal.session like :filter ) "
+	               + "AND (cal.school.owner = :group OR :group is null) AND ( cal.school = :owner OR :owner is null )  "
+	          	 )	       
+	       List<Calendar> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group );
+
 }
+		  

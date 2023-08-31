@@ -138,7 +138,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
       //  System.out.println("Long is set "+ owner);
         
         if ( query.equals("") || query == null ) {
-        	if ( group == null ) {
+        	if ( group == null && owner == null ) {
         		teas = teaRepository.findAll();
         	}
         	else {
@@ -155,7 +155,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         	}       	
         }
         else {
-        	if ( group == null ) {
+        	if ( group == null && owner == null ) {
         		teas = teaRepository.filterAll("%"+ query + "%");
         	}
         	else {    
@@ -205,7 +205,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
       //  System.out.println("Long is set "+ owner);
         
         if ( query.equals("") || query == null ) {
-        	if ( group == null ) {
+        	if ( group == null && owner == null ) {
         		schs = teaRepository.findAll(pageable);
         	}
         	else {

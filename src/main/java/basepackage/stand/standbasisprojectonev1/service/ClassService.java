@@ -110,7 +110,7 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
       //  System.out.println("Long is set "+ owner);
         
         if ( query.equals("") || query == null ) {
-        	if ( group == null ) {
+        	if ( group == null && owner == null ) {
         		cls = classRepository.findAll();
         	}
         	else {
@@ -127,7 +127,7 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
         	}       	
         }
         else {
-        	if ( group == null ) {
+        	if ( group == null && owner == null ) {
         		cls = classRepository.filterAll("%"+ query + "%");
         	}
         	else {    

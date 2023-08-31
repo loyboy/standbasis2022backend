@@ -27,9 +27,12 @@ import org.springframework.stereotype.Service;
 import basepackage.stand.standbasisprojectonev1.exception.BadRequestException;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.School;
+import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CalendarRequest;
 import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
+import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
 import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
@@ -38,6 +41,9 @@ public class CalendarService {
 
 	@Autowired		
     private CalendarRepository calRepository;
+	
+	@Autowired
+    private SchoolgroupRepository schgroupRepository;
 	
 	@Autowired		
     private SchoolRepository schRepository;
@@ -87,29 +93,112 @@ public List<Calendar> findByActive() {
 		return null;
 	}
 	
-	public Map<String, Object> getPaginatedCalendars(int page, int size, String query, Optional<Long> ownerval) {
+public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ownerval, Optional<Long> groupval) {
+		
+        Long owner = ownerval.orElse(null); 
+        Long group = groupval.orElse(null);
+		// Retrieve Teachers
+        
+        List<Calendar> teas = null;
+             
+        if ( query.equals("") || query == null ) {
+        	if ( group == null && owner == null ) {
+        		teas = calRepository.findAll();
+        	}
+        	else {
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		Optional<School> schownerobj = null;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner ); }
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }        		
+        		
+        			teas = calRepository.findBySchoolPage( 
+        					schownerobj == null ? null : schownerobj.get(), 
+        	        		schgroupobj == null ? null : schgroupobj.get()
+        			);
+        	}       	
+        }
+        else {
+        	if ( group == null && owner == null ) {
+        		teas = calRepository.filterAll("%"+ query + "%");
+        	}
+        	else {    
+        		
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		Optional<School> schownerobj = null;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner ); }
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }
+        		
+        		teas = calRepository.findFilterBySchool( "%"+ query + "%", 
+        				schownerobj == null ? null : schownerobj.get(), 
+    	        		schgroupobj == null ? null : schgroupobj.get() 
+    	         );
+        	}
+        }
+
+        if(teas.size() == 0) {
+        	Map<String, Object> responseEmpty = new HashMap<>();
+        	responseEmpty.put("calendars", Collections.emptyList());
+        	
+        	return responseEmpty;
+        }
+        
+        List<Calendar> calarray = new ArrayList<Calendar>(teas);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("calendars", calarray);      
+        
+        return response;
+    }
+	
+	
+	public Map<String, Object> getPaginatedCalendars(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval) {
         validatePageNumberAndSize(page, size);
-        Long owner = ownerval.orElse(null);        
+        Long owner = ownerval.orElse(null); 
+        Long group = groupval.orElse(null);
         // Retrieve Calendars
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Calendar> schs = null;
         
         if ( query.equals("") || query == null ) {
-        	if ( owner == null ) {
+        	if ( group == null && owner == null ) {
         		schs = calRepository.findAll(pageable);
         	}
         	else {
-        		Optional<School> schobj = schRepository.findById( owner );
-        		schs = calRepository.findBySchoolPage( schobj.orElse(null), pageable);
+        		//Optional<School> schobj = schRepository.findById( owner );
+        		//schs = calRepository.findBySchoolPage( schobj.orElse(null), pageable);
+        		
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		Optional<School> schownerobj = null;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner ); }
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }        		
+        		
+        			schs = calRepository.findBySchoolPage( 
+        					schownerobj == null ? null : schownerobj.get(), 
+        	        		schgroupobj == null ? null : schgroupobj.get()
+        					, pageable);
         	}        	
         }
         else {
-        	if ( owner == null ) {
+        	if ( group == null && owner == null ) {
         		schs = calRepository.filter("%"+ query + "%",  pageable);
         	}
         	else {    
-        		Optional<School> schobj = schRepository.findById( owner );
-        		schs = calRepository.findFilterBySchool( "%"+ query + "%", schobj.orElse(null), pageable);
+        		//Optional<School> schobj = schRepository.findById( owner );
+        		//schs = calRepository.findFilterBySchool( "%"+ query + "%", schobj.orElse(null), pageable);
+        		Optional<SchoolGroup> schgroupobj = null ;
+        		Optional<School> schownerobj = null;
+        		
+        		if(owner != null) { schownerobj = schRepository.findById( owner ); }
+        		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }
+        		
+        	// Optional<School> schobj = schRepository.findById( owner );
+        		schs = calRepository.findFilterBySchool( "%"+ query + "%", 
+        				schownerobj == null ? null : schownerobj.get(), 
+    	        		schgroupobj == null ? null : schgroupobj.get(), 
+    	        pageable);
         	}
         }
 
@@ -134,13 +223,13 @@ public List<Calendar> findByActive() {
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         
-       // long active = 1; long inactive = 0;
-      /*  long sriCalendars = schRepository.countBySri(active);
-        long nonSriCalendars = schRepository.countBySri(inactive);
-        long inactiveCalendars = schRepository.countByStatus(inactive);*/
+        Map<String, Object> response2 = getOrdinaryCalendars(query, ownerval, groupval);
         
-        long activeCalendars = calarray.stream().filter(sch -> sch.getStatus() == 1).count();       
-        long inactiveCalendars = calarray.stream().filter(sch -> sch.getStatus() == 0).count();
+        @SuppressWarnings("unchecked")
+		List<Calendar> listCalendar = (List<Calendar>) response2.get("calendars");
+        
+        long activeCalendars = listCalendar.stream().filter(sch -> sch.getStatus() == 1).count();       
+        long inactiveCalendars = listCalendar.stream().filter(sch -> sch.getStatus() == 0).count();
         
         response.put("totalActive", activeCalendars);
         response.put("totalInactive", inactiveCalendars);

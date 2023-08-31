@@ -61,11 +61,12 @@ public class CalendarController {
 	 public ResponseEntity<?> getPaginatedCalendars(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
 			 @RequestParam(value = "q") String query,
-			 @RequestParam(value = "school", required=false) Optional<Long> school
+			 @RequestParam(value = "school", required=false) Optional<Long> school,
+			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> schoolgroup
 			 ) {
 		// System.out.println("Long is set here "+ owner);
 		 
-		 Map<String, Object> response = service.getPaginatedCalendars( page, size, query, school );
+		 Map<String, Object> response = service.getPaginatedCalendars( page, size, query, school, schoolgroup );
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 
