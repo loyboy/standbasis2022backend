@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceActivity;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceManagement;
+import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.Rowcall;
 import basepackage.stand.standbasisprojectonev1.model.School;
@@ -53,6 +54,7 @@ import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceActivityService;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceManagementService;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceService;
+import basepackage.stand.standbasisprojectonev1.service.EnrollmentService;
 import basepackage.stand.standbasisprojectonev1.service.UserService;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
 import basepackage.stand.standbasisprojectonev1.util.FileUploadUtil;
@@ -72,6 +74,9 @@ public class AttendanceController {
 	 
 	 @Autowired
 	 UserService serviceUser;
+	 
+	 @Autowired
+	 EnrollmentService serviceEnrollment;
 	 
 	 @Autowired
 	 private EventManagerRepository eventRepository;
@@ -233,14 +238,18 @@ public class AttendanceController {
 		 Map<String, Object> attManageResponse = serviceManagement.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, subject, datefrom, dateto);
 		 Map<String, Object> attStudent = service.getOrdinaryStudentAttendances(query, schoolgroup, school, classid,  calendar, student, datefrom, dateto);
 		 Map<String, Object> attActivityResponse = serviceActivity.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, datefrom, dateto);
-		
-		 
+			 
 		 List<Attendance> ordinaryArray = (List<Attendance>) response.get("attendances");
 		 List<Rowcall> ordinaryStudentArray = (List<Rowcall>) attStudent.get("attendances");
 		 List<AttendanceManagement> ordinaryArrayManagement = (List<AttendanceManagement>) attManageResponse.get("attendancemanagement");
 		 List<AttendanceActivity> ordinaryArrayActivity = (List<AttendanceActivity>) attActivityResponse.get("attendanceactivity");
 			
 		 Map<String, Object> newResponse = new HashMap<>();
+		 int student_population = 0;
+		 for (Attendance att : ordinaryArray) {	
+			 List<Enrollment> ordinaryEnroll = serviceEnrollment.findEnrollmentFromClass(att.getTimetable().getClass_stream().getClsId());
+			 student_population += ordinaryEnroll.size();
+		 }
 		 
 		 Integer max = ordinaryArray.size(); 
 		 Integer maxManage = ordinaryArrayManagement.size();
@@ -266,7 +275,7 @@ public class AttendanceController {
 		 newResponse.put("approval_done", Approvaldone.intValue() );
 		 newResponse.put("teacher_absent", teacherAbsent.intValue() );
 		 newResponse.put("teacher_expected", max );
-		 newResponse.put("student_expected", maxStudent );
+		 newResponse.put("student_expected", student_population );
 		 newResponse.put("endorsement_expected", ordinaryArrayActivity.stream().filter(o -> o.getOwnertype().equals("Principal") ).count() );
 			
 		 return new ResponseEntity<>(newResponse, HttpStatus.OK);	        

@@ -70,7 +70,8 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		+ "AND (lsn.class_index = :cls OR :cls is null) "
     		+ "AND (lsn.week = :week OR :week is null) "
     		+ "AND (lsn.teacher = :tea OR :tea is null) "
-    		+ "AND (lsn.calendar = :cal OR :cal is null) "
+    		+ "AND (lsn.calendar.term = :term OR :term is null) "
+    		+ "AND (lsn.calendar.session = :year OR :year is null) "
     		+ "AND (lsn.subject = :sub OR :sub is null) "
     		+ "AND (lsn.submission >= :datefrom OR :datefrom is null) "
     		+ "AND (lsn.submission <= :dateto OR :dateto is null) "
@@ -82,7 +83,8 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		@Param("week") Integer week, 
     		@Param("tea") Teacher tea,
     		@Param("sub") Subject sub,
-    		@Param("cal") Calendar cal,
+    		@Param("term") Integer term,
+    		@Param("year") String year,
     		@Param("datefrom") Timestamp datefrom,
     		@Param("dateto") Timestamp dateto
     );
@@ -125,7 +127,8 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		+ "AND (lsn.class_index = :cls OR :cls is null) "
     		+ "AND (lsn.week = :week OR :week is null) "
     		+ "AND (lsn.teacher = :tea OR :tea is null) "
-    		+ "AND (lsn.calendar = :cal OR :cal is null) "
+    		+ "AND (lsn.calendar.term = :term OR :term is null) "
+    		+ "AND (lsn.calendar.session = :year OR :year is null) "
     		+ "AND (lsn.subject = :sub OR :sub is null) "
     		+ "AND (lsn.submission >= :datefrom OR :datefrom is null) "
     		+ "AND (lsn.submission <= :dateto OR :dateto is null) "
@@ -140,7 +143,8 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		@Param("week") Integer week, 
     		@Param("tea") Teacher tea, 
     		@Param("sub") Subject sub,
-    		@Param("cal") Calendar cal,
+    		@Param("term") Integer term,
+    		@Param("year") String year,
     		@Param("datefrom") Timestamp datefrom,
     		@Param("dateto") Timestamp dateto
     	);

@@ -175,6 +175,8 @@ public class LessonnoteService {
         // Retrieve Lessonnotes
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Lessonnote> Lessonnotes = null;
+        Optional<Integer> termVal = Optional.ofNullable(null);
+        Optional<String> yearVal = Optional.ofNullable(null);
         
         if ( query == null || query.equals("") ) {
         	if ( schgroup == null ) {
@@ -191,7 +193,10 @@ public class LessonnoteService {
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
         		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
-        		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  } 
+        		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  }
+        		
+        		if (calendarownerobj.isPresent()) { termVal = Optional.ofNullable( calendarownerobj.get().getTerm() ); }
+        		if (calendarownerobj.isPresent()) { yearVal = Optional.ofNullable( calendarownerobj.get().getSession() ); }
         		
         		Lessonnotes = lsnRepository.findByTeacherSchoolgroupPage(
         				schgroupobj == null ? null : schgroupobj.get(), 
@@ -224,6 +229,9 @@ public class LessonnoteService {
         		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
         		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
         		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  } 
+        		
+        		if (calendarownerobj.isPresent()) { termVal = Optional.ofNullable( calendarownerobj.get().getTerm() ); }
+        		if (calendarownerobj.isPresent()) { yearVal = Optional.ofNullable( calendarownerobj.get().getSession() ); }
         		
         		Lessonnotes = lsnRepository.findFilterByTeacherSchoolgroupPage( 
         				"%"+ query + "%",         				
@@ -265,7 +273,7 @@ public class LessonnoteService {
         response.put("totalPages", Lessonnotes.getTotalPages());
         response.put("isLast", Lessonnotes.isLast());
         
-        Map<String, Object> response2 = getOrdinaryTeacherLessonnotes(query, schgroupId, schId, classId, week, calendarId, teacherId, subjectId, datefrom, dateto );
+        Map<String, Object> response2 = getOrdinaryTeacherLessonnotes(query, schgroupId, schId, classId, week, yearVal, termVal, teacherId, subjectId, datefrom, dateto );
         List<Lessonnote> ordinaryArray = (List<Lessonnote>) response2.get("lessonnotes");
         
         long submitLess = ordinaryArray.stream().filter(o -> o.getSubmission() != null).count();       
@@ -277,7 +285,7 @@ public class LessonnoteService {
         return response;
     }
 	
-	public Map<String, Object> getOrdinaryTeacherLessonnotes(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Integer> classId, Optional<Integer> week, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Long> subjectId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
+	public Map<String, Object> getOrdinaryTeacherLessonnotes(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Integer> classId, Optional<Integer> week, Optional<String> year, Optional<Integer> term, Optional<Long> teacherId, Optional<Long> subjectId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
         
         Long schgroup = schgroupId.orElse(null);
         Long schowner = schId.orElse(null);
@@ -285,7 +293,8 @@ public class LessonnoteService {
         Integer weeknow = week.orElse(null);
         Long subjectowner = subjectId.orElse(null);
         Long teacherowner = teacherId.orElse(null);     
-        Long calendarowner = calendarId.orElse(null);
+        Integer termval = term.orElse(null);
+        String yearval = year.orElse(null);
         
         List<Lessonnote> lessonnotes = null;
         
@@ -304,7 +313,7 @@ public class LessonnoteService {
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
         		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  } 
-        		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
+        		//if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
         		
         		lessonnotes = lsnRepository.findByTeacherSchoolgroup(         				
         				schgroupobj == null ? null : schgroupobj.get(), 
@@ -313,7 +322,9 @@ public class LessonnoteService {
                         weeknow,
                         teacherownerobj == null ? null : teacherownerobj.get(),
                         subjectownerobj == null ? null : subjectownerobj.get(),		
-                        calendarownerobj == null ? null : calendarownerobj.get(),
+                       // calendarownerobj == null ? null : calendarownerobj.get(),
+                        termval,
+                        yearval,
                         datefrom.isEmpty() ? null : datefrom.get(),
                         dateto.isEmpty() ? null : dateto.get() 
         		);
@@ -332,7 +343,7 @@ public class LessonnoteService {
         		
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
-        		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
+        		//if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
         		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  } 
         		
         		lessonnotes = lsnRepository.findFilterByTeacherSchoolgroup( 
@@ -343,7 +354,9 @@ public class LessonnoteService {
                         weeknow,
                         teacherownerobj == null ? null : teacherownerobj.get(),
                         subjectownerobj == null ? null : subjectownerobj.get(),	
-                        calendarownerobj == null ? null : calendarownerobj.get(),
+                       // calendarownerobj == null ? null : calendarownerobj.get(),
+                        termval,
+                        yearval,		
                         datefrom.isEmpty() ? null : datefrom.get(),
                         dateto.isEmpty() ? null : dateto.get() 
         		);

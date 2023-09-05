@@ -44,6 +44,7 @@ import basepackage.stand.standbasisprojectonev1.payload.onboarding.TimetableRequ
 import basepackage.stand.standbasisprojectonev1.repository.AssessmentRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceManagementRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
+import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
 import basepackage.stand.standbasisprojectonev1.repository.LessonnoteRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceActivityService;
@@ -114,6 +115,9 @@ public class MneController {
 	 
 	 @Autowired
 	 private LessonnoteRepository lsnRepository;
+	 
+	 @Autowired		
+	 private CalendarRepository calRepository;
 	 
 	 @GetMapping("/attendance/students")
 	 public ResponseEntity<?> getStudentAttendance(
@@ -532,11 +536,18 @@ public class MneController {
 			 @RequestParam(value = "week", required=false) Optional<Integer>  week
 	 ){
 		 
-		
+			 Optional<Integer> termVal = Optional.ofNullable(null);
+		     Optional<String> yearVal = Optional.ofNullable(null);
+		     Optional<basepackage.stand.standbasisprojectonev1.model.Calendar> calendarownerobj = null;
+		     if(calendar.isPresent()) { calendarownerobj = calRepository.findById( calendar.get() );  } 
+		     if (calendarownerobj.isPresent()) { 
+		    	 termVal = Optional.ofNullable(calendarownerobj.get().getTerm());  
+		    	 yearVal = Optional.ofNullable(calendarownerobj.get().getSession());  
+		     }
 			 Optional<Long> WithNullableValue = Optional.ofNullable(null);
 			 Optional<Integer> WithNullableValueInt = Optional.ofNullable(null);
 			 Optional<Timestamp> WithNullableValueTime = Optional.ofNullable(null);
-			 Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes("", schoolgroup, school, WithNullableValueInt, week, calendar, WithNullableValue, WithNullableValue, WithNullableValueTime, WithNullableValueTime );
+			 Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes("", schoolgroup, school, WithNullableValueInt, week, yearVal, termVal, WithNullableValue, WithNullableValue, WithNullableValueTime, WithNullableValueTime );
 			 Map<String, Object> lsnActivityResponse = serviceActivity.getOrdinaryTeacherLessonnotes("", schoolgroup, school, WithNullableValueInt, week,  calendar, WithNullableValue, WithNullableValueTime, WithNullableValueTime );
 			 
 			 List<LessonnoteManagement> ordinaryArrayManagement = (List<LessonnoteManagement>) lsnManageResponse.get("lessonnotemanagement");

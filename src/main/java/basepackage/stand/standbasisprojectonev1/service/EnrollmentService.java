@@ -235,10 +235,14 @@ public class EnrollmentService {
         
         enrolarray = schs.getContent();
         
+        List<Enrollment> totalEnrollment = enrolarray.stream()
+        		.filter( en -> en.getStatus() == 1 )
+        		.collect(Collectors.toList());
+        
         Map<String, Object> response = new HashMap<>();
         response.put("enrollments", enrolarray);
         response.put("currentPage", schs.getNumber());
-        response.put("totalItems", schs.getTotalElements());
+        response.put("totalItems", totalEnrollment.size() );
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
          

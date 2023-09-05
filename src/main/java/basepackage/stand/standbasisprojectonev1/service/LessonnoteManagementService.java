@@ -220,7 +220,7 @@ public class LessonnoteManagementService {
     }
 	
 	
-	public Map<String, Object> getOrdinaryTeacherLessonnotes(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Integer> classId,  Optional<Integer> week, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Long> subjectId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
+	public Map<String, Object> getOrdinaryTeacherLessonnotes(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Integer> classId,  Optional<Integer> week, Optional<String> year, Optional<Integer> term, Optional<Long> teacherId, Optional<Long> subjectId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
         
         Long schgroup = schgroupId.orElse(null);
         Long schowner = schId.orElse(null);
@@ -228,7 +228,8 @@ public class LessonnoteManagementService {
         Integer weeknow = week.orElse(null);
         Long subjectowner = subjectId.orElse(null);
         Long teacherowner = teacherId.orElse(null);     
-        Long calendarowner = calendarId.orElse(null);
+        Integer termval = term.orElse(null);
+        String yearval = year.orElse(null);
         
         List<LessonnoteManagement> lessonnotes = null;
         
@@ -245,7 +246,7 @@ public class LessonnoteManagementService {
         		
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  }        		
-        		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
+        		//if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
         		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  } 
         		
         		lessonnotes = lsnmanageRepository.findByTeacherSchoolgroup(    				
@@ -255,7 +256,8 @@ public class LessonnoteManagementService {
                 		weeknow,
                 		teacherownerobj == null ? null : teacherownerobj.get(),
                 		subjectownerobj == null ? null : subjectownerobj.get(),		
-                		calendarownerobj == null ? null : calendarownerobj.get(),
+                		termval,
+                        yearval,
                 		datefrom.isEmpty() ? null : datefrom.get(),
                         dateto.isEmpty() ? null : dateto.get()
         		);
@@ -274,7 +276,7 @@ public class LessonnoteManagementService {
         		
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
-        		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
+        		//if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
         		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  }         		
         		
         		lessonnotes = lsnmanageRepository.findFilterByTeacherSchoolgroup( 
@@ -285,7 +287,8 @@ public class LessonnoteManagementService {
                         weeknow,
                         teacherownerobj == null ? null : teacherownerobj.get(),
                         subjectownerobj == null ? null : subjectownerobj.get(),			
-                        calendarownerobj == null ? null : calendarownerobj.get(),
+                        termval,
+                        yearval,
                         datefrom.isEmpty() ? null : datefrom.get(),
                         dateto.isEmpty() ? null : dateto.get()
         		);

@@ -47,6 +47,7 @@ import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteAct
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteComposite;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteManagementRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.LessonnoteRequest;
+import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
 import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
@@ -83,6 +84,9 @@ public class LessonnoteController {
 	 
 	 @Autowired
 	 private UserRepository userRepository;
+	 
+	 @Autowired		
+	 private CalendarRepository calRepository;
 	 
 	 private final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	 
@@ -205,7 +209,15 @@ public class LessonnoteController {
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
 			 ) {
 		 
-		 Map<String, Object> response = service.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, subject, datefrom, dateto  );
+		 Optional<Integer> termVal = Optional.ofNullable(null);
+	     Optional<String> yearVal = Optional.ofNullable(null);
+	     Optional<basepackage.stand.standbasisprojectonev1.model.Calendar> calendarownerobj = null;
+	     if(calendar.isPresent()) { calendarownerobj = calRepository.findById( calendar.get() );  } 
+	     if (calendarownerobj.isPresent()) { 
+	    	 termVal = Optional.ofNullable(calendarownerobj.get().getTerm());  
+	    	 yearVal = Optional.ofNullable(calendarownerobj.get().getSession());  
+	     }
+		 Map<String, Object> response = service.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, yearVal, termVal, teacher, subject, datefrom, dateto  );
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 
@@ -215,7 +227,8 @@ public class LessonnoteController {
 			 @RequestParam(value = "q", required=false) String query,
 			 @RequestParam(value = "schoolgroup" ) Optional<Long> schoolgroup,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
-			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
+			 @RequestParam(value = "schoolyear", required=false) Optional<String> schoolyear,
+			 @RequestParam(value = "schoolterm", required=false) Optional<Integer> schoolterm,
 			 @RequestParam(value = "week", required=false) Optional<Integer> week,
 			 
 			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
@@ -225,8 +238,8 @@ public class LessonnoteController {
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
 			 ) {
 		 
-		 Map<String, Object> response = service.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, subject, datefrom, dateto );
-		 Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, subject, datefrom, dateto );
+		 Map<String, Object> response = service.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, schoolyear, schoolterm, teacher, subject, datefrom, dateto );
+		 Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, schoolyear, schoolterm, teacher, subject, datefrom, dateto );
 		// Map<String, Object> lsnActivityResponse = serviceActivity.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week,  calendar, teacher, datefrom, dateto );
 				 
 		 List<Lessonnote> ordinaryArray = (List<Lessonnote>) response.get("lessonnotes");
@@ -288,23 +301,7 @@ public class LessonnoteController {
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }*/
 	 
-	 @GetMapping("/teachersLnm")
-	 public ResponseEntity<?> getTeacherLessonnoteManagement(
-			 @RequestParam(value = "q", required=false) String query,
-			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
-			 @RequestParam(value = "school", required=false) Optional<Long> school,
-			 @RequestParam(value = "class", required=false) Optional<Integer> classid,
-			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
-			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
-			 @RequestParam(value = "week", required=false) Optional<Integer> week,
-			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
-			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
-			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
-			 ) {
-		 
-		 Map<String, Object> response = serviceManagement.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, calendar, teacher, subject, datefrom, dateto  );
-		 return new ResponseEntity<>(response, HttpStatus.OK);	        
-	 }
+	
 	 
 	 @GetMapping("/teachersLna")
 	 public ResponseEntity<?> getTeacherLessonnoteActivity(
