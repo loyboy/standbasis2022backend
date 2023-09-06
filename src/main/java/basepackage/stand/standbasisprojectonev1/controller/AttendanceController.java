@@ -249,6 +249,7 @@ public class AttendanceController {
 		 for (Attendance att : ordinaryArray) {	
 			 List<Enrollment> ordinaryEnroll = serviceEnrollment.findEnrollmentFromClass(att.getTimetable().getClass_stream().getClsId());
 			 student_population += ordinaryEnroll.size();
+			 System.out.println("Student pop: " + ordinaryEnroll.size() );		 
 		 }
 		 
 		 Integer max = ordinaryArray.size(); 
