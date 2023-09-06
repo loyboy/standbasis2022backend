@@ -214,11 +214,11 @@ public Map<String, Object> getPaginatedTeacherLessonnotes(int page,int size, Str
         response.put("totalPages", lessonnotes.getTotalPages());
         response.put("isLast", lessonnotes.isLast());
         
-        long slipLessonnotes = calarray.stream().filter(sch -> sch.getSlip() == 1).count();       
-        long notslipLessonnotes = calarray.stream().filter(sch -> sch.getSlip() == 0).count();
+       // long slipLessonnotes = calarray.stream().filter(sch -> sch.getSlip() == 1).count();       
+       // long notslipLessonnotes = calarray.stream().filter(sch -> sch.getSlip() == 0).count();
         
-        response.put("totalSlip", slipLessonnotes);
-        response.put("totalNotSlip", notslipLessonnotes);
+        //response.put("totalSlip", slipLessonnotes);
+        //response.put("totalNotSlip", notslipLessonnotes);
   
         return response;
     }
