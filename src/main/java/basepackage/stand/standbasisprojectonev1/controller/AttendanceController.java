@@ -246,12 +246,12 @@ public class AttendanceController {
 			
 		 Map<String, Object> newResponse = new HashMap<>();
 		 int student_population = 0;
-		 for (Attendance att : ordinaryArray) {	
+		/* for (Attendance att : ordinaryArray) {	
 			 List<Enrollment> ordinaryEnroll = serviceEnrollment.findEnrollmentFromClass(att.getTimetable().getClass_stream().getClsId());
 			 student_population += ordinaryEnroll.size();
 			 System.out.println("Student pop: " + ordinaryEnroll.size() );
 			 System.out.println("Attendance ID: " + att.getAttId() );
-		 }
+		 }*/
 		 
 		 Integer max = ordinaryArray.size(); 
 		 Integer maxManage = ordinaryArrayManagement.size();

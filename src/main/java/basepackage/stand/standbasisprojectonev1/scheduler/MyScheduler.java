@@ -232,7 +232,7 @@ public class MyScheduler {
 						Enrollment newEnrol = new Enrollment();						
 						newEnrol.setCalendar(savedCalendar);
 						newEnrol.setSession_count( e.getSession_count() != null ? (e.getSession_count() + 1) : 2 );
-						newEnrol.setClassstream( next_classroom );
+						newEnrol.setClassstream( cal.getTerm().equals(3) ? next_classroom : myclassroom );
 						newEnrol.setStudent(e.getStudent());
 						newEnrol.setId(e.getId());
 						newEnrol.setStatus(1);

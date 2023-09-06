@@ -31,7 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import basepackage.stand.standbasisprojectonev1.model.Assessment;
+import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceActivity;
+import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteActivity;
@@ -247,6 +249,12 @@ public class LessonnoteController {
 		 //List<LessonnoteActivity> ordinaryArrayLessonnote = (List<LessonnoteActivity>) lsnActivityResponse.get("Lessonnoteactivity");
 			
 		 Map<String, Object> newResponse = new HashMap<>();
+		 
+		 for (Lessonnote lsn : ordinaryArray) {	
+			 
+			 System.out.println("Week: " + week.get() + " " + "SchoolYear&Term: " + schoolyear.get() + "@" + schoolterm.get() );
+			 System.out.println("LSN ID: " + lsn.getLessonnoteId() );
+		 }
 		 
 		 Integer max = ordinaryArray.size(); 
 		// Integer maxManage = ordinaryArrayManagement.size();
