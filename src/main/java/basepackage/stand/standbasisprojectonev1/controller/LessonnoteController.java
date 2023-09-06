@@ -252,7 +252,7 @@ public class LessonnoteController {
 		 
 		 for (Lessonnote lsn : ordinaryArray) {	
 			 
-			 System.out.println("Week: " + week.get() + " " + "SchoolYear&Term: " + schoolyear.get() + "@" + schoolterm.get() );
+			// System.out.println("Week: " + week.get() + " " + "SchoolYear&Term: " + schoolyear.get() + "@" + schoolterm.get() );
 			 System.out.println("LSN ID: " + lsn.getLessonnoteId() );
 		 }
 		 
