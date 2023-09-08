@@ -147,6 +147,7 @@ public class MneController {
 	     
 	     //System.out.println("myrowcall precall: " + enrolobj.getStudent().getPupId() + " --- " + calendar );
 	     
+		 //get all rowcalls irrepective of the subjects
 	     List<Rowcall> myrowcall = attRepository.findByStudentMne(enrolobj.getStudent().getPupId(), calendar, timestampWeekStart, timestampWeekEnd);
 	     
 	     System.out.println("myrowcall: " + myrowcall.size() );
@@ -190,18 +191,25 @@ public class MneController {
 	     List<Integer> allAverage = new ArrayList<>();
 	     
 	     String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
-	     for (String sub : subjectNamesArray) {	    	
-		     
+	     
+	     System.out.println("subjectNamesArray: " + subjectNamesArray.length );
+	     
+	     for (String sub : subjectNamesArray) {   	 
+	    	 
+	    	 System.out.println("Current Index: " + j + " >> " + sub);
+	    	 
 		     List<Rowcall> rwcallOne = myrowcall.stream().filter(rw -> rw.getAttendance().getTimetable().getSubject().getName().equals(sub) ).collect(Collectors.toList());
 		       
 		     System.out.println("rwcallOne: " + rwcallOne.size() );
+		     
 		     if (rwcallOne.size() > 0) {
+		    	 
 		    	 int perf = 0;
 		    	 List<Rowcall> rwcallPresent = rwcallOne.stream().filter(rw -> rw.getStatus() == 1 ).collect(Collectors.toList());
 		    	 System.out.println("rwcallPresent: " + rwcallPresent.size() );
 		    	 
 		    	 if (rwcallPresent.size() > 0) {
-		    		 perf = ( rwcallPresent.size()/myrowcall.size() ) * 100;
+		    		 perf = ( rwcallPresent.size()/rwcallOne.size() ) * 100;
 		    	 }   	
 		    	 
 			     Map<String, Object> objectmnecolumntemp = new HashMap<>();
