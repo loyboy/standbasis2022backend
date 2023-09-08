@@ -194,15 +194,16 @@ public class MneController {
 		     
 		     List<Rowcall> rwcallOne = myrowcall.stream().filter(rw -> rw.getAttendance().getTimetable().getSubject().getName().equals(sub) ).collect(Collectors.toList());
 		       
+		     System.out.println("rwcallOne: " + rwcallOne.size() );
 		     if (rwcallOne.size() > 0) {
 		    	 int perf = 0;
 		    	 List<Rowcall> rwcallPresent = rwcallOne.stream().filter(rw -> rw.getStatus() == 1 ).collect(Collectors.toList());
+		    	 System.out.println("rwcallPresent: " + rwcallPresent.size() );
 		    	 
 		    	 if (rwcallPresent.size() > 0) {
 		    		 perf = ( rwcallPresent.size()/myrowcall.size() ) * 100;
-		    	 }	    	
+		    	 }   	
 		    	 
-			     
 			     Map<String, Object> objectmnecolumntemp = new HashMap<>();
 		    	 objectmnecolumntemp.put("key", "d"+j);
 		    	 objectmnecolumntemp.put("label", sub );
