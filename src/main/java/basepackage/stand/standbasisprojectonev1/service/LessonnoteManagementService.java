@@ -82,7 +82,7 @@ public class LessonnoteManagementService {
 		if (lsn.isPresent()) {
 			Lessonnote lsnval = lsn.get();
 			List<LessonnoteManagement> lsnmanage = new ArrayList<LessonnoteManagement>();
-			lsnmanage.add( lsnmanageRepository.findByLessonnote(lsnval).get() );
+			lsnmanage.add( lsnmanageRepository.findByLessonnote(lsnval).isPresent() ? lsnmanageRepository.findByLessonnote(lsnval).get() : null  );
 			return lsnmanage;
 		}
 		return null;		

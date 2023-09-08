@@ -209,7 +209,7 @@ public class MneController {
 		    	 System.out.println("rwcallPresent: " + rwcallPresent.size() );
 		    	 
 		    	 if (rwcallPresent.size() > 0) {
-		    		 perf = ( rwcallPresent.size()/rwcallOne.size() ) * 100;
+		    		 perf = (rwcallPresent.size() * 100) / rwcallOne.size();
 		    	 }   	
 		    	 
 			     Map<String, Object> objectmnecolumntemp = new HashMap<>();
@@ -331,7 +331,7 @@ public class MneController {
 		    	 List<Attendance> new_my_attendance = my_attendance.stream().filter(att -> att.getTimetable().getSubject().equals(subclass.getSubject()) && att.getTimetable().getClass_stream().equals( subclass.getClass_stream() ) ).collect(Collectors.toList());
 		    	 	    
 		    	 if (attcallPresent.size() > 0) {		    		
-		    		 perf = ( (double) attcallPresent.size() / new_my_attendance.size() ) * 100;
+		    		 perf = (double) ( attcallPresent.size() * 100 ) / new_my_attendance.size();
 		    	 }    	
 		    	 
 			     Map<String, Object> objectmnecolumntemp = new HashMap<>();
@@ -358,7 +358,7 @@ public class MneController {
 		    		 int sum = attcallPresent1.stream()
 	                            .mapToInt(att -> att.getScore())
 	                            .sum();
-		    		 perf = ( (double) sum / (new_my_attendance1.size() * 100) ) * 100;
+		    		 perf = (double)(sum * 100)/(new_my_attendance1.size() * 100);
 		    	 }    	
 		    	 
 		    	 j++;
