@@ -194,18 +194,18 @@ public class MneController {
 	     
 	     System.out.println("subjectNamesArray: " + subjectNamesArray.length );
 	     
-	     for (String sub : subjectNamesArray) {   	 
-	    	 
-	    	 System.out.println("Current Index: " + j + " >> " + sub);
-	    	 
-		     List<Rowcall> rwcallOne = myrowcall.stream().filter(rw -> rw.getAttendance().getTimetable().getSubject().getName().equals(sub) ).collect(Collectors.toList());
-		       
-		     System.out.println("rwcallOne: " + rwcallOne.size() );
+	     for (String sub : subjectNamesArray) {	 
+	    	  
+		     List<Rowcall> rwcallOne = myrowcall.stream().filter(rw -> rw.getAttendance().getTimetable().getSubject().getName().equals(sub) ).collect(Collectors.toList());     
 		     
 		     if (rwcallOne.size() > 0) {
 		    	 
+		    	 System.out.println("Current Index: " + j + " >> " + sub);
+		    	 System.out.println("rwcallOne: " + rwcallOne.size() );
 		    	 int perf = 0;
-		    	 List<Rowcall> rwcallPresent = rwcallOne.stream().filter(rw -> rw.getStatus() == 1 ).collect(Collectors.toList());
+		    	 
+		    	 List<Rowcall> rwcallPresent = rwcallOne.stream().filter(rw -> rw.getStatus().equals(1) ).collect(Collectors.toList());
+		    	 
 		    	 System.out.println("rwcallPresent: " + rwcallPresent.size() );
 		    	 
 		    	 if (rwcallPresent.size() > 0) {
