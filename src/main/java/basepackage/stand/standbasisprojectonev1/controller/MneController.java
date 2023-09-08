@@ -149,11 +149,11 @@ public class MneController {
 	     
 	     List<Rowcall> myrowcall = attRepository.findByStudentMne(enrolobj.getStudent().getPupId(), calendar, timestampWeekStart, timestampWeekEnd);
 	     
-	     //System.out.println("myrowcall: " + myrowcall.toString() );
+	     System.out.println("myrowcall: " + myrowcall.size() );
 	     
 	     List<TimeTable> pupilclasses = timetableservice.findClassOffered(enrolobj.getClassstream().getClsId(), calendar);
 	     
-	     System.out.println("pupilclasses: " + pupilclasses.toString() );
+	     System.out.println("pupilclasses: " + pupilclasses.size() );
 	     
 	     List< Map<String, Object> > mnecolumndata = new ArrayList<>();
 	     List< Map<String, Object> > mnecolumn = new ArrayList<>();
