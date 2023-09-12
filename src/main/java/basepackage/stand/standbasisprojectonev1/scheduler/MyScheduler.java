@@ -111,7 +111,7 @@ public class MyScheduler {
 				for ( Lessonnote lsn : allLessonnote ) {
 					List<LessonnoteManagement> list = serviceManagement.findByLessonnote(lsn.getLessonnoteId());
 					LessonnoteManagement lsnmanage = list.get(0);
-					int totalScore = ( (lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0) + (lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + (lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/4;
+					int totalScore = ( ( lsnmanage != null && lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0 ) + ( lsnmanage != null && lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + ( lsnmanage != null && lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/4;
 					lsnmanage.setScore(totalScore);
 						
 					lsnmanageRepository.save(lsnmanage);

@@ -416,8 +416,8 @@ public class MneController {
 	 public ResponseEntity<?> getStudentLessonnote( 
 			 @RequestParam(value = "enrol") Long enrolId,
 			 @RequestParam(value = "calendar") Long calendar,
-			 @RequestParam(value = "week") Integer week,
-			 @RequestParam(value = "type") String typeof
+			 @RequestParam(value = "week",required=false) Integer week,
+			 @RequestParam(value = "type",required=false) String typeof
 	  ){
 		 
 		 Calendar calobj = calendarservice.findCalendar(calendar);

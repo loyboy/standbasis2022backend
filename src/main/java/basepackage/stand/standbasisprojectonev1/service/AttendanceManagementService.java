@@ -208,6 +208,7 @@ public class AttendanceManagementService {
         
         Map<String, Object> response = new HashMap<>();
         response.put("attendancemanagement", calarray);
+        response.put("totalItems", attendances.getTotalElements());
        
         return response;
     }
