@@ -28,25 +28,25 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long>{
 	
 	@Query("select assess from Assessment assess "
 			+ "JOIN Lessonnote lsn ON lsn = assess.lsn "
-    		+ "AND lsn.title like :filter "
+    		+ "WHERE lsn.title like :filter "
        	 )
 	List<Assessment> filterAll( @Param("filter") String filter );
 	
 	@Query("select assess from Assessment assess "
 			+ "JOIN Lessonnote lsn ON lsn = assess.lsn "
-    		+ "AND lsn.calendar = :cal "
+    		+ "WHERE lsn.calendar = :cal "
        	  )
 	List<Assessment> findByCalendar( @Param("cal") Calendar c);
 	
 	@Query("select assess from Assessment assess "
 			+ "JOIN Lessonnote lsn ON lsn = assess.lsn "
-    		+ "AND lsn.title like :filter "
+    		+ "WHERE (assess.enroll.student.name like :filter OR lsn.title like :filter OR lsn.subject.name like :filter ) "
        	 )
 	Page<Assessment> filter( @Param("filter") String filter, Pageable pg); 
 	
 	@Query("select assess from Assessment assess "
 			+ "JOIN Lessonnote lsn ON lsn = assess.lsn "
-			+ "AND assess._type = :typeof " 
+			+ "WHERE assess._type = :typeof " 
 			+ "AND (assess.enroll.student = :pup OR :pup is null) "
 			+ "AND (lsn.calendar = :cal OR :cal is null) "
 			+ "AND (lsn.week = :week OR :week is null) "
