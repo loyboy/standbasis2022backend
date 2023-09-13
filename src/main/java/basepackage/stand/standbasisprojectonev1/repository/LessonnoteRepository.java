@@ -287,7 +287,7 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		+ "AND (assess._type = :type OR :type is null) "
     		+ "AND ( DATE(lsn.submission) >= :datefrom OR :datefrom is null) "
     		+ "AND ( DATE(lsn.submission) <= :dateto OR :dateto is null) "
-    		+ "OR ( assess.enroll.student.name like :filter OR lsn.title like :filter OR lsn.subject.name like :filter ) "
+    		+ "AND ( assess.enroll.student.name like :filter OR lsn.title like :filter OR lsn.subject.name like :filter ) "
        	 )
     
     Page<Assessment> findFilterByStudentSchoolgroupPage(
