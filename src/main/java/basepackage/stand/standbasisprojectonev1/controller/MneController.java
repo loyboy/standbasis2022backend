@@ -571,16 +571,16 @@ public class MneController {
 			     mnecolumn.add( objectmnecolumn2 );
 			     
 			     Map<String, Object> objectmnecolumn21 = new HashMap<>();
-			     objectmnecolumn2.put("key", "homework_performance");
-			     objectmnecolumn2.put("label", "Homework");
-			     objectmnecolumn2.put("sortable", true);
+			     objectmnecolumn21.put("key", "homework_performance");
+			     objectmnecolumn21.put("label", "Homework");
+			     objectmnecolumn21.put("sortable", true);
 			     
 			     mnecolumn.add( objectmnecolumn21 );
 			     
 			     Map<String, Object> objectmnecolumn22 = new HashMap<>();
-			     objectmnecolumn2.put("key", "test_performance");
-			     objectmnecolumn2.put("label", "Test");
-			     objectmnecolumn2.put("sortable", true);
+			     objectmnecolumn22.put("key", "test_performance");
+			     objectmnecolumn22.put("label", "Test");
+			     objectmnecolumn22.put("sortable", true);
 			     
 			     mnecolumn.add( objectmnecolumn22 );
 		     
