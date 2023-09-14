@@ -95,13 +95,13 @@ public class LessonnoteManagementService {
 			Optional<LessonnoteManagement> lsnmanage = lsnmanageRepository.findByLessonnote(lsnval);
 			if (!attRequest.getAction().equals("closure") && !attRequest.getAction().equals("closed") ) {
 				if ( lsnval.getCycle_count() == 2) {
-					lsnmanage.get().setManagement(100);
+					lsnmanage.get().setQuality(100);
 				}
 				else if ( lsnval.getCycle_count() == 3 || lsnval.getCycle_count() == 4) {
-					lsnmanage.get().setManagement(60);
+					lsnmanage.get().setQuality(60);
 				}
 				else if ( lsnval.getCycle_count() == 5 || lsnval.getCycle_count() == 6) {
-					lsnmanage.get().setManagement(50);
+					lsnmanage.get().setQuality(50);
 				}
 				else if ( lsnval.getCycle_count() > 6) {
 					lsnmanage.get().setManagement(30);

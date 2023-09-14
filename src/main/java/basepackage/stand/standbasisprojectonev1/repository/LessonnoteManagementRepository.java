@@ -32,9 +32,18 @@ public interface LessonnoteManagementRepository extends JpaRepository<Lessonnote
 		
 		@Query("select lsnmanage from LessonnoteManagement lsnmanage "
 				+ "JOIN Lessonnote lsn ON lsn = lsnmanage.lsn_id "
-	    		+ "AND lsn.title like :filter "
+	    		+ "WHERE lsn.title like :filter "
 	       	 )
 		List<LessonnoteManagement> filterAll( @Param("filter") String filter );
+		
+		@Query("select lsnmanage from LessonnoteManagement lsnmanage "
+				+ "JOIN Lessonnote lsn ON lsn = lsnmanage.lsn_id "			
+				+ "WHERE (lsn.week = :week OR :week is null) "
+	    		+ "AND (lsn.teacher = :tea OR :tea is null) "
+	    		+ "AND (lsn.calendar = :cal OR :cal is null) "
+	       	  )
+		List<LessonnoteManagement> findTeacherMne( @Param("week") Integer week, @Param("tea") Teacher tea, @Param("cal") Calendar cal );
+		
 		
 		@Query("select lsnmanage from LessonnoteManagement lsnmanage "
 				+ "JOIN Lessonnote lsn ON lsn = lsnmanage.lsn_id "

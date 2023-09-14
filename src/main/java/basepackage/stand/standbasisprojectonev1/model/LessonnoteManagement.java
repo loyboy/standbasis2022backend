@@ -27,7 +27,7 @@ public class LessonnoteManagement extends DateAudit{
      
     private Integer submission; // used to tell if the lsn is submitted on time/not
     
-    private Integer quality; //used to check if the "Grammar", "Subject_Matter", "Arrangement" & "Incomplete upload" is 400%
+    private Integer quality; //used for quality of Lessonnote i.e cycles/trips of Lessonnote   
     
     private Integer sub_perf_classwork; 
     
@@ -35,7 +35,7 @@ public class LessonnoteManagement extends DateAudit{
     
     private Integer sub_perf_test; 
     
-    private Integer management; //used for quality of Lessonnote i.e cycles/trips of Lessonnote
+    private Integer management; //used to check if the "Grammar", "Subject_Matter", "Arrangement" & "Incomplete upload" is 400%
     
     private Integer score;
     

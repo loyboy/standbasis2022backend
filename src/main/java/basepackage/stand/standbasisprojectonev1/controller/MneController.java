@@ -30,6 +30,7 @@ import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.EvaluationValues;
+import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteActivity;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteManagement;
 import basepackage.stand.standbasisprojectonev1.model.Rowcall;
@@ -45,6 +46,8 @@ import basepackage.stand.standbasisprojectonev1.repository.AssessmentRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceManagementRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
 import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
+import basepackage.stand.standbasisprojectonev1.repository.LessonnoteActivityRepository;
+import basepackage.stand.standbasisprojectonev1.repository.LessonnoteManagementRepository;
 import basepackage.stand.standbasisprojectonev1.repository.LessonnoteRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceActivityService;
@@ -115,6 +118,12 @@ public class MneController {
 	 
 	 @Autowired
 	 private LessonnoteRepository lsnRepository;
+	 
+	 @Autowired
+	 private LessonnoteManagementRepository lsnmanageRepository;
+	 
+	 @Autowired
+	 private LessonnoteActivityRepository lsnactivityRepository;
 	 
 	 @Autowired		
 	 private CalendarRepository calRepository;
@@ -528,12 +537,271 @@ public class MneController {
 	 
 	 @GetMapping("/lessonnote/teachers")
 	 public ResponseEntity<?> getTeacherLessonnote(
-			 @RequestParam(value = "teacher") Long teacher,
-			 @RequestParam(value = "calendar") Long calendar,
-			 @RequestParam(value = "week") Integer week
+			 @RequestParam(value = "teacher",required=false) Long teacher,
+			 @RequestParam(value = "calendar",required=false) Long calendar,
+			 @RequestParam(value = "week",required=false) Integer week
 	 ){
 		 
-		 return null;
+		 try { 
+			 Calendar calobj = calendarservice.findCalendar(calendar);
+			 Teacher teaobj = teacher != null ? teacherservice.findTeacher(teacher) : null;			 
+			      
+		     List<Lessonnote> my_lessonnote = lsnRepository.findTeacherMne(  week , teaobj , calobj );    
+		     List<LessonnoteManagement> my_lessonnotemanagement = lsnmanageRepository.findTeacherMne( week , teaobj , calobj);    
+		     List<LessonnoteActivity> my_lessonnoteactivity = lsnactivityRepository.findPrincipalMne( week , teaobj , calobj);    
+			       
+		     List<TimeTable> teacherclasses = timetableservice.findClassTaught( teaobj.getTeaId(), calendar);
+		     
+		     List< Map<String, Object> > mnecolumndata = new ArrayList<>();
+		     List< Map<String, Object> > mnecolumn = new ArrayList<>();
+			 
+		     Map<String, Object> objectmnecolumn = new HashMap<>();
+		     objectmnecolumn.put("key", "teacher_name");
+		     objectmnecolumn.put("label", "User Name");
+		     objectmnecolumn.put("sortable", true);
+		     
+		     mnecolumn.add( objectmnecolumn );
+		     
+		     if( teacher != null ) {
+			     Map<String, Object> objectmnecolumn2 = new HashMap<>();
+			     objectmnecolumn2.put("key", "classwork_performance");
+			     objectmnecolumn2.put("label", "Classwork");
+			     objectmnecolumn2.put("sortable", true);
+			     
+			     mnecolumn.add( objectmnecolumn2 );
+			     
+			     Map<String, Object> objectmnecolumn21 = new HashMap<>();
+			     objectmnecolumn2.put("key", "homework_performance");
+			     objectmnecolumn2.put("label", "Homework");
+			     objectmnecolumn2.put("sortable", true);
+			     
+			     mnecolumn.add( objectmnecolumn21 );
+			     
+			     Map<String, Object> objectmnecolumn22 = new HashMap<>();
+			     objectmnecolumn2.put("key", "test_performance");
+			     objectmnecolumn2.put("label", "Test");
+			     objectmnecolumn2.put("sortable", true);
+			     
+			     mnecolumn.add( objectmnecolumn22 );
+		     
+		     }
+		     
+		     Map<String, Object> objectmnecolumn3 = new HashMap<>();
+		     objectmnecolumn3.put("key", "management");
+		     objectmnecolumn3.put("label", "Management");
+		     objectmnecolumn3.put("sortable", true);
+		     
+		     mnecolumn.add( objectmnecolumn3 );
+		     
+		     Map<String, Object> objectmnecolumndata = new HashMap<>();
+		     if (teacher != null) {			     
+			     objectmnecolumndata.put("teacher_name", teaobj.getFname() + " " + teaobj.getLname() );
+		     }
+		     else {
+			     objectmnecolumndata.put("teacher_name", "Principal" );
+		     }
+		     
+		     int j = 1;
+		     
+		     List<TimeTable> uniqueTimetables = findUniqueTimetablesByClassIndex(teacherclasses);
+		     
+		     List<Double> allAveragePrincipal = new ArrayList<>();
+		     List<Double> allAverageClaswork = new ArrayList<>();
+		     List<Double> allAverageHomework = new ArrayList<>();
+		     List<Double> allAverageTest = new ArrayList<>();
+		     List<Double> allAverageManagement = new ArrayList<>();
+		     
+		     for (TimeTable subclass : uniqueTimetables) {	    	
+			     		    	 
+			     List<Lessonnote> lsncall = my_lessonnote.stream().filter(lsn -> lsn.getSubject().equals(subclass.getSubject()) && lsn.getClass_index().equals( subclass.getClass_stream().getClass_index() ) ).collect(Collectors.toList());
+			     List<LessonnoteManagement> lsncall_manage = my_lessonnotemanagement.stream().filter(lsn -> lsn.getLsn_id().getSubject().equals(subclass.getSubject()) && lsn.getLsn_id().getClass_index().equals( subclass.getClass_stream().getClass_index() ) ).collect(Collectors.toList());
+			     List<LessonnoteActivity> lsncall_activity = my_lessonnoteactivity.stream().filter(lsn -> lsn.getLsn_id().getSubject().equals(subclass.getSubject()) && lsn.getLsn_id().getClass_index().equals( subclass.getClass_stream().getClass_index() ) ).collect(Collectors.toList());
+			     
+			    // System.out.println("Inside the for loop : " + attcall.size() + " >> " + attcall_manage.size() + ">>" + j );  
+			     if (teacher == null && lsncall_activity.size() > 0) {
+			    	 
+			    	 double perf = 0.0;
+			    	 List<LessonnoteActivity> lsncallActivity_principal = lsncall_activity.stream().filter(lsn -> lsn.getSlip() != null && lsn.getSlip().equals(0) ).collect(Collectors.toList());
+			    	 //same with upper
+			    	 List<LessonnoteActivity> new_my_activity = lsncall_activity;
+			    	 	    
+			    	 if (lsncallActivity_principal.size() > 0) {
+			    		 
+			    		 perf = (double) (lsncallActivity_principal.size() * 100)/(new_my_activity.size() );
+			    	 }    	
+			    	 
+			    	 j++;
+			    	 
+				     Map<String, Object> objectmnecolumntemp = new HashMap<>();
+			    	 objectmnecolumntemp.put("key", "d"+j);
+			    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Principal Management" );
+			    	 objectmnecolumntemp.put("sortable", true);
+			    	 
+				     mnecolumn.add( objectmnecolumntemp );
+				     
+				     allAveragePrincipal.add(perf);	     
+				     
+				     objectmnecolumndata.put("d"+j, (int) perf  );	     	     
+				     
+			     }
+			     
+			     if (teacher != null && lsncall_manage.size() > 0) {
+			    	 
+			    	 double classwork_perf = 0.0;
+			    	 double homework_perf = 0.0;
+			    	 double test_perf = 0.0;
+			    	 double management_perf = 0.0;
+			    	 List<LessonnoteManagement> lsncallManagement_classwork = lsncall_manage.stream().filter(lsn -> lsn.getSub_perf_classwork() != null ).collect(Collectors.toList());
+			    	 List<LessonnoteManagement> lsncallManagement_homework = lsncall_manage.stream().filter(lsn -> lsn.getSub_perf_homework() != null ).collect(Collectors.toList());
+			    	 List<LessonnoteManagement> lsncallManagement_test = lsncall_manage.stream().filter(lsn -> lsn.getSub_perf_test() != null ).collect(Collectors.toList());
+			    	 List<LessonnoteManagement> lsncallManagement = lsncall_manage.stream().filter(lsn -> lsn.getManagement() != null ).collect(Collectors.toList());
+			    	 
+			    	 //same with upper
+			    	 List<LessonnoteManagement> new_my_lsn_manage = lsncall_manage;
+			    	 	    
+			    	 if (lsncallManagement_classwork.size() > 0) {
+			    		 int sum = lsncallManagement_classwork.stream()
+		                            .mapToInt(lsn -> lsn.getSub_perf_classwork())
+		                            .sum();
+			    		 classwork_perf = (double)(sum * 100)/(new_my_lsn_manage.size() * 100);
+			    	 }
+			    	 
+			    	 if (lsncallManagement_homework.size() > 0) {
+			    		 int sum = lsncallManagement_homework.stream()
+		                            .mapToInt(lsn -> lsn.getSub_perf_homework())
+		                            .sum();
+			    		 homework_perf = (double)(sum * 100)/(new_my_lsn_manage.size() * 100);
+			    	 }
+			    	 
+			    	 if (lsncallManagement_test.size() > 0) {
+			    		 int sum = lsncallManagement_test.stream()
+		                            .mapToInt(lsn -> lsn.getSub_perf_test())
+		                            .sum();
+			    		 test_perf = (double)(sum * 100)/(new_my_lsn_manage.size() * 100);
+			    	 }
+			    	 
+			    	 if (lsncallManagement.size() > 0) {
+			    		 int sum = lsncallManagement.stream()
+		                            .mapToInt(lsn -> lsn.getManagement() )
+		                            .sum();
+			    		 management_perf = (double)(sum * 100)/(new_my_lsn_manage.size() * 100);
+			    	 }
+			    	 
+			    	 j++;
+			    	 
+				     Map<String, Object> objectmnecolumntemp = new HashMap<>();
+			    	 objectmnecolumntemp.put("key", "d"+j);
+			    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Classwork %" );
+			    	 objectmnecolumntemp.put("sortable", true);
+			    	 
+				     mnecolumn.add( objectmnecolumntemp );
+				     
+				     allAverageClaswork.add(classwork_perf);	     
+				     
+				     objectmnecolumndata.put("d"+j , (int) classwork_perf  );
+				     
+				     ////////////////////////////
+				     j++;
+				     
+				     Map<String, Object> objectmnecolumntemp2 = new HashMap<>();
+			    	 objectmnecolumntemp2.put("key", "d"+j);
+			    	 objectmnecolumntemp2.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Homework %" );
+			    	 objectmnecolumntemp2.put("sortable", true);
+			    	 
+				     mnecolumn.add( objectmnecolumntemp2 );
+				     
+				     allAverageHomework.add(homework_perf);	     
+				     
+				     objectmnecolumndata.put("d"+j , (int) homework_perf  );
+				     
+				     /////////////////////////////
+				     j++;
+				     
+				     Map<String, Object> objectmnecolumntemp3 = new HashMap<>();
+			    	 objectmnecolumntemp3.put("key", "d"+j);
+			    	 objectmnecolumntemp3.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Test %" );
+			    	 objectmnecolumntemp3.put("sortable", true);
+			    	 
+				     mnecolumn.add( objectmnecolumntemp3 );
+				     
+				     allAverageTest.add(test_perf);	     
+				     
+				     objectmnecolumndata.put("d"+j , (int) test_perf  );
+				     
+				     ///////////////////////////////
+				     j++;
+				     
+				     Map<String, Object> objectmnecolumntemp4 = new HashMap<>();
+			    	 objectmnecolumntemp4.put("key", "d"+j);
+			    	 objectmnecolumntemp4.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Management %" );
+			    	 objectmnecolumntemp4.put("sortable", true);
+			    	 
+				     mnecolumn.add( objectmnecolumntemp4 );
+				     
+				     allAverageManagement.add(management_perf);	     
+				     
+				     objectmnecolumndata.put("d"+j , (int) management_perf  );
+				     
+			     }
+			     
+			     
+			     
+			     j++;
+			     
+			 }
+		     
+		     if (teacher != null) {
+		    	 double averagePerfClasswork = allAverageClaswork.stream()
+			                .mapToInt(Double::intValue)
+			                .average()
+			                .orElse(0.0);
+			     double averagePerfHomework = allAverageHomework.stream()
+			                .mapToInt(Double::intValue)
+			                .average()
+			                .orElse(0.0);
+			     double averagePerfTest = allAverageTest.stream()
+			                .mapToInt(Double::intValue)
+			                .average()
+			                .orElse(0.0);
+			     
+			     objectmnecolumndata.put("classwork_performance", averagePerfClasswork);
+			     objectmnecolumndata.put("homework_performance", averagePerfHomework);
+			     objectmnecolumndata.put("test_performance", averagePerfTest);
+			     
+			     double averagePerfManagement = allAverageManagement.stream()
+			                .mapToInt(Double::intValue)
+			                .average()
+			                .orElse(0.0);
+			     
+			     objectmnecolumndata.put("management", averagePerfManagement);
+			     
+			     mnecolumndata.add( objectmnecolumndata );
+		     }
+		     else {
+		    	 
+		    	 double averagePerfManagement = allAveragePrincipal.stream()
+			                .mapToInt(Double::intValue)
+			                .average()
+			                .orElse(0.0);
+			     
+			     objectmnecolumndata.put("management", averagePerfManagement);
+			     
+			     mnecolumndata.add( objectmnecolumndata );
+		    	 
+		     }    
+		     
+		     Map<String, Object> response = new HashMap<>();
+				
+			 response.put("mnecolumn", mnecolumn);
+			 response.put("mnecolumndata", mnecolumndata);
+		     
+			 return new ResponseEntity<>(response, HttpStatus.OK);
+			 
+		 }
+		 catch (Exception ex) {
+			 ex.printStackTrace();
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
+	     }
 	 }
 	 
 	 @SuppressWarnings("unchecked")
@@ -693,6 +961,30 @@ public class MneController {
 	            for (TimeTable uniqueTimetable : uniqueTimetables) {
 	                if ( ( timetable.getSubject().getSubId() == uniqueTimetable.getSubject().getSubId() ) &&
 	                     ( timetable.getClass_stream().getClsId() == uniqueTimetable.getClass_stream().getClsId() )  
+	                   ) {
+	                    isUnique = false;
+	                    break;
+	                }
+	            }
+
+	            if (isUnique) {
+	                uniqueTimetables.add(timetable);
+	            }
+	        }
+
+	        return uniqueTimetables;
+	    }
+	 
+	 private List<TimeTable> findUniqueTimetablesByClassIndex(List<TimeTable> timetables) {
+	        List<TimeTable> uniqueTimetables = new ArrayList<>();
+
+	        for (TimeTable timetable : timetables) {
+	            // Check if the timetable's subject and class stream are unique
+	            boolean isUnique = true;
+
+	            for (TimeTable uniqueTimetable : uniqueTimetables) {
+	                if ( ( timetable.getSubject().getSubId() == uniqueTimetable.getSubject().getSubId() ) &&
+	                     ( timetable.getClass_stream().getClass_index() == uniqueTimetable.getClass_stream().getClass_index() )  
 	                   ) {
 	                    isUnique = false;
 	                    break;

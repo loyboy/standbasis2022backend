@@ -16,6 +16,7 @@ import basepackage.stand.standbasisprojectonev1.model.AttendanceActivity;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteActivity;
+import basepackage.stand.standbasisprojectonev1.model.LessonnoteManagement;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Subject;
@@ -56,6 +57,15 @@ public interface LessonnoteActivityRepository extends JpaRepository<LessonnoteAc
        	 )
 	Page<LessonnoteActivity> filter( @Param("filter") String filter, Pageable pg );
 	
+	@Query("select lsnactivity from LessonnoteActivity lsnactivity "
+			+ "JOIN Lessonnote lsn ON lsn = lsnactivity.lsn_id "			
+			+ "WHERE (lsn.week = :week OR :week is null) "
+    		+ "AND (lsn.teacher = :tea OR :tea is null) "
+    		+ "AND (lsn.calendar = :cal OR :cal is null) "
+    		+ "AND (lsnactivity.ownertype = 'Principal') "
+       	  )
+	List<LessonnoteActivity> findPrincipalMne( @Param("week") Integer week, @Param("tea") Teacher tea, @Param("cal") Calendar cal );
+		
 	@Query("select lsnactivity from LessonnoteActivity lsnactivity "
 			+ "JOIN Lessonnote lsn ON lsn = lsnactivity.lsn_id "
 			+ "where lsn.calendar.school.owner = :owner "
