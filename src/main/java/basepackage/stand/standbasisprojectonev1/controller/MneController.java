@@ -852,8 +852,8 @@ public class MneController {
 			 Long teacherManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.stream().filter(o -> o.getManagement() >= 50).count() : 0; 
 			 Long headAdministration = ordinaryArrayActivity != null ? ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count() : 0; 
 			 
-			 newResponse.put("teacher_management", (teacherManagement.intValue() * 100)/maxManagement );
-			 newResponse.put("head_admin", (headAdministration.intValue() * 100)/maxActivity );
+			 newResponse.put("teacher_management", maxManagement > 0 ? (teacherManagement.intValue() * 100)/maxManagement : 0 );
+			 newResponse.put("head_admin", maxActivity > 0 ? (headAdministration.intValue() * 100)/maxActivity : 0 );
 			 
 			 return new ResponseEntity<>(newResponse, HttpStatus.OK);
 				
@@ -916,11 +916,11 @@ public class MneController {
 			 Long studentExcusedAttendance = ordinaryStudentArray != null ?  ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0 && o.getRemark() != null).count() : 0; 
 			 Long headAdministration = ordinaryArrayActivity != null ? ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count() : 0; 
 			 
-			 newResponse.put("teacher_attendance", (teacherAttendance.intValue() * 100)/max  );
-			 newResponse.put("teacher_management", (teacherAttendanceManagement.intValue() * 100)/maxManagement );
-			 newResponse.put("student_att", (studentAttendance.intValue() * 100)/maxStudent ) ;
-			 newResponse.put("student_att_excused", (studentExcusedAttendance.intValue()  * 100)/maxStudent );
-			 newResponse.put("head_admin", (headAdministration.intValue() * 100)/maxActivity);
+			 newResponse.put("teacher_attendance", max > 0 ? (teacherAttendance.intValue() * 100)/max : 0  );
+			 newResponse.put("teacher_management", maxManagement > 0 ? (teacherAttendanceManagement.intValue() * 100)/maxManagement : 0 );
+			 newResponse.put("student_att", maxStudent > 0 ? (studentAttendance.intValue() * 100)/maxStudent : 0 ) ;
+			 newResponse.put("student_att_excused", maxStudent > 0 ? (studentExcusedAttendance.intValue()  * 100)/maxStudent : 0 );
+			 newResponse.put("head_admin", maxActivity > 0 ? (headAdministration.intValue() * 100)/maxActivity : 0);
 			 
 			 return new ResponseEntity<>(newResponse, HttpStatus.OK);
 		 }
