@@ -816,7 +816,7 @@ public class MneController {
 	 }
 	 
 	 @SuppressWarnings("unchecked")
-	@GetMapping("/lessonnote/proprietors")
+	 @GetMapping("/lessonnote/proprietors")
 	 public ResponseEntity<?> getProprietorLessonnote(
 			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
@@ -826,15 +826,18 @@ public class MneController {
 		 
 			 Optional<Integer> termVal = Optional.ofNullable(null);
 		     Optional<String> yearVal = Optional.ofNullable(null);
+		     
 		     Optional<basepackage.stand.standbasisprojectonev1.model.Calendar> calendarownerobj = null;
 		     if(calendar.isPresent()) { calendarownerobj = calRepository.findById( calendar.get() );  } 
 		     if (calendarownerobj.isPresent()) { 
 		    	 termVal = Optional.ofNullable(calendarownerobj.get().getTerm());  
 		    	 yearVal = Optional.ofNullable(calendarownerobj.get().getSession());  
 		     }
+		     
 			 Optional<Long> WithNullableValue = Optional.ofNullable(null);
 			 Optional<Integer> WithNullableValueInt = Optional.ofNullable(null);
 			 Optional<Timestamp> WithNullableValueTime = Optional.ofNullable(null);
+			 
 			 Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes("", schoolgroup, school, WithNullableValueInt, week, yearVal, termVal, WithNullableValue, WithNullableValue, WithNullableValueTime, WithNullableValueTime );
 			 Map<String, Object> lsnActivityResponse = serviceActivity.getOrdinaryTeacherLessonnotes("", schoolgroup, school, WithNullableValueInt, week,  calendar, WithNullableValue, WithNullableValueTime, WithNullableValueTime );
 			 
@@ -847,10 +850,10 @@ public class MneController {
 			 Integer maxActivity = ordinaryArrayActivity.size(); 
 			 
 			 Long teacherManagement = ordinaryArrayManagement.stream().filter(o -> o.getManagement() >= 50).count(); 
-			 Long headAdministration = ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getOwnertype().equals("Principal") ).count(); 
+			 Long headAdministration = ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count(); 
 			 
-			 newResponse.put("teacher_management", (teacherManagement.intValue()/maxManagement) * 100 );
-			 newResponse.put("head_admin", (headAdministration.intValue()/maxActivity) * 100 );
+			 newResponse.put("teacher_management", (teacherManagement.intValue() * 100)/maxManagement );
+			 newResponse.put("head_admin", (headAdministration.intValue() * 100)/maxActivity );
 			 
 			 return new ResponseEntity<>(newResponse, HttpStatus.OK);
 				
@@ -911,13 +914,13 @@ public class MneController {
 			 Long teacherAttendanceManagement = ordinaryArrayManagement.stream().filter(o -> o.getScore() >= 50).count();
 			 Long studentAttendance = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 1).count(); 
 			 Long studentExcusedAttendance = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0 && o.getRemark() != null).count(); 
-			 Long headAdministration = ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getOwnertype().equals("Principal") ).count(); 
+			 Long headAdministration = ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count(); 
 			 
-			 newResponse.put("teacher_attendance", (teacherAttendance.intValue()/max) * 100 );
-			 newResponse.put("teacher_management", (teacherAttendanceManagement.intValue()/maxManagement) * 100 );
-			 newResponse.put("student_att", (studentAttendance.intValue()/maxStudent) * 100 );
-			 newResponse.put("student_att_excused", (studentExcusedAttendance.intValue()/maxStudent) * 100 );
-			 newResponse.put("head_admin", (headAdministration.intValue()/maxActivity) * 100 );
+			 newResponse.put("teacher_attendance", (teacherAttendance.intValue() * 100)/max  );
+			 newResponse.put("teacher_management", (teacherAttendanceManagement.intValue() * 100)/maxManagement );
+			 newResponse.put("student_att", (studentAttendance.intValue() * 100)/maxStudent ) ;
+			 newResponse.put("student_att_excused", (studentExcusedAttendance.intValue()  * 100)/maxStudent );
+			 newResponse.put("head_admin", (headAdministration.intValue() * 100)/maxActivity);
 			 
 			 return new ResponseEntity<>(newResponse, HttpStatus.OK);
 		 }
