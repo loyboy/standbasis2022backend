@@ -905,10 +905,10 @@ public class MneController {
 			 
 			 Map<String, Object> newResponse = new HashMap<>();
 			 
-			 Integer maxManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.size() : 0; 
-			 Integer max = ordinaryArray != null ? ordinaryArray.size() : 0;
-			 Integer maxActivity = ordinaryArrayActivity != null ? ordinaryArrayActivity.size() : 0;
-			 Integer maxStudent = ordinaryStudentArray != null ? ordinaryStudentArray.size() : 0;
+			 Integer maxManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.size() : 10; 
+			 Integer max = ordinaryArray != null ? ordinaryArray.size() : 10;
+			 Integer maxActivity = ordinaryArrayActivity != null ? ordinaryArrayActivity.size() : 10;
+			 Integer maxStudent = ordinaryStudentArray != null ? ordinaryStudentArray.size() : 10;
 			 
 			 Long teacherAttendance = ordinaryArray != null ? ordinaryArray.stream().filter(o -> ( o.getDone() == 1 || o.getDone() == 2 ) ).count() : 0; 
 			 Long teacherAttendanceManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.stream().filter(o -> o.getScore() >= 50).count() : 0;
