@@ -846,11 +846,11 @@ public class MneController {
 			 
 			 Map<String, Object> newResponse = new HashMap<>();
 			 
-			 Integer maxManagement = ordinaryArrayManagement.size(); 
-			 Integer maxActivity = ordinaryArrayActivity.size(); 
+			 Integer maxManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.size() : 0; 
+			 Integer maxActivity = ordinaryArrayActivity != null ? ordinaryArrayActivity.size() : 0; 
 			 
-			 Long teacherManagement = ordinaryArrayManagement.stream().filter(o -> o.getManagement() >= 50).count(); 
-			 Long headAdministration = ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count(); 
+			 Long teacherManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.stream().filter(o -> o.getManagement() >= 50).count() : 0; 
+			 Long headAdministration = ordinaryArrayActivity != null ? ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count() : 0; 
 			 
 			 newResponse.put("teacher_management", (teacherManagement.intValue() * 100)/maxManagement );
 			 newResponse.put("head_admin", (headAdministration.intValue() * 100)/maxActivity );
@@ -905,16 +905,16 @@ public class MneController {
 			 
 			 Map<String, Object> newResponse = new HashMap<>();
 			 
-			 Integer maxManagement = ordinaryArrayManagement.size(); 
-			 Integer max = ordinaryArray.size();
-			 Integer maxActivity = ordinaryArrayActivity.size();
-			 Integer maxStudent = ordinaryStudentArray.size();
+			 Integer maxManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.size() : 0; 
+			 Integer max = ordinaryArray != null ? ordinaryArray.size() : 0;
+			 Integer maxActivity = ordinaryArrayActivity != null ? ordinaryArrayActivity.size() : 0;
+			 Integer maxStudent = ordinaryStudentArray != null ? ordinaryStudentArray.size() : 0;
 			 
-			 Long teacherAttendance = ordinaryArray.stream().filter(o -> ( o.getDone() == 1 || o.getDone() == 2 ) ).count(); 
-			 Long teacherAttendanceManagement = ordinaryArrayManagement.stream().filter(o -> o.getScore() >= 50).count();
-			 Long studentAttendance = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 1).count(); 
-			 Long studentExcusedAttendance = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0 && o.getRemark() != null).count(); 
-			 Long headAdministration = ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count(); 
+			 Long teacherAttendance = ordinaryArray != null ? ordinaryArray.stream().filter(o -> ( o.getDone() == 1 || o.getDone() == 2 ) ).count() : 0; 
+			 Long teacherAttendanceManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.stream().filter(o -> o.getScore() >= 50).count() : 0;
+			 Long studentAttendance = ordinaryStudentArray != null ? ordinaryStudentArray.stream().filter(o -> o.getStatus() == 1).count() : 0; 
+			 Long studentExcusedAttendance = ordinaryStudentArray != null ?  ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0 && o.getRemark() != null).count() : 0; 
+			 Long headAdministration = ordinaryArrayActivity != null ? ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count() : 0; 
 			 
 			 newResponse.put("teacher_attendance", (teacherAttendance.intValue() * 100)/max  );
 			 newResponse.put("teacher_management", (teacherAttendanceManagement.intValue() * 100)/maxManagement );
