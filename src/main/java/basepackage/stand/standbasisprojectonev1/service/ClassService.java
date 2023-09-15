@@ -222,7 +222,7 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
         Map<String, Object> response = new HashMap<>();
         response.put("classrooms", teaarray);
         response.put("currentPage", schs.getNumber());
-        response.put("totalItems", schs.getTotalElements());
+        
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         
@@ -268,13 +268,12 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
 				undeployedPrimary++;
 			}
         }
-        
+        	response.put("totalItems", listClassrooms.size());
         	response.put("totalPrimary", countPrimary.size() );
         	response.put("totalSJunior", countSecondaryJunior.size() );
         	response.put("totalSSenior", countSecondarySenior.size());
         	response.put("totalSUndeployed", undeployedSeconday);
         	response.put("totalPUndeployed", undeployedPrimary);
-        	//
         
         return response;
     }
