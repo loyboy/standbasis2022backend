@@ -846,8 +846,8 @@ public class MneController {
 			 
 			 Map<String, Object> newResponse = new HashMap<>();
 			 
-			 Integer maxManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.size() : 0; 
-			 Integer maxActivity = ordinaryArrayActivity != null ? ordinaryArrayActivity.size() : 0; 
+			 Integer maxManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.size() : 10; 
+			 Integer maxActivity = ordinaryArrayActivity != null ? ordinaryArrayActivity.size() : 10; 
 			 
 			 Long teacherManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.stream().filter(o -> o.getManagement() >= 50).count() : 0; 
 			 Long headAdministration = ordinaryArrayActivity != null ? ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count() : 0; 
