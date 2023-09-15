@@ -630,6 +630,9 @@ public class MneController {
 			    	 //same with upper
 			    	 List<LessonnoteActivity> new_my_activity = lsncall_activity;
 			    	 	    
+			    	 System.out.println("filtered List: " + lsncallActivity_principal.size() );
+			    	 System.out.println("Total List: " 	  + new_my_activity.size() );
+			    	 
 			    	 if (lsncallActivity_principal.size() > 0) {
 			    		 
 			    		 perf = (double) (lsncallActivity_principal.size() * 100)/(new_my_activity.size() );
