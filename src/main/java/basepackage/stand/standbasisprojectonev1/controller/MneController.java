@@ -630,8 +630,8 @@ public class MneController {
 			    	 //same with upper
 			    	 List<LessonnoteActivity> new_my_activity = lsncall_activity;
 			    	 	    
-			    	 System.out.println("filtered List: " + lsncallActivity_principal.size() );
-			    	 System.out.println("Total List: " 	  + new_my_activity.size() );
+			    	 System.out.println("filtered List: " + lsncallActivity_principal.get(0).getLsnactId() );
+			    	 System.out.println("Total List: " 	  + new_my_activity.get(0).getLsnactId() );
 			    	 
 			    	 if (lsncallActivity_principal.size() > 0) {
 			    		 
