@@ -818,7 +818,7 @@ public class MneController {
 	 @SuppressWarnings("unchecked")
 	 @GetMapping("/lessonnote/proprietors")
 	 public ResponseEntity<?> getProprietorLessonnote(
-			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
+			 @RequestParam(value = "group") Optional<Long> schoolgroup,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
 			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
 			 @RequestParam(value = "week", required=false) Optional<Integer>  week
@@ -862,7 +862,7 @@ public class MneController {
 	 @SuppressWarnings("unchecked")
 	 @GetMapping("/attendance/proprietors")
 	 public ResponseEntity<?> getProprietorAttendance(
-			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
+			 @RequestParam(value = "group") Optional<Long> schoolgroup,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
 			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
 			 @RequestParam(value = "week", required=false) Optional<Integer>  week
