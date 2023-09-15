@@ -829,7 +829,7 @@ public class MneController {
 		     
 		     Optional<basepackage.stand.standbasisprojectonev1.model.Calendar> calendarownerobj = null;
 		     if(calendar.isPresent()) { calendarownerobj = calRepository.findById( calendar.get() );  } 
-		     if (calendarownerobj.isPresent()) { 
+		     if (calendar.isPresent()) { 
 		    	 termVal = Optional.ofNullable(calendarownerobj.get().getTerm());  
 		    	 yearVal = Optional.ofNullable(calendarownerobj.get().getSession());  
 		     }
