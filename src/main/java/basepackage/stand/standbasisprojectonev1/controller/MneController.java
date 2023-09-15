@@ -13,6 +13,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -544,8 +545,12 @@ public class MneController {
 		 
 		 try { 
 			 Calendar calobj = calendarservice.findCalendar(calendar);
-			 Teacher teaobj = teacher != null ? teacherservice.findTeacher(teacher) : null;			 
-			      
+			 Teacher teaobj = teacher != null ? teacherservice.findTeacher(teacher) : null;	
+			 LocalDate stDate = calobj.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+			 LocalDate endDate = calobj.getEnddate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+			 LocalDate todayDate = LocalDate.now();
+			 int weekNumber = calculateWeekNumber(todayDate, stDate, endDate);
+			 
 		     List<Lessonnote> my_lessonnote = lsnRepository.findTeacherMne(  week , teaobj , calobj );    
 		     List<LessonnoteManagement> my_lessonnotemanagement = lsnmanageRepository.findTeacherMne( week , teaobj , calobj);    
 		     List<LessonnoteActivity> my_lessonnoteactivity = lsnactivityRepository.findPrincipalMne( week , teaobj , calobj);    
@@ -626,12 +631,10 @@ public class MneController {
 			     if (teacher == null && lsncall_activity.size() > 0) {
 			    	 
 			    	 double perf = 0.0;
-			    	 List<LessonnoteActivity> lsncallActivity_principal = lsncall_activity.stream().filter(lsn -> lsn.getSlip() != null && lsn.getSlip().equals(0) ).collect(Collectors.toList());
+			    	 List<LessonnoteActivity> lsncallActivity_principal = lsncall_activity.stream().filter(lsn -> lsn.getSlip() != null && lsn.getSlip().equals(0) && lsn.getActual() != null && lsn.getLsn_id().getWeek() <= weekNumber ).collect(Collectors.toList());
 			    	 //same with upper
 			    	 List<LessonnoteActivity> new_my_activity = lsncall_activity;
 			    	 	    
-			    	 System.out.println("filtered List: " + lsncallActivity_principal.get(0).getLsnactId() );
-			    	 System.out.println("Total List: " 	  + new_my_activity.get(0).getLsnactId() );
 			    	 
 			    	 if (lsncallActivity_principal.size() > 0) {
 			    		 
@@ -1005,5 +1008,17 @@ public class MneController {
 	        }
 
 	        return uniqueTimetables;
+	    }
+	 
+	 public static int calculateWeekNumber(LocalDate today, LocalDate startDate, LocalDate endDate) {
+	        long daysBetween = ChronoUnit.DAYS.between(startDate, today);
+	        long totalDays = ChronoUnit.DAYS.between(startDate, endDate);
+
+	        if (daysBetween < 0 || daysBetween > totalDays) {
+	            throw new IllegalArgumentException("Today's date is outside the specified date range");
+	        }
+
+	        // Adding 1 to start from Week 1 instead of Week 0
+	        return (int) (daysBetween / 7) + 1;
 	    }
 }
