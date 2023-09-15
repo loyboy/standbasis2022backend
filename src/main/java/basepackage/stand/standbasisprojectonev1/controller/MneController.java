@@ -549,8 +549,13 @@ public class MneController {
 		     List<Lessonnote> my_lessonnote = lsnRepository.findTeacherMne(  week , teaobj , calobj );    
 		     List<LessonnoteManagement> my_lessonnotemanagement = lsnmanageRepository.findTeacherMne( week , teaobj , calobj);    
 		     List<LessonnoteActivity> my_lessonnoteactivity = lsnactivityRepository.findPrincipalMne( week , teaobj , calobj);    
-			       
-		     List<TimeTable> teacherclasses = timetableservice.findClassTaught( teaobj.getTeaId(), calendar);
+		     List<TimeTable> teacherclasses = null;
+		     if (teacher != null) {
+				  teacherclasses = timetableservice.findClassTaught( teaobj.getTeaId(), calendar);
+			 }
+			 else {
+				  teacherclasses = timetableservice.getTimetablesByCalendar(calendar);
+			 }
 		     
 		     List< Map<String, Object> > mnecolumndata = new ArrayList<>();
 		     List< Map<String, Object> > mnecolumn = new ArrayList<>();
