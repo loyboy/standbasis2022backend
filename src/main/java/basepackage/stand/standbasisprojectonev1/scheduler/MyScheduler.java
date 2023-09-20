@@ -177,7 +177,7 @@ public class MyScheduler {
 		
 	}
 	
-	@Scheduled(cron = "0 45 11 * * *")
+	@Scheduled(cron = "0 10 12 * * *")
     public void switchToNewTerm() {
 		
 	try {
@@ -246,6 +246,12 @@ public class MyScheduler {
 				
 				for ( TimeTable tt: allTimetables) {
 					if (tt.getStatus() == 1) {
+						String fname = tt.getTeacher().getFname();
+						String lname = tt.getTeacher().getLname();
+						String subname = tt.getSubject().getName();
+						String clsname = tt.getClass_stream().getTitle();
+						String extCls = tt.getClass_stream().getExt();
+						
 						TimeTable newTime = new TimeTable();
 						newTime.setId(tt.getId());
 						newTime.setCalendar(savedCalendar);
@@ -255,9 +261,9 @@ public class MyScheduler {
 						newTime.setSubject(tt.getSubject());
 						newTime.setTime_of(tt.getTime_of());
 						newTime.setDay_of(tt.getDay_of());
-						newTime.setTea_name( tt.getTeacher().getFname() + " " + tt.getTeacher().getLname() );
-						newTime.setSub_name( tt.getSubject().getName() );
-						newTime.setClass_name( tt.getClass_stream().getTitle() + " " + tt.getClass_stream().getExt() );
+						newTime.setTea_name( fname + " " + lname );
+						newTime.setSub_name( subname );
+						newTime.setClass_name( clsname + " " + extCls );
 						newTime.setStatus(1);
 						timeRepository.save(newTime);
 					}
