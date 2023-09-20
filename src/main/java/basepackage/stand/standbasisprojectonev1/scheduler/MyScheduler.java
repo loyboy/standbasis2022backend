@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -177,7 +178,7 @@ public class MyScheduler {
 		
 	}
 	
-	@Scheduled(cron = "0 10 12 * * *")
+	@Scheduled(cron = "0 40 12 * * *")
     public void switchToNewTerm() {
 		
 	try {
@@ -246,6 +247,7 @@ public class MyScheduler {
 				
 				for ( TimeTable tt: allTimetables) {
 					if (tt.getStatus() == 1) {
+						
 						String fname = tt.getTeacher().getFname();
 						String lname = tt.getTeacher().getLname();
 						String subname = tt.getSubject().getName();
