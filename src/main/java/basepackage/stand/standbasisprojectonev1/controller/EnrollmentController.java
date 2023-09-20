@@ -89,6 +89,18 @@ public class EnrollmentController {
 	     }
 	}
 	 
+	 @GetMapping("/student/{id}")
+	 public ResponseEntity<?> getEnrollmentsByPupilId( @PathVariable(value = "pupil") Long pupId ) {
+		 try { 
+			 List<Enrollment> list = service.findEnrollmentByPupil( pupId );
+			 return ResponseEntity.ok().body(new ApiContentResponse<Enrollment>(true, "List of Enrollments by Pupil ID gotten successfully.", list));	        
+		 }
+		 catch (Exception ex) {
+			 ex.printStackTrace();
+			 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	 }
+	 
 	 @GetMapping("/{id}")
 	 public ResponseEntity<?> getEnrollment(@PathVariable(value = "id") Long id) {
 		 try {

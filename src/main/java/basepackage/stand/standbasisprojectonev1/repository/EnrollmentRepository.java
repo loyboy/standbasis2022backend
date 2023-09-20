@@ -22,6 +22,11 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     	Optional<Enrollment> findById(Long enrolId);
     	
     	@Query("select e from Enrollment e "                 
+    			+ "WHERE e.student.pupId = :pupId "            
+           	  )
+    	List<Enrollment> findByPupilIdTwo( @Param("pupId") Long pupId );
+    	
+    	@Query("select e from Enrollment e "                 
     			+ "WHERE e.enrolId = :enrolId "            
            	  )
     	Optional<Enrollment> findByPupilId( @Param("enrolId") Long pupId );

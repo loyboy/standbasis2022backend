@@ -177,7 +177,7 @@ public class MyScheduler {
 		
 	}
 	
-	@Scheduled(cron = "0 0 1 * * *")
+	@Scheduled(cron = "0 20 11 * * *")
     public void switchToNewTerm() {
 		
 	try {
@@ -264,10 +264,7 @@ public class MyScheduler {
 					
 					tt.setStatus(-99);
 					timeRepository.save(tt);
-				}
-				
-			
-				
+				}				
 			}
 		}		
 		
