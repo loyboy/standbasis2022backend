@@ -269,7 +269,7 @@ public class LessonnoteController {
 		 Long teacherNoApprovalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() != null && o.getRevert() == null ) && o.getApproval().compareTo( addDays(2,o.getExpected_submission()) ) > 0 ).count();
 		 
 		 Long teacherRevertedLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && o.getRevert() != null ).count();
-		 Long teacherBadCycles = ordinaryArrayManagement.stream().filter(o -> o.getLsn_id().getSubmission() != null && o.getQuality() < 50).count(); 
+		 Long teacherBadCycles = ordinaryArrayManagement.stream().filter(o -> o.getLsn_id().getSubmission() != null && o.getQuality() < 50 && o.getQuality() != 0).count(); 
 		 
 		/* Long teacherLateClosure = ordinaryArray.stream().filter(o -> { 			 
 			 if (o.getLaunch() != null) {
