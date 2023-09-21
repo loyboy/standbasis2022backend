@@ -79,6 +79,14 @@ public class AssessmentService {
 		 return null;		 
 	}
 	
+	public List<Assessment> findAssessmentByEnrolment(Enrollment enrol, Integer week) {		
+		List<Assessment> ass = assessRepository.findAssessmentByEnrolment(enrol, week);
+		if (ass.size() > 0) {				
+			return ass;
+		}
+		return null;
+	}
+	
 	public Assessment findAssessment(Long id) {		
 		Optional<Assessment> ass = assessRepository.findById(id);
 		if (ass.isPresent()) {

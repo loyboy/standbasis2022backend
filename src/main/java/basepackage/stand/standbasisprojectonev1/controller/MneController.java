@@ -64,11 +64,15 @@ import basepackage.stand.standbasisprojectonev1.service.StudentService;
 import basepackage.stand.standbasisprojectonev1.service.SubjectService;
 import basepackage.stand.standbasisprojectonev1.service.TeacherService;
 import basepackage.stand.standbasisprojectonev1.service.TimetableService;
+import basepackage.stand.standbasisprojectonev1.service.AssessmentService;
 
 @RestController
 @RequestMapping("/api/mne")
 public class MneController {
 	 
+	 @Autowired
+	 AssessmentService asservice;
+	
 	 @Autowired
 	 SchoolService schoolservice;
 	
@@ -130,25 +134,95 @@ public class MneController {
 	 private CalendarRepository calRepository;
 	 
 	 @GetMapping("/attendance/parent/students")
-	 public ResponseEntity<?> getStudentAttendanceParent( @RequestParam(value = "enrol") Long enrolId, @RequestParam(value = "date") String dateTo) {	
+	 public ResponseEntity<?> getStudentAttendanceParent( @RequestParam(value = "enrol") Long enrolId, @RequestParam(value = "date") Timestamp dateTo) {	
+	   try {
+		 Enrollment enrolobj = enrolservice.findEnrollment(enrolId);
+		 Rowcall myrowcall = serviceAtt.findByDateAndEnrolId(enrolobj.getStudent(), dateTo );
 		 
-		 Map<String, Object> response = new HashMap<>();
-			
-		// response.put("mnecolumn", mnecolumn);
-		// response.put("mnecolumndata", mnecolumndata);
+		 List< Map<String, Object> > mnecolumndata = new ArrayList<>();
+	     List< Map<String, Object> > mnecolumn = new ArrayList<>();
 	     
-		 return new ResponseEntity<>(response, HttpStatus.OK);	
+		 Map<String, Object> objectmnecolumn = new HashMap<>();
+	     objectmnecolumn.put("key", "student_name");
+	     objectmnecolumn.put("label", "Student Name");
+	     objectmnecolumn.put("sortable", true);
+	     
+	     mnecolumn.add( objectmnecolumn );
+	     
+	     Map<String, Object> objectmnecolumn2 = new HashMap<>();
+	     objectmnecolumn2.put("key", "present");
+	     objectmnecolumn2.put("label", "Present?");
+	     objectmnecolumn2.put("sortable", true);
+	     
+	     mnecolumn.add( objectmnecolumn2 );
+	     
+	     Map<String, Object> objectmnecolumn3 = new HashMap<>();
+	     objectmnecolumn3.put("key", "date");
+	     objectmnecolumn3.put("label", "Date of Rowcall");
+	     objectmnecolumn3.put("sortable", true);
+	     
+	     mnecolumn.add( objectmnecolumn3 );
+	     
+	     Map<String, Object> objectmnecolumndata = new HashMap<>();
+	     objectmnecolumndata.put("student_name", myrowcall != null ? enrolobj.getStudent().getName() : "Not Done" );		
+	     objectmnecolumndata.put("date", myrowcall != null ? dateTo : "Not Done" );
+	     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Present" : "Absent" : "Not Done" );
+	     mnecolumndata.add( objectmnecolumndata ); 
+		 		
+	     	Map<String, Object> response = new HashMap<>();
+		
+		 	response.put("mnecolumn", mnecolumn);
+		 	response.put("mnecolumndata", mnecolumndata);
+		 	
+		 	return new ResponseEntity<>(response, HttpStatus.OK);	
+		 }
+		 catch (Exception ex) {
+			 ex.printStackTrace();
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
+	     }	
 	 }
 	 
 	 @GetMapping("/assessment/parent/students")
 	 public ResponseEntity<?> getStudentAssessmentParent( @RequestParam(value = "enrol") Long enrolId, @RequestParam(value = "week") Integer week) {	
-		 
-		 Map<String, Object> response = new HashMap<>();
+		 try {  
+			 
+			 Enrollment enrolobj = enrolservice.findEnrollment(enrolId);		 
+			 
+			 Map<String, Object> response = new HashMap<>();
+			 
+			 List<Assessment> assess = asservice.findAssessmentByEnrolment(enrolobj, week);
 			
-	//	 response.put("mnecolumn", mnecolumn);
-	//	 response.put("mnecolumndata", mnecolumndata);
-	     
-		 return new ResponseEntity<>(response, HttpStatus.OK);	
+			 Long totalClasswork = assess.stream().filter(o -> o.get_type().equals("clw")).count();
+			 int sumClasswork = assess.stream().filter(o -> o.get_type().equals("clw"))
+                     .mapToInt(lsn -> lsn.getScore())
+                     .sum();
+			 @SuppressWarnings("unlikely-arg-type")
+			 double clswork_perf = !totalClasswork.equals(0) ? (double)(sumClasswork * 100)/(totalClasswork * 100) : 0.0;
+			 
+			 Long totalHomework = assess.stream().filter(o -> o.get_type().equals("hwk")).count();
+			 int sumHomework = assess.stream().filter(o -> o.get_type().equals("hwk"))
+                     .mapToInt(lsn -> lsn.getScore())
+                     .sum();
+			 @SuppressWarnings("unlikely-arg-type")
+			 double homework_perf = !totalHomework.equals(0) ? (double)(sumHomework * 100)/(totalHomework * 100) : 0.0;
+			 
+			 Long totalTest = assess.stream().filter(o -> o.get_type().equals("tst")).count();
+			 int sumTest = assess.stream().filter(o -> o.get_type().equals("tst"))
+                     .mapToInt(lsn -> lsn.getScore())
+                     .sum();
+			 @SuppressWarnings("unlikely-arg-type")
+			 double test_perf = !totalHomework.equals(0) ? (double)(sumTest * 100)/(totalTest * 100) : 0.0;			 
+			 
+			 response.put("classwork", clswork_perf);
+			 response.put("homework", homework_perf);
+			 response.put("test", test_perf);
+		 	 return new ResponseEntity<>(response, HttpStatus.OK);	
+		 }
+		 catch (Exception ex) {
+			 ex.printStackTrace();
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
+	     }
+		
 	 }
 	 
 	 @GetMapping("/attendance/students")
