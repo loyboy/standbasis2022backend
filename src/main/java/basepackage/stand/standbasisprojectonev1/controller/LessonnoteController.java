@@ -261,11 +261,15 @@ public class LessonnoteController {
 		 //Integer maxActivity = ordinaryArrayLessonnote.size();
 				 
 		 Long teacherTotalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null ).count();
-		 Long teacherLateLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() == null && parseTimestamp(todayDate()).compareTo( o.getExpected_submission() ) > 0 ).count();
-		 Long teacherLateApprovalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() == null && o.getRevert() == null ) && parseTimestamp(todayDate()).compareTo( o.getExpected_submission() ) > 0 ).count();
-		 Long teacherNoApprovalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() == null && o.getRevert() == null ) && parseTimestamp(todayDate()).compareTo( addDays(2,o.getExpected_submission()) ) > 0 ).count();
+		 Long teacherLateLessonnotes = ordinaryArray.stream().filter(o -> (o.getResubmission() != null && o.getResubmission().compareTo( o.getExpected_submission() ) > 0) || (o.getSubmission() != null && o.getSubmission().compareTo( o.getExpected_submission() ) > 0) ).count();
+		 
+		 Long teacherLateApprovalLessonnotes = ordinaryArray.stream().filter(o -> ( o.getResubmission() != null && ( o.getApproval() != null && o.getRevert() == null ) && o.getResubmission().compareTo( o.getExpected_submission() ) > 0 && o.getResubmission().compareTo( addDays(2,o.getExpected_submission()) ) < 0 ) 
+				 || ( o.getSubmission() != null && ( o.getApproval() != null && o.getRevert() == null ) && o.getSubmission().compareTo( o.getExpected_submission() ) > 0 && o.getSubmission().compareTo( addDays(2,o.getExpected_submission()) ) < 0 ) ).count();
+		 
+		 Long teacherNoApprovalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() != null && o.getRevert() == null ) && o.getApproval().compareTo( addDays(2,o.getExpected_submission()) ) > 0 ).count();
+		 
 		 Long teacherRevertedLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && o.getRevert() != null ).count();
-		 Long teacherBadCycles = ordinaryArrayManagement.stream().filter(o -> o.getManagement() < 50).count(); 
+		 Long teacherBadCycles = ordinaryArrayManagement.stream().filter(o -> o.getLsn_id().getSubmission() != null && o.getQuality() < 50).count(); 
 		 
 		/* Long teacherLateClosure = ordinaryArray.stream().filter(o -> { 			 
 			 if (o.getLaunch() != null) {
@@ -274,8 +278,8 @@ public class LessonnoteController {
 			 }
 			 return false;			 
 		 }).count();*/
-		 Long teacherLateClosure = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() != null ) && parseTimestamp(todayDate()).compareTo( o.getExpected_closure() ) > 0 ).count(); 
-		 Long teacherNoClosure   = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() != null ) && parseTimestamp(todayDate()).compareTo( addDays(2,o.getExpected_closure())  ) > 0 ).count();			
+		 Long teacherLateClosure = ordinaryArray.stream().filter(o -> o.getSubmission() != null && o.getClosure() != null && ( o.getApproval() != null ) && o.getPrincipal_closure().compareTo( o.getExpected_closure() ) > 0 ).count(); 
+		 Long teacherNoClosure   = ordinaryArray.stream().filter(o -> o.getSubmission() != null && o.getClosure() != null && ( o.getApproval() != null ) && o.getPrincipal_closure().compareTo( addDays(2,o.getExpected_closure())  ) > 0 ).count();			
 		 
 		 newResponse.put("total_lessonnotes", max );
 		 newResponse.put("teacher_submitted", teacherTotalLessonnotes.intValue() );
@@ -375,6 +379,8 @@ public class LessonnoteController {
 			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,	
 			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
+			 @RequestParam(value = "schoolyear", required=false) Optional<String> schoolyear,
+			 @RequestParam(value = "schoolterm", required=false) Optional<Integer> schoolterm,
 			 @RequestParam(value = "week", required=false) Optional<Integer> week,
 			 
 			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
@@ -386,7 +392,7 @@ public class LessonnoteController {
 			 ) 
 	 {
 		 
-		 Map<String, Object> response = serviceAssessment.getOrdinaryStudentlessonnotes(query, schoolgroup, school, classid, week, calendar, student, datefrom, dateto );
+		 Map<String, Object> response = serviceAssessment.getOrdinaryStudentlessonnotes(query, schoolgroup, school, classid, week, schoolyear, schoolterm, calendar, student, datefrom, dateto );
 		 
 		 @SuppressWarnings("unchecked")
 		 List<Assessment> ordinaryArray = (List<Assessment>) response.get("assessments");

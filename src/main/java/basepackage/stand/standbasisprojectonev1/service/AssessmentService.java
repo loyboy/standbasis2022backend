@@ -197,14 +197,16 @@ public class AssessmentService {
         return response;
     }
 	
-	public Map<String, Object> getOrdinaryStudentlessonnotes(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Long> classId, Optional<Integer> week, Optional<Long> calendarId, Optional<Long> studentId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
+	public Map<String, Object> getOrdinaryStudentlessonnotes(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Long> classId, Optional<Integer> week, Optional<String> year, Optional<Integer> term, Optional<Long> calendarId, Optional<Long> studentId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
                 
         Long schgroup = schgroupId.orElse(null);
         Long schowner = schId.orElse(null);
         Long classowner = classId.orElse(null);
         Integer weeknow = week.orElse(null);
         Long studentowner = studentId.orElse(null);
-        Long calendarowner = calendarId.orElse(null);    
+        Long calendarowner = calendarId.orElse(null); 
+        Integer termval = term.orElse(null);
+        String yearval = year.orElse(null);
         
         List<Assessment> lessonnotes = null;
         
@@ -231,6 +233,8 @@ public class AssessmentService {
                         weeknow,
                         studentownerobj == null ? null : studentownerobj.get(),
                         calendarownerobj == null ? null : calendarownerobj.get(),
+                        termval,
+                        yearval,
                         datefrom.isEmpty() ? null : datefrom.get(),
                         dateto.isEmpty() ? null : dateto.get()
         		);
@@ -260,6 +264,8 @@ public class AssessmentService {
                         weeknow,
                         studentownerobj == null ? null : studentownerobj.get(),
                         calendarownerobj == null ? null : calendarownerobj.get(),
+                        termval,
+                        yearval,
                         datefrom.isEmpty() ? null : datefrom.get(),
                         dateto.isEmpty() ? null : dateto.get()
         		);

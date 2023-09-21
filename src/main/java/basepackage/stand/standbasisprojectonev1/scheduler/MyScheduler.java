@@ -287,7 +287,7 @@ public class MyScheduler {
 	
 	// "0 0/10 * * * *" - 10 minutes interval
 	// "0 0 0 * * *" - Everyday at 0:00
-	@Scheduled(cron = "0 40 13 * * *")
+	@Scheduled(cron = "0 55 11 * * *")
     public void insertAttendances() {       
 		
 		//Check what day of the week is this
@@ -301,7 +301,7 @@ public class MyScheduler {
 	    daysOfWeek.put(4, "THURSDAY");
 	    daysOfWeek.put(5, "FRIDAY");
 	    daysOfWeek.put(6, "SATURDAY");
-	    daysOfWeek.put(0, "SUNDAY");
+	    daysOfWeek.put(0, "SUNDAY");//
 		
 	    //Get Timetable data for this day with Current calendar
 	    List<TimeTable> tt = timeRepository.findByActiveCalendar(1);
@@ -334,7 +334,7 @@ public class MyScheduler {
 	// "0 0 0 * * 0" -- once a week
 	// 0 0 0 ? * WED
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "35 40 13 * * *")
+	@Scheduled(cron = "35 * * 31 12 *")
     public void insertLessonnotes() {
 		
 		 Map<Integer, String> classMap = new HashMap<>();

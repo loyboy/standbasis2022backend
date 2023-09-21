@@ -60,6 +60,8 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long>{
     		+ "AND (assess.enroll.classstream = :cls OR :cls is null) "
     		+ "AND (lsn.week = :week OR :week is null) "
     		+ "AND (lsn.calendar = :cal OR :cal is null) "
+    		+ "AND (lsn.calendar.term = :term OR :term is null) "
+    		+ "AND (lsn.calendar.session = :year OR :year is null) "
     		+ "AND (assess.enroll.student = :pup OR :pup is null) "
     		+ "AND (lsn.submission >= :datefrom OR :datefrom is null) "
     		+ "AND (lsn.submission <= :dateto OR :dateto is null) "
@@ -71,6 +73,8 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long>{
     		@Param("week") Integer week,
     		@Param("pup") Student pup,
     		@Param("cal") Calendar cal,
+    		@Param("term") Integer term,
+    		@Param("year") String year,
     		@Param("datefrom") Timestamp datefrom,
     		@Param("dateto") Timestamp dateto
     	);
@@ -105,6 +109,8 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long>{
     		+ "AND (assess.enroll.classstream = :cls OR :cls is null) "
     		+ "AND (lsn.week = :week OR :week is null) "
     		+ "AND (lsn.calendar = :cal OR :cal is null) "
+    		+ "AND (lsn.calendar.term = :term OR :term is null) "
+    		+ "AND (lsn.calendar.session = :year OR :year is null) "
     		+ "AND (assess.enroll.student = :pup OR :pup is null) "
     		+ "AND (lsn.submission >= :datefrom OR :datefrom is null) "
     		+ "AND (lsn.submission <= :dateto OR :dateto is null) "
@@ -119,6 +125,8 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long>{
     		@Param("week") Integer week,
     		@Param("pup") Student pup,
     		@Param("cal") Calendar cal,
+    		@Param("term") Integer term,
+    		@Param("year") String year,
     		@Param("datefrom") Timestamp datefrom,
     		@Param("dateto") Timestamp dateto
     	);

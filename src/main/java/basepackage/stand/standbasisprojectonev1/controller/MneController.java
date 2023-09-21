@@ -129,6 +129,28 @@ public class MneController {
 	 @Autowired		
 	 private CalendarRepository calRepository;
 	 
+	 @GetMapping("/attendance/parent/students")
+	 public ResponseEntity<?> getStudentAttendanceParent( @RequestParam(value = "enrol") Long enrolId, @RequestParam(value = "date") String dateTo) {	
+		 
+		 Map<String, Object> response = new HashMap<>();
+			
+		// response.put("mnecolumn", mnecolumn);
+		// response.put("mnecolumndata", mnecolumndata);
+	     
+		 return new ResponseEntity<>(response, HttpStatus.OK);	
+	 }
+	 
+	 @GetMapping("/assessment/parent/students")
+	 public ResponseEntity<?> getStudentAssessmentParent( @RequestParam(value = "enrol") Long enrolId, @RequestParam(value = "week") Integer week) {	
+		 
+		 Map<String, Object> response = new HashMap<>();
+			
+	//	 response.put("mnecolumn", mnecolumn);
+	//	 response.put("mnecolumndata", mnecolumndata);
+	     
+		 return new ResponseEntity<>(response, HttpStatus.OK);	
+	 }
+	 
 	 @GetMapping("/attendance/students")
 	 public ResponseEntity<?> getStudentAttendance(
 			 @RequestParam(value = "enrol") Long enrolId,
