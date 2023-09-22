@@ -58,7 +58,7 @@ public class UserService {
     private TeacherRepository teaRepository;
 	
 	public Boolean checkUsername( CheckUserRequest checkuser ) {
-		Optional<User> u = userRepository.findByUsername( checkuser.getUsername() );
+		Optional<User> u = userRepository.findByUsernameAndStatus( checkuser.getUsername(), 1 );
 		
 		return u.isPresent();
 	}
