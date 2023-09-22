@@ -82,7 +82,7 @@ public class AuthController {
 		
 		        String jwt = tokenProvider.generateToken(authentication);
 		        
-		        User user = userRepository.findByUsername( loginRequest.getUsername() )
+		        User user = userRepository.findByUsernameAndStatus( loginRequest.getUsername(), 1 )
 		                .orElseThrow(() ->
 		                        new UsernameNotFoundException("User not found with username  : " +  loginRequest.getUsername() )
 		        );        

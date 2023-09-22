@@ -23,7 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByIdIn(List<Long> userIds);
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findByUsernameAndStatus(String username, Integer status);
     
     @Query( "select u from User u "
     		+ "WHERE ( u.school.owner = :group OR :group is null ) OR ( u.school = :sch OR :sch is null ) "
