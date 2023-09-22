@@ -90,7 +90,7 @@ public class EnrollmentController {
 	}
 	 
 	 @GetMapping("/student/{id}")
-	 public ResponseEntity<?> getEnrollmentsByPupilId( @PathVariable(value = "pupil") Long pupId ) {
+	 public ResponseEntity<?> getEnrollmentsByPupilId( @PathVariable(value = "id") Long pupId ) {
 		 try { 
 			 List<Enrollment> list = service.findEnrollmentByPupil( pupId );
 			 return ResponseEntity.ok().body(new ApiContentResponse<Enrollment>(true, "List of Enrollments by Pupil ID gotten successfully.", list));	        
