@@ -164,7 +164,7 @@ public class MneController {
 	     mnecolumn.add( objectmnecolumn3 );
 	     
 	     Map<String, Object> objectmnecolumndata = new HashMap<>();
-	     objectmnecolumndata.put("student_name", myrowcall != null ? enrolobj.getStudent().getName() : "Not Done" );		
+	     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );		
 	     objectmnecolumndata.put("date", myrowcall != null ? dateTo : "Not Done" );
 	     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Present" : "Absent" : "Not Done" );
 	     mnecolumndata.add( objectmnecolumndata ); 
