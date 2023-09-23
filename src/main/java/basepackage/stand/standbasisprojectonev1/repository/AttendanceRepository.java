@@ -34,7 +34,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     @Query("select rw from Rowcall rw "
     		+ "JOIN Attendance att ON att = rw.attendance " 
     		+ "WHERE (rw.student = :pup) "
-    		+ "AND ( DATE(att._date) <= :dateto) "
+    		+ "AND ( DATE(att._date) = :dateto ) "
     	   )
     Optional<Rowcall> findByDateAndEnrolId( @Param("pup") Student pup, @Param("dateto") Timestamp dateto);
     
