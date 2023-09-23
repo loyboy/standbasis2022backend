@@ -191,32 +191,37 @@ public class MneController {
 			 Map<String, Object> response = new HashMap<>();
 			 
 			 List<Assessment> assess = asservice.findAssessmentByEnrolment(enrolobj, week);
-			
-			 Long totalClasswork = assess.stream().filter(o -> o.get_type().equals("clw")).count();
-			 int sumClasswork = assess.stream().filter(o -> o.get_type().equals("clw"))
-                     .mapToInt(lsn -> lsn.getScore())
-                     .sum();
-			 @SuppressWarnings("unlikely-arg-type")
-			 double clswork_perf = !totalClasswork.equals(0) ? (double)(sumClasswork * 100)/(totalClasswork * 100) : 0.0;
+			 double clswork_perf = 0.0;
+			 double homework_perf = 0.0;
+			 double test_perf = 0.0;
 			 
-			 Long totalHomework = assess.stream().filter(o -> o.get_type().equals("hwk")).count();
-			 int sumHomework = assess.stream().filter(o -> o.get_type().equals("hwk"))
-                     .mapToInt(lsn -> lsn.getScore())
-                     .sum();
-			 @SuppressWarnings("unlikely-arg-type")
-			 double homework_perf = !totalHomework.equals(0) ? (double)(sumHomework * 100)/(totalHomework * 100) : 0.0;
+			 if (assess != null) {
+				 Long totalClasswork = assess.stream().filter(o -> o.get_type().equals("clw")).count();
+				 int sumClasswork = assess.stream().filter(o -> o.get_type().equals("clw"))
+	                     .mapToInt(lsn -> lsn.getScore())
+	                     .sum();
+				 
+				 clswork_perf = !totalClasswork.equals(0) ? (double)(sumClasswork * 100)/(totalClasswork * 100) : 0.0;
+				 
+				 Long totalHomework = assess.stream().filter(o -> o.get_type().equals("hwk")).count();
+				 int sumHomework = assess.stream().filter(o -> o.get_type().equals("hwk"))
+	                     .mapToInt(lsn -> lsn.getScore())
+	                     .sum();
+				 
+				 homework_perf = !totalHomework.equals(0) ? (double)(sumHomework * 100)/(totalHomework * 100) : 0.0;
+				 
+				 Long totalTest = assess.stream().filter(o -> o.get_type().equals("tst")).count();
+				 int sumTest = assess.stream().filter(o -> o.get_type().equals("tst"))
+	                     .mapToInt(lsn -> lsn.getScore())
+	                     .sum();
+				
+				 test_perf = !totalHomework.equals(0) ? (double)(sumTest * 100)/(totalTest * 100) : 0.0;			 
+			 }
+				 response.put("classwork", clswork_perf);
+				 response.put("homework", homework_perf);
+				 response.put("test", test_perf);
+			 	 return new ResponseEntity<>(response, HttpStatus.OK);
 			 
-			 Long totalTest = assess.stream().filter(o -> o.get_type().equals("tst")).count();
-			 int sumTest = assess.stream().filter(o -> o.get_type().equals("tst"))
-                     .mapToInt(lsn -> lsn.getScore())
-                     .sum();
-			 @SuppressWarnings("unlikely-arg-type")
-			 double test_perf = !totalHomework.equals(0) ? (double)(sumTest * 100)/(totalTest * 100) : 0.0;			 
-			 
-			 response.put("classwork", clswork_perf);
-			 response.put("homework", homework_perf);
-			 response.put("test", test_perf);
-		 	 return new ResponseEntity<>(response, HttpStatus.OK);	
 		 }
 		 catch (Exception ex) {
 			 ex.printStackTrace();
