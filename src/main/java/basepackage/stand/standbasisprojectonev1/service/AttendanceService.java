@@ -116,11 +116,10 @@ public class AttendanceService {
 		return null;		
 	}
 	
-	public Rowcall findByDateAndEnrolId(Student id, Timestamp dateTo) {		
-		Optional<Rowcall> att = attRepository.findByDateAndEnrolId(id, dateTo);
-		if (att.isPresent()) {
-			Rowcall attval = att.get();			
-			return attval;
+	public List<Rowcall> findByDateAndEnrolId(Student id, Timestamp dateTo) {		
+		List<Rowcall> att = attRepository.findByDateAndEnrolId(id, dateTo);
+		if (att != null && att.size() > 0) {					
+			return att;
 		}
 		return null;		
 	}

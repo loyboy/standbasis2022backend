@@ -36,7 +36,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		+ "WHERE (rw.student = :pup) "
     		+ "AND ( DATE(att._date) = :dateto ) "
     	   )
-    Optional<Rowcall> findByDateAndEnrolId( @Param("pup") Student pup, @Param("dateto") Timestamp dateto);
+    List<Rowcall> findByDateAndEnrolId( @Param("pup") Student pup, @Param("dateto") Timestamp dateto);
     
     @Query(" select att from Attendance att where att._desc like :filter ")
     Page<Attendance> filter( @Param("filter") String filter, Pageable pg); 
