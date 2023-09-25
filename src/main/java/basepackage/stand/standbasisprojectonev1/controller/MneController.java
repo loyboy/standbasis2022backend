@@ -134,76 +134,126 @@ public class MneController {
 	 private CalendarRepository calRepository;
 	 
 	 @GetMapping("/attendance/parent/students")
-	 public ResponseEntity<?> getStudentAttendanceParent( @RequestParam(value = "enrol") Long enrolId, @RequestParam(value = "date") Timestamp dateTo) {	
+	 public ResponseEntity<?> getStudentAttendanceParent( 
+			 @RequestParam(value = "enrol",required=false) Long enrolId, 
+			 @RequestParam(value = "date") Timestamp dateTo,
+			 @RequestParam(value = "parent",required=false) String parent
+	 ) {	
 	   try {
-		 Enrollment enrolobj = enrolservice.findEnrollment(enrolId);
-		 List<Rowcall> myrowcalls = serviceAtt.findByDateAndEnrolId(enrolobj.getStudent(), dateTo );
+		     List< Map<String, Object> > mnecolumndata = new ArrayList<>();
+		     List< Map<String, Object> > mnecolumn = new ArrayList<>();
+		     
+			 Map<String, Object> objectmnecolumn = new HashMap<>();
+		     objectmnecolumn.put("key", "student_name");
+		     objectmnecolumn.put("label", "Student Name");
+		     objectmnecolumn.put("sortable", true);
+		     
+		     mnecolumn.add( objectmnecolumn );
+		     
+		     Map<String, Object> objectmnecolumn1 = new HashMap<>();
+		     objectmnecolumn1.put("key", "class_name");
+		     objectmnecolumn1.put("label", "Class Name");
+		     objectmnecolumn1.put("sortable", true);
+		     
+		     mnecolumn.add( objectmnecolumn1 );
+		     
+		     Map<String, Object> objectmnecolumn11 = new HashMap<>();
+		     objectmnecolumn11.put("key", "subject_name");
+		     objectmnecolumn11.put("label", "Subject Name");
+		     objectmnecolumn11.put("sortable", true);
+		     
+		     mnecolumn.add( objectmnecolumn11 );
+		     
+		     Map<String, Object> objectmnecolumn2 = new HashMap<>();
+		     objectmnecolumn2.put("key", "present");
+		     objectmnecolumn2.put("label", "Realized?");
+		     objectmnecolumn2.put("sortable", true);
+		     
+		     mnecolumn.add( objectmnecolumn2 );
+		     
+		     Map<String, Object> objectmnecolumn3 = new HashMap<>();
+		     objectmnecolumn3.put("key", "date");
+		     objectmnecolumn3.put("label", "Date/Time");
+		     objectmnecolumn3.put("sortable", true);
+		     
+		     mnecolumn.add( objectmnecolumn3 );
+		     
+		 if (enrolId != null) {
+			 Enrollment enrolobj = enrolservice.findEnrollment(enrolId);
+			 List<Rowcall> myrowcalls = serviceAtt.findByDateAndEnrolId(enrolobj.getStudent(), dateTo );		 
+		     
+			     if (myrowcalls != null && myrowcalls.size() > 0) {
+			    	 for (Rowcall myrowcall : myrowcalls) {	 
+					     Map<String, Object> objectmnecolumndata = new HashMap<>();
+					     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );	
+					     objectmnecolumndata.put("class_name", enrolobj.getClassstream().getTitle() );	
+					     objectmnecolumndata.put("subject_name", myrowcall.getAttendance().getTimetable().getSubject().getName() );
+					     objectmnecolumndata.put("date", myrowcall != null ? dateTo : "Not Done" );
+					     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Realized" : "Not-Realized" : "Not Done" );
+					     mnecolumndata.add( objectmnecolumndata ); 
+				     }
+			     }
+			     else {
+			    	 Map<String, Object> objectmnecolumndata = new HashMap<>();
+				     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );	
+				     objectmnecolumndata.put("class_name", enrolobj.getClassstream().getTitle() );	
+				     objectmnecolumndata.put("subject_name", "Not Done" );
+				     objectmnecolumndata.put("date", "Not Done" );
+				     objectmnecolumndata.put("present", "Not Done" );
+				     mnecolumndata.add( objectmnecolumndata ); 
+			     }     
+			 		
+		     	Map<String, Object> response = new HashMap<>();
+			
+			 	response.put("mnecolumn", mnecolumn);
+			 	response.put("mnecolumndata", mnecolumndata);
+			 	
+			 	return new ResponseEntity<>(response, HttpStatus.OK);
+		 	}
 		 
-		 List< Map<String, Object> > mnecolumndata = new ArrayList<>();
-	     List< Map<String, Object> > mnecolumn = new ArrayList<>();
-	     
-		 Map<String, Object> objectmnecolumn = new HashMap<>();
-	     objectmnecolumn.put("key", "student_name");
-	     objectmnecolumn.put("label", "Student Name");
-	     objectmnecolumn.put("sortable", true);
-	     
-	     mnecolumn.add( objectmnecolumn );
-	     
-	     Map<String, Object> objectmnecolumn1 = new HashMap<>();
-	     objectmnecolumn1.put("key", "class_name");
-	     objectmnecolumn1.put("label", "Class Name");
-	     objectmnecolumn1.put("sortable", true);
-	     
-	     mnecolumn.add( objectmnecolumn1 );
-	     
-	     Map<String, Object> objectmnecolumn11 = new HashMap<>();
-	     objectmnecolumn11.put("key", "subject_name");
-	     objectmnecolumn11.put("label", "Subject Name");
-	     objectmnecolumn11.put("sortable", true);
-	     
-	     mnecolumn.add( objectmnecolumn11 );
-	     
-	     Map<String, Object> objectmnecolumn2 = new HashMap<>();
-	     objectmnecolumn2.put("key", "present");
-	     objectmnecolumn2.put("label", "Present?");
-	     objectmnecolumn2.put("sortable", true);
-	     
-	     mnecolumn.add( objectmnecolumn2 );
-	     
-	     Map<String, Object> objectmnecolumn3 = new HashMap<>();
-	     objectmnecolumn3.put("key", "date");
-	     objectmnecolumn3.put("label", "Date of Rowcall");
-	     objectmnecolumn3.put("sortable", true);
-	     
-	     mnecolumn.add( objectmnecolumn3 );
-	     
-	     if (myrowcalls != null && myrowcalls.size() > 0) {
-	    	 for (Rowcall myrowcall : myrowcalls) {	 
-			     Map<String, Object> objectmnecolumndata = new HashMap<>();
-			     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );	
-			     objectmnecolumndata.put("class_name", enrolobj.getClassstream().getTitle() );	
-			     objectmnecolumndata.put("subject_name", myrowcall.getAttendance().getTimetable().getSubject().getName() );
-			     objectmnecolumndata.put("date", myrowcall != null ? dateTo : "Not Done" );
-			     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Present" : "Absent" : "Not Done" );
-			     mnecolumndata.add( objectmnecolumndata ); 
+		 	else if (parent != null) {
+			 
+			 String[] parts = parent.split("-");
+		        
+		     for (String part : parts) {
+		    	 Long studentId = Long.parseLong(part);	
+		    	 Student stuobj = studentservice.findStudent(studentId);
+		    	 List<Rowcall> myrowcalls = serviceAtt.findByDateAndEnrolId(stuobj, dateTo );	    	
+		    	
+			     if (myrowcalls != null && myrowcalls.size() > 0) {
+			    	 for (Rowcall myrowcall : myrowcalls) {	 
+					     Map<String, Object> objectmnecolumndata = new HashMap<>();
+					     objectmnecolumndata.put("student_name", stuobj.getName() );	
+					     	
+					     objectmnecolumndata.put("subject_name", myrowcall.getAttendance().getTimetable().getSubject().getName() );
+					     objectmnecolumndata.put("date", myrowcall != null ? dateTo : "Not Done" );
+					     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Realized" : "Not-Realized" : "Not Done" );
+					     mnecolumndata.add( objectmnecolumndata ); 
+				     }
+			     }
+			     else {
+			    	 Map<String, Object> objectmnecolumndata = new HashMap<>();
+				     objectmnecolumndata.put("student_name", stuobj.getName() );	
+				     	
+				     objectmnecolumndata.put("subject_name", "Not Done" );
+				     objectmnecolumndata.put("date", "Not Done" );
+				     objectmnecolumndata.put("present", "Not Done" );
+				     mnecolumndata.add( objectmnecolumndata ); 
+			     }
 		     }
-	     }
-	     else {
-	    	 Map<String, Object> objectmnecolumndata = new HashMap<>();
-		     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );	
-		     objectmnecolumndata.put("class_name", enrolobj.getClassstream().getTitle() );	
-		     objectmnecolumndata.put("subject_name", "Not Done" );
-		     objectmnecolumndata.put("date", "Not Done" );
-		     objectmnecolumndata.put("present", "Not Done" );
-		     mnecolumndata.add( objectmnecolumndata ); 
-	     }     
+		     
+		     	Map<String, Object> response = new HashMap<>();
+				
+			 	response.put("mnecolumn", mnecolumn);
+			 	response.put("mnecolumndata", mnecolumndata);
+			 	
+			 	return new ResponseEntity<>(response, HttpStatus.OK);
+		 
+		 }
+		 
+		 	Map<String, Object> response3 = new HashMap<>();		 	
+		 	return new ResponseEntity<>(response3, HttpStatus.OK);
 		 		
-	     	Map<String, Object> response = new HashMap<>();
-		
-		 	response.put("mnecolumn", mnecolumn);
-		 	response.put("mnecolumndata", mnecolumndata);
-		 	
-		 	return new ResponseEntity<>(response, HttpStatus.OK);	
 		 }
 		 catch (Exception ex) {
 			 ex.printStackTrace();
