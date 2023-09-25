@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -148,14 +149,14 @@ public class MneController {
 		     objectmnecolumn.put("label", "Student Name");
 		     objectmnecolumn.put("sortable", true);
 		     
-		     mnecolumn.add( objectmnecolumn );
+		     mnecolumn.add( objectmnecolumn );		     
+		    
+		   // Map<String, Object> objectmnecolumn1 = new HashMap<>();
+		   //  objectmnecolumn1.put("key", "class_name");
+		   //  objectmnecolumn1.put("label", "Class Name");
+		   //  objectmnecolumn1.put("sortable", true);
 		     
-		     Map<String, Object> objectmnecolumn1 = new HashMap<>();
-		     objectmnecolumn1.put("key", "class_name");
-		     objectmnecolumn1.put("label", "Class Name");
-		     objectmnecolumn1.put("sortable", true);
-		     
-		     mnecolumn.add( objectmnecolumn1 );
+		   //  mnecolumn.add( objectmnecolumn1 );
 		     
 		     Map<String, Object> objectmnecolumn11 = new HashMap<>();
 		     objectmnecolumn11.put("key", "subject_name");
@@ -186,9 +187,9 @@ public class MneController {
 			    	 for (Rowcall myrowcall : myrowcalls) {	 
 					     Map<String, Object> objectmnecolumndata = new HashMap<>();
 					     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );	
-					     objectmnecolumndata.put("class_name", enrolobj.getClassstream().getTitle() );	
+					   //  objectmnecolumndata.put("class_name", enrolobj.getClassstream().getTitle() );	
 					     objectmnecolumndata.put("subject_name", myrowcall.getAttendance().getTimetable().getSubject().getName() );
-					     objectmnecolumndata.put("date", myrowcall != null ? dateTo : "Not Done" );
+					     objectmnecolumndata.put("date", myrowcall != null ? Date.from(myrowcall.getCreatedAt()) : "Not Done" );
 					     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Realized" : "Not-Realized" : "Not Done" );
 					     mnecolumndata.add( objectmnecolumndata ); 
 				     }
@@ -196,7 +197,7 @@ public class MneController {
 			     else {
 			    	 Map<String, Object> objectmnecolumndata = new HashMap<>();
 				     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );	
-				     objectmnecolumndata.put("class_name", enrolobj.getClassstream().getTitle() );	
+				  //   objectmnecolumndata.put("class_name", enrolobj.getClassstream().getTitle() );	
 				     objectmnecolumndata.put("subject_name", "Not Done" );
 				     objectmnecolumndata.put("date", "Not Done" );
 				     objectmnecolumndata.put("present", "Not Done" );
@@ -226,7 +227,7 @@ public class MneController {
 					     objectmnecolumndata.put("student_name", stuobj.getName() );	
 					     	
 					     objectmnecolumndata.put("subject_name", myrowcall.getAttendance().getTimetable().getSubject().getName() );
-					     objectmnecolumndata.put("date", myrowcall != null ? dateTo : "Not Done" );
+					     objectmnecolumndata.put("date", myrowcall != null ? Date.from(myrowcall.getCreatedAt()) : "Not Done" );
 					     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Realized" : "Not-Realized" : "Not Done" );
 					     mnecolumndata.add( objectmnecolumndata ); 
 				     }
