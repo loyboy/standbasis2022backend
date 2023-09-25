@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -186,10 +188,14 @@ public class MneController {
 			     if (myrowcalls != null && myrowcalls.size() > 0) {
 			    	 for (Rowcall myrowcall : myrowcalls) {	 
 					     Map<String, Object> objectmnecolumndata = new HashMap<>();
+					     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+					     String customDateString = sdf.format( Date.from(myrowcall.getCreatedAt()) );
+					     
 					     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );	
 					   //  objectmnecolumndata.put("class_name", enrolobj.getClassstream().getTitle() );	
 					     objectmnecolumndata.put("subject_name", myrowcall.getAttendance().getTimetable().getSubject().getName() );
-					     objectmnecolumndata.put("date", myrowcall != null ? Date.from(myrowcall.getCreatedAt()) : "Not Done" );
+					     objectmnecolumndata.put("date", myrowcall != null ? customDateString : "Not Done" );
 					     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Realized" : "Not-Realized" : "Not Done" );
 					     mnecolumndata.add( objectmnecolumndata ); 
 				     }
@@ -223,11 +229,16 @@ public class MneController {
 		    	
 			     if (myrowcalls != null && myrowcalls.size() > 0) {
 			    	 for (Rowcall myrowcall : myrowcalls) {	 
+			    		 
+			    		 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+					     String customDateString = sdf.format( Date.from(myrowcall.getCreatedAt()) );
+					     
 					     Map<String, Object> objectmnecolumndata = new HashMap<>();
 					     objectmnecolumndata.put("student_name", stuobj.getName() );	
 					     	
 					     objectmnecolumndata.put("subject_name", myrowcall.getAttendance().getTimetable().getSubject().getName() );
-					     objectmnecolumndata.put("date", myrowcall != null ? Date.from(myrowcall.getCreatedAt()) : "Not Done" );
+					     objectmnecolumndata.put("date", myrowcall != null ? customDateString : "Not Done" );
 					     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Realized" : "Not-Realized" : "Not Done" );
 					     mnecolumndata.add( objectmnecolumndata ); 
 				     }
