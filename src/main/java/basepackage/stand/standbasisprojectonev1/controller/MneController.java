@@ -158,7 +158,14 @@ public class MneController {
 		   //  objectmnecolumn1.put("label", "Class Name");
 		   //  objectmnecolumn1.put("sortable", true);
 		     
-		   //  mnecolumn.add( objectmnecolumn1 );
+		   //  mnecolumn.add( objectmnecolumn1 );	    
+		     
+		     Map<String, Object> objectmnecolumn3 = new HashMap<>();
+		     objectmnecolumn3.put("key", "date");
+		     objectmnecolumn3.put("label", "Date/Time");
+		     objectmnecolumn3.put("sortable", true);
+		     
+		     mnecolumn.add( objectmnecolumn3 );
 		     
 		     Map<String, Object> objectmnecolumn11 = new HashMap<>();
 		     objectmnecolumn11.put("key", "subject_name");
@@ -169,17 +176,10 @@ public class MneController {
 		     
 		     Map<String, Object> objectmnecolumn2 = new HashMap<>();
 		     objectmnecolumn2.put("key", "present");
-		     objectmnecolumn2.put("label", "Realized?");
+		     objectmnecolumn2.put("label", "Status?");
 		     objectmnecolumn2.put("sortable", true);
 		     
 		     mnecolumn.add( objectmnecolumn2 );
-		     
-		     Map<String, Object> objectmnecolumn3 = new HashMap<>();
-		     objectmnecolumn3.put("key", "date");
-		     objectmnecolumn3.put("label", "Date/Time");
-		     objectmnecolumn3.put("sortable", true);
-		     
-		     mnecolumn.add( objectmnecolumn3 );
 		     
 		 if (enrolId != null) {
 			 Enrollment enrolobj = enrolservice.findEnrollment(enrolId);
@@ -193,7 +193,6 @@ public class MneController {
 					     String customDateString = sdf.format( Date.from(myrowcall.getCreatedAt()) );
 					     
 					     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );	
-					   //  objectmnecolumndata.put("class_name", enrolobj.getClassstream().getTitle() );	
 					     objectmnecolumndata.put("subject_name", myrowcall.getAttendance().getTimetable().getSubject().getName() );
 					     objectmnecolumndata.put("date", myrowcall != null ? customDateString : "Not Done" );
 					     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Realized" : "Not-Realized" : "Not Done" );
@@ -225,8 +224,12 @@ public class MneController {
 		     for (String part : parts) {
 		    	 Long studentId = Long.parseLong(part);	
 		    	 Student stuobj = studentservice.findStudent(studentId);
-		    	 List<Rowcall> myrowcalls = serviceAtt.findByDateAndEnrolId(stuobj, dateTo );	    	
-		    	
+		    	 List<Rowcall> myrowcalls = serviceAtt.findByDateAndEnrolId(stuobj, dateTo );
+		    	 Enrollment enrolobj = enrolservice.findEnrollmentByActive(studentId);
+		    	 List<Attendance> myattendance = attRepository.findByAttendanceToday(dateTo);
+		    	 
+		    	 List<Attendance> myattendance_filtered = myattendance.stream().filter(att -> att.getTimetable().getClass_stream() == enrolobj.getClassstream() ).collect(Collectors.toList());
+		    	 
 			     if (myrowcalls != null && myrowcalls.size() > 0) {
 			    	 for (Rowcall myrowcall : myrowcalls) {	 
 			    		 
@@ -244,13 +247,22 @@ public class MneController {
 				     }
 			     }
 			     else {
-			    	 Map<String, Object> objectmnecolumndata = new HashMap<>();
-				     objectmnecolumndata.put("student_name", stuobj.getName() );	
-				     	
-				     objectmnecolumndata.put("subject_name", "Not Done" );
-				     objectmnecolumndata.put("date", "Not Done" );
-				     objectmnecolumndata.put("present", "Not Done" );
-				     mnecolumndata.add( objectmnecolumndata ); 
+			    	 if (myattendance_filtered != null && myattendance_filtered.size() > 0) {
+				    	 for (Attendance attobj : myattendance_filtered) {
+				    		 
+				    		 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+						     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+						     String customDateString = sdf.format( Date.from(attobj.getCreatedAt()) );
+						     
+					    	 Map<String, Object> objectmnecolumndata = new HashMap<>();
+						     objectmnecolumndata.put("student_name", stuobj.getName() );	
+						     	
+						     objectmnecolumndata.put("subject_name", attobj.getTimetable().getSubject().getName() );
+						     objectmnecolumndata.put("date", customDateString + " " + attobj.getTimetable().getTime_of() );
+						     objectmnecolumndata.put("present", "Not Filed" );
+						     mnecolumndata.add( objectmnecolumndata );						     
+				    	 }
+			    	 }
 			     }
 		     }
 		     
@@ -264,7 +276,7 @@ public class MneController {
 		 }
 		 
 		 	Map<String, Object> response3 = new HashMap<>();		 	
-		 	return new ResponseEntity<>(response3, HttpStatus.OK);
+		 	return new ResponseEntity<>(response3, HttpStatus.OK);//
 		 		
 		 }
 		 catch (Exception ex) {

@@ -388,6 +388,8 @@ public class AttendanceController {
 		 try {
 			 Attendance valAtt = service.update(attRequest.getAttendance(),id);
 			 
+			 Thread.sleep(2000);
+			 
 			 AttendanceManagement val = serviceManagement.updateByAttendance(attRequest.getManagement(), id);
 			 //get Activity ID
 			 AttendanceActivity val2  = serviceActivity.findAttendanceActivityByAttendance(id);

@@ -78,6 +78,15 @@ public class EnrollmentService {
 		return null;
 	}
 	
+	public Enrollment findEnrollmentByActive(long id) {		
+		Optional<Enrollment> enc = enrollRepository.findByPupilIdActive(id);
+		if (enc.isPresent()) {
+			Enrollment enrolval = enc.get();			
+			return enrolval;
+		}
+		return null;
+	}
+	
 	public List<Enrollment> findEnrollmentByPupil(long id) {		
 		List<Enrollment> enc = enrollRepository.findByPupilIdTwo(id);
 		return enc;

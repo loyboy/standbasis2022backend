@@ -56,6 +56,11 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		@Param("friday") Date friday,
     		@Param("monday") Date monday
     );
+    
+    @Query( " select att from Attendance att where DATE(att._date) = :today ")
+    List<Attendance> findByAttendanceToday(     		 
+    		@Param("today") Timestamp today
+    );
     //-------------------------------------------------------------------------------------------------
     
     @Query("select att from Attendance att where att.timetable.school.owner = :owner "
