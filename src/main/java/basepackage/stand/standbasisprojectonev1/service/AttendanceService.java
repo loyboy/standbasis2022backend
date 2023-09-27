@@ -665,14 +665,15 @@ public class AttendanceService {
 	public Attendance update(AttendanceRequest attRequest, long id) {
 		Optional<Attendance> existing = attRepository.findById(id);
 		if (existing.isPresent()) {			
-			Attendance attval = existing.get();
-			if ( attval.getDone() == 1 ) {
-				return null;
-			}
+			Attendance attval = existing.get();			
 			
 			if ( attRequest.getPrincipal_action() != null ) {
 				attval.setPrincipal_action(attRequest.getPrincipal_action());
 				attRepository.save(attval);
+				return null;
+			}
+			
+			if ( attval.getDone() == 1 ) {
 				return null;
 			}
 			
