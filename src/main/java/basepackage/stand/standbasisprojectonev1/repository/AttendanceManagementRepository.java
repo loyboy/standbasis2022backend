@@ -28,8 +28,8 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 		
 		@Query("select attmanage from AttendanceManagement attmanage "
 	    		+ "JOIN Attendance att ON att = attmanage.att_id "
-	 			+ "WHERE att.timetable.school.owner = :owner "
-	    		+ "AND ( :sch is null OR att.timetable.school = :sch ) "
+	 			+ "WHERE "
+	    		+ ":sch is null OR att.timetable.school = :sch "
 	    		+ "AND ( :cls is null OR att.timetable.class_stream = :cls ) "
 	    		+ "AND ( :tea is null OR att.timetable.teacher = :tea ) "
 	    		+ "AND ( :cal is null OR att.timetable.calendar = :cal ) "
