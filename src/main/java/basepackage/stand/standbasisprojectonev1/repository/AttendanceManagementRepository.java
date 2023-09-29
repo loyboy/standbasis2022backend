@@ -115,8 +115,8 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	    		+ "AND (att.timetable.class_stream = :cls OR :cls is null) "
 	    		+ "AND (att.timetable.teacher = :tea OR :tea is null) "
 	    		+ "AND (att.timetable.calendar = :cal OR :cal is null) "
-	    		+ "AND (att.done IS NOT :done OR :done is null) "
-	    		+ "AND (att.done IS NOT -1 ) "
+	    		+ "AND (att.done <> :done OR :done is null) "
+	    		+ "AND (att.done <> -1 ) "
 	    		+ "AND (DATE(att._date) >= :datefrom OR :datefrom is null) "
 	    		+ "AND (DATE(att._date) <= :dateto OR :dateto is null) "
 	    	   )
