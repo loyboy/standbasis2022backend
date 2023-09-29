@@ -218,6 +218,25 @@ public class AttendanceController {
 	 }
 	 
 	 
+	 	@SuppressWarnings("unchecked")
+		@GetMapping("/exportTeachers")
+		 public ResponseEntity<?> getMNETeacherAttendances(				
+				 @RequestParam(value = "school", required=false) Optional<Long> school,
+				 @RequestParam(value = "class", required=false) Optional<Long> classid,
+				 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
+				 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
+				 @RequestParam(value = "subject", required=false) Optional<Long> subject,
+				 @RequestParam(value = "attendancedone", required=false) Optional<Integer> done,
+				 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
+				 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
+		 ) {
+		 
+		 	Map<String, Object> attManageResponse = serviceManagement.getExportOrdinaryTeacherAttendances(  school, classid, calendar, teacher, subject, done, datefrom, dateto );
+			
+		 	//Map<String, Object> newResponse = new HashMap<>();
+		 	return new ResponseEntity<>(attManageResponse, HttpStatus.OK);	
+	    }
+	 
 	 
 	 @SuppressWarnings("unchecked")
 	@GetMapping("/mneTeachers")
@@ -387,8 +406,6 @@ public class AttendanceController {
 		 
 		 try {
 			 Attendance valAtt = service.update(attRequest.getAttendance(),id);
-			 
-			 Thread.sleep(2000);
 			 
 			 AttendanceManagement val = serviceManagement.updateByAttendance(attRequest.getManagement(), id);
 			 //get Activity ID

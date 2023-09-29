@@ -37,6 +37,7 @@ import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.TeacherRequest;
+import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository;
 import basepackage.stand.standbasisprojectonev1.repository.TeacherRepository;
@@ -50,6 +51,9 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 	
 	@Autowired		
     private TeacherRepository teaRepository;
+	
+	@Autowired		
+    private AttendanceRepository attRepository;
 	
 	@Autowired		
     private SchoolRepository schRepository;
@@ -76,6 +80,15 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 		if (sch.isPresent()) {
 			School schval = sch.get();			
 			return teaRepository.findBySchool(schval);
+		}
+		return null;		
+	}
+	
+	public List<Teacher> getTeachersBySchoolAttendance(Long id) {		
+		Optional<School> sch = schRepository.findById(id);
+		if (sch.isPresent()) {
+			School schval = sch.get();			
+			return attRepository.findByTeacher(schval);
 		}
 		return null;		
 	}

@@ -241,8 +241,8 @@ public class MneController {
 					     objectmnecolumndata.put("student_name", stuobj.getName() );	
 					     	
 					     objectmnecolumndata.put("subject_name", myrowcall.getAttendance().getTimetable().getSubject().getName() );
-					     objectmnecolumndata.put("date", myrowcall != null ? customDateString : "Not Done" );
-					     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Realized" : "Not-Realized" : "Not Done" );
+					     objectmnecolumndata.put("date", myrowcall != null ? customDateString : "Not Filed" );
+					     objectmnecolumndata.put("present", myrowcall != null ? myrowcall.getStatus().equals(1) ? "Realized" : "Not-Realized" : "Not Filed" );
 					     mnecolumndata.add( objectmnecolumndata ); 
 				     }
 			     }

@@ -303,6 +303,56 @@ public class AttendanceManagementService {
         return response;
     }
 	
+	public Map<String, Object> getExportOrdinaryTeacherAttendances( Optional<Long> schId, Optional<Long> classId, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Long> subject, Optional<Integer> done, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
+        
+        Long schowner = schId.orElse(null);
+        Long classowner = classId.orElse(null);
+        Long teacherowner = teacherId.orElse(null);     
+        Long calendarowner = calendarId.orElse(null);
+        Long subjectowner = subject.orElse(null);
+        Integer doneval = done.orElse(null);
+        
+        List<AttendanceManagement> attendances = null;        
+        		
+        		Optional<School> schownerobj = null;
+        		Optional<ClassStream> classownerobj = null ;
+        		Optional<Teacher> teacherownerobj = null;
+        		Optional<Calendar> calendarownerobj = null;
+        		Optional<Subject> subjectownerobj = null;
+        		
+        		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
+        		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
+        		if(classowner != null) { classownerobj = clsRepository.findById( classowner );  } 
+        		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
+        		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  }
+        		
+        		attendances = attmanageRepository.findByTeacherExport( 
+                        schownerobj == null ? null : schownerobj.get() , 
+                        classownerobj == null ? null : classownerobj.get(), 
+                        teacherownerobj == null ? null : teacherownerobj.get(),
+                        calendarownerobj == null ? null : calendarownerobj.get(),
+                        subjectownerobj == null ? null : subjectownerobj.get(),
+                        doneval == null ? null : doneval,
+                        datefrom.isEmpty() ? null : datefrom.get(),
+                        dateto.isEmpty() ? null : dateto.get()
+        		);        
+
+		        if(attendances.size() == 0) {
+		        	Map<String, Object> responseEmpty = new HashMap<>();
+		        	responseEmpty.put("attendancemanagement", Collections.emptyList());
+		        	responseEmpty.put("totalItems", 0 );        	
+		        	return responseEmpty;
+		        }
+		        
+		        List<AttendanceManagement> calarray = new ArrayList<AttendanceManagement>(attendances);
+		        
+		        Map<String, Object> response = new HashMap<>();
+		        response.put("attendancemanagement", calarray );
+		        response.put("totalItems", calarray.size() );
+		        
+		        return response;
+    }
+	
 
 	private static void copyNonNullProperties(Object src, Object target) {
 	    BeanUtils.copyProperties(src, target, getNullPropertyNames(src));

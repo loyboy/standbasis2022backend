@@ -36,6 +36,7 @@ import basepackage.stand.standbasisprojectonev1.payload.onboarding.TeacherReques
 import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
+import basepackage.stand.standbasisprojectonev1.service.AttendanceService;
 import basepackage.stand.standbasisprojectonev1.service.TeacherService;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
 import basepackage.stand.standbasisprojectonev1.util.FileUploadUtil;
@@ -46,6 +47,9 @@ public class TeacherController {
 
 	 @Autowired
 	 TeacherService service;
+	 
+	 @Autowired
+	 AttendanceService serviceAtt;
 	 
 	 @Autowired
 	 private EventManagerRepository eventRepository;
@@ -63,6 +67,12 @@ public class TeacherController {
 	 public ResponseEntity<?> getTeachersBySchool( @PathVariable(value = "id") Long id ) {
 		 List<Teacher> list = service.findAllBySchool(id);
 		 return ResponseEntity.ok().body(new ApiContentResponse<Teacher>(true, "List of teachers by school gotten successfully.", list));		
+	 }
+	 
+	 @GetMapping("/school/{id}/attendance")
+	 public ResponseEntity<?> getTeachersBySchoolAttendance( @PathVariable(value = "id") Long id ) {
+		 List<Teacher> list = service.getTeachersBySchoolAttendance(id);
+		 return ResponseEntity.ok().body(new ApiContentResponse<Teacher>(true, "List of teachers by school as gotten ordered by attendance successfully.", list));		
 	 }
 	 
 	 @GetMapping("/school/count/{id}")

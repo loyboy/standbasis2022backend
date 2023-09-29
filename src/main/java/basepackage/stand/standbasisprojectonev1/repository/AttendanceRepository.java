@@ -31,6 +31,12 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     
     List<Attendance> findByTimetable(TimeTable t);
     
+    @Query("select DISTINCT tea from Teacher tea "
+    		+ "JOIN Attendance att ON tea = att.teacher " 
+    		+ "WHERE (att.teacher.school = :sch) "
+    	   )
+    List<Teacher> findByTeacher( @Param("sch") School sch );
+    
     @Query("select rw from Rowcall rw "
     		+ "JOIN Attendance att ON att = rw.attendance " 
     		+ "WHERE (rw.student = :pup) "

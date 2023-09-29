@@ -677,7 +677,16 @@ public class AttendanceService {
 				return null;
 			}
 			
-			attval.set_date( new Date() );
+			//had to add 1 hour to the time bcos of the server
+			Date currentDate = new Date();
+	        
+			java.util.Calendar calendar = java.util.Calendar.getInstance();
+	        calendar.setTime(currentDate);
+	        calendar.add(java.util.Calendar.HOUR_OF_DAY, 1);
+	        
+	        Date newDate = calendar.getTime();
+			
+			attval.set_date( newDate );
 			System.out.println("Done value: " + attRequest.getDone() + " Att value: " + attval.getAttId() );
 			attval.setDone(attRequest.getDone());
 			attval.setPeriod(attRequest.getPeriod());

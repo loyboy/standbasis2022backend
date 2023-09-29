@@ -27,6 +27,29 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 		Optional<AttendanceManagement> findById(Long attmanageId); 
 		
 		@Query("select attmanage from AttendanceManagement attmanage "
+	    		+ "JOIN Attendance att ON att = attmanage.att_id "
+	 			+ "WHERE att.timetable.school.owner = :owner "
+	    		+ "AND ( :sch is null OR att.timetable.school = :sch ) "
+	    		+ "AND ( :cls is null OR att.timetable.class_stream = :cls ) "
+	    		+ "AND ( :tea is null OR att.timetable.teacher = :tea ) "
+	    		+ "AND ( :cal is null OR att.timetable.calendar = :cal ) "
+	    		+ "AND ( :sub is null OR att.timetable.subject = :sub ) "
+	    		+ "AND ( :done is null OR att.done = :done ) "
+	    		+ "AND ( :datefrom is null OR DATE(att._date) >= :datefrom ) "
+	    		+ "AND ( :dateto is null OR DATE(att._date) <= :dateto ) "
+	      )	
+		List<AttendanceManagement> findByTeacherExport(
+	    		@Param("sch") School sch, 
+	    		@Param("cls") ClassStream cls, 
+	    		@Param("tea") Teacher tea,  
+	    		@Param("cal") Calendar cal,
+	    		@Param("sub") Subject sub,
+	    		@Param("done") Integer done,
+	    		@Param("datefrom") Date datefrom,
+	    		@Param("dateto") Date dateto
+	    	);
+		
+		@Query("select attmanage from AttendanceManagement attmanage "
 				+ "JOIN Attendance att ON att = attmanage.att_id "
 	    		+ "AND att.attId = :attId "
 	       	 )
@@ -92,7 +115,8 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	    		+ "AND (att.timetable.class_stream = :cls OR :cls is null) "
 	    		+ "AND (att.timetable.teacher = :tea OR :tea is null) "
 	    		+ "AND (att.timetable.calendar = :cal OR :cal is null) "
-	    		+ "AND (att.done = :done OR :done is null) "
+	    		+ "AND (att.done IS NOT :done OR :done is null) "
+	    		+ "AND (att.done IS NOT -1 ) "
 	    		+ "AND (DATE(att._date) >= :datefrom OR :datefrom is null) "
 	    		+ "AND (DATE(att._date) <= :dateto OR :dateto is null) "
 	    	   )
