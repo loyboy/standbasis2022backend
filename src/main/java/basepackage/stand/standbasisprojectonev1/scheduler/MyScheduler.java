@@ -112,10 +112,13 @@ public class MyScheduler {
 				for ( Lessonnote lsn : allLessonnote ) {
 					List<LessonnoteManagement> list = serviceManagement.findByLessonnote(lsn.getLessonnoteId());
 					LessonnoteManagement lsnmanage = list.get(0);
-					int totalScore = ( ( lsnmanage != null && lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0 ) + ( lsnmanage != null && lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + ( lsnmanage != null && lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/4;
-					lsnmanage.setScore(totalScore);
+					int totalScore = 0;
+					if (lsnmanage != null) {
+						totalScore = ( ( lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0 ) + ( lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + ( lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/3;
+						lsnmanage.setScore(totalScore);
 						
-					lsnmanageRepository.save(lsnmanage);
+						lsnmanageRepository.save(lsnmanage);
+					}
 					
 					if ( (lsn.getCan_close() == null || lsn.getCan_close() == false) && ( lsn.getApproval() != null ) ) {
 						
@@ -161,10 +164,10 @@ public class MyScheduler {
 							lsnmanagedd.setSub_perf_homework(averageHomework);
 							lsnmanagedd.setSub_perf_test(averageTest);
 							int averageAssessment = (averageClasswork+averageHomework+averageTest)/3;
-							int totalScoredd = (averageAssessment + (lsnmanage.getSubmission() != null ? lsnmanage.getSubmission() : 0) + (lsnmanage.getQuality() != null ? lsnmanage.getQuality() : 0) + (lsnmanage.getManagement() != null ? lsnmanage.getManagement() : 0))/4;
-							lsnmanage.setScore(totalScoredd);
+							int totalScoredd = (averageAssessment + totalScore)/2;
+							lsnmanagedd.setScore(totalScoredd);
 							
-							lsnmanageRepository.save(lsnmanage);
+							lsnmanageRepository.save(lsnmanagedd);
 						}
 						else {
 							 

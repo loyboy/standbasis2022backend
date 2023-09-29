@@ -114,8 +114,15 @@ public class AttendanceController {
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
 			 ) {
 		 
-			 Map<String, Object> response = serviceManagement.getPaginatedTeacherAttendances ( page, size, query, schoolgroup, school, classid, calendar, teacher, done, datefrom, dateto  );
-			 return new ResponseEntity<>(response, HttpStatus.OK);
+		 	 try {
+		 		 
+		 		Map<String, Object> response = serviceManagement.getPaginatedTeacherAttendances ( page, size, query, schoolgroup, school, classid, calendar, teacher, done, datefrom, dateto  );
+				 return new ResponseEntity<>(response, HttpStatus.OK);
+			 } catch (Exception e) {					
+					e.printStackTrace();
+					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
+			 }
+			 
 	 }
 	 
 	 @GetMapping("/paginateAttendanceActivity")
@@ -231,10 +238,15 @@ public class AttendanceController {
 				 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
 		 ) {
 		 
-		 	Map<String, Object> attManageResponse = serviceManagement.getExportOrdinaryTeacherAttendances(  school, classid, calendar, teacher, subject, done, datefrom, dateto );
-			
-		 	//Map<String, Object> newResponse = new HashMap<>();
-		 	return new ResponseEntity<>(attManageResponse, HttpStatus.OK);	
+	 			try {
+				 	Map<String, Object> attManageResponse = serviceManagement.getExportOrdinaryTeacherAttendances(  school, classid, calendar, teacher, subject, done, datefrom, dateto );
+					
+				 	//Map<String, Object> newResponse = new HashMap<>();
+				 	return new ResponseEntity<>(attManageResponse, HttpStatus.OK);
+			 	} catch (Exception e) {					
+					e.printStackTrace();
+					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
+			 	}
 	    }
 	 
 	 
