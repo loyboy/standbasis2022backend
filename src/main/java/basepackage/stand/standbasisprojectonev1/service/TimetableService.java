@@ -319,8 +319,15 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
 			
 			if (timeRequest.getStatus() != null) {
 				timeval.setStatus(timeRequest.getStatus());
-			}			
-			return timeRepository.save(timeval); //
+			}
+			
+			TimeTable savedTimeval = timeRepository.save(timeval);
+			
+			savedTimeval.setSub_name( savedTimeval.getSubject().getName() );
+			savedTimeval.setTea_name( savedTimeval.getTeacher().getFname() + " " + savedTimeval.getTeacher().getLname() );
+			savedTimeval.setClass_name( savedTimeval.getClass_stream().getTitle() );
+			
+			return timeRepository.save(savedTimeval); 
 		}	   
 		
 		return null;

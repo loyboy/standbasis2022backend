@@ -251,11 +251,22 @@ public class MyScheduler {
 				for ( TimeTable tt: allTimetables) {
 					if (tt.getStatus() == 1) {
 						
+						ClassStream myclassroom = clsRepository.findById( tt.getClass_stream().getClsId() ).get();
+						//System.out.println(" Class stream schid is here: " + e.getClassstream().getClsId() );
+						ClassStream next_classroom = null; 
+											
+						List<ClassStream> allclasses = clsRepository.findBySchool( myclassroom.getSchool() );
+						List<ClassStream> allclasses_filtered = allclasses.stream().filter(c -> (c.getClass_index() == myclassroom.getClass_index() + 1) ).collect(Collectors.toList());
+						if (allclasses_filtered.size() > 0) {
+							next_classroom = allclasses_filtered.get(0);
+						}
+						
 						String fname = tt.getTeacher().getFname();
 						String lname = tt.getTeacher().getLname();
 						String subname = tt.getSubject().getName();
-						String clsname = tt.getClass_stream().getTitle();
-						String extCls = tt.getClass_stream().getExt();
+						
+						String clsname = cal.getTerm().equals(3) ? next_classroom.getTitle() : tt.getClass_stream().getTitle();
+						String extCls  = cal.getTerm().equals(3) ? next_classroom.getExt() : tt.getClass_stream().getExt();
 						
 						TimeTable newTime = new TimeTable();
 						newTime.setId(tt.getId());
@@ -337,7 +348,7 @@ public class MyScheduler {
 	// "0 0 0 * * 0" -- once a week
 	// 0 0 0 ? * WED
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "35 * * 31 12 *")
+	@Scheduled(cron = "35 50 16 * * *")
     public void insertLessonnotes() {
 		
 		 Map<Integer, String> classMap = new HashMap<>();
