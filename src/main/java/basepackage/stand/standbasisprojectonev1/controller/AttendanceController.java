@@ -559,6 +559,19 @@ public class AttendanceController {
 	     }
 	 }
 	 
+	 @PutMapping("/rowcall/obs/{id}")
+	 public ResponseEntity<?> updateRowcallObs(@PathVariable(value = "id") Long id, @RequestBody RowcallRequest attRequest) {
+		 try {
+			 
+			 Rowcall val = service.update(attRequest,id);
+			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Rowcall has been updated successfully.", val));
+			
+		 }
+		 catch (Exception ex) {
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	 }
+	 
 	 //Done by Principal
 	 @PutMapping("/approve/{activity}")
 	 public ResponseEntity<?> approveAttendance(

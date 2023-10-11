@@ -29,6 +29,8 @@ public class Rowcall extends DateAudit{
     private String pupil_fullname;     
        
     private String remark; 
+    
+    private String observation; 
 
     private Integer status;    
     

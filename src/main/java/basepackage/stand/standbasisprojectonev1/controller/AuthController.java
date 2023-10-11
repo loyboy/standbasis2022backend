@@ -31,6 +31,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import javax.validation.Valid;
@@ -96,6 +99,12 @@ public class AuthController {
 		        	if (foundCal == null) {
 		        		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse(false, "Login has failed due to Calendar expiration."));   
 		        	}
+		        	
+		        	LocalDate stDate = foundCal.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+					LocalDate endDate = foundCal.getEnddate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+					LocalDate todayDate = LocalDate.now();
+					int weekNumber = calculateWeekNumber(todayDate, stDate, endDate);
+					
 		        	realId = user.getUserId();		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
 		        	lgres.setUsername(user.getName());
@@ -103,7 +112,7 @@ public class AuthController {
 		            lgres.setSchool_date( new Date( foundCal.getStartdate().getTime() ).toLocaleString() );
 		            lgres.setSchool_name( user.getSchool().getName() );
 		            lgres.setCalendar_id( foundCal.getCalendarId() );
-		            
+		            lgres.setCalendar_text( "Week "+weekNumber + " | " + foundCal.getSession() + " | " + "Term " + foundCal.getTerm() );
 		            //lgres.setSchool_date( "2023-01-01" );
 		            lgres.setEmail(user.getEmail());
 		            lgres.setRole("teacher");
@@ -114,12 +123,21 @@ public class AuthController {
 		        if ( user.getRole() == RoleName.PRINCIPAL) {
 		        	Calendar foundCal = calService.findAllByStatus( user.getSchool().getSchId() , 1).get();
 		        	realId = user.getUserId();
+		        	if (foundCal == null) {
+		        		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse(false, "Login has failed due to Calendar expiration."));   
+		        	}
 		        	
+		        	LocalDate stDate = foundCal.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+					LocalDate endDate = foundCal.getEnddate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+					LocalDate todayDate = LocalDate.now();
+					int weekNumber = calculateWeekNumber(todayDate, stDate, endDate);
+					
 		        	lgres.setPermissions(user.getPermissionsJSON());
 		        	lgres.setUsername(user.getName());
 		        	lgres.setSchool_name( user.getSchool().getName() );
 		        	lgres.setCalendar_id( foundCal == null ? null : foundCal.getCalendarId() );
-		        	
+		        	lgres.setCalendar_text( "Week "+weekNumber + " | " + foundCal.getSession() + " | " + "Term " + foundCal.getTerm() );
+			          
 		            lgres.setAccess_token(jwt);
 		            lgres.setEmail(user.getEmail());
 		            lgres.setRole("principal");
@@ -194,7 +212,7 @@ public class AuthController {
 		            lgres.setCode( user.getGuardian_id() );
 		        } 
 		        
-		        System.out.println( " Ending >> " + lgres.getId() );
+		       // System.out.println( " Ending >> " + lgres.getId() );
 		        return ResponseEntity.ok().body(lgres);        
         }
         catch (BadCredentialsException ex) {
@@ -245,4 +263,16 @@ public class AuthController {
 			return ResponseEntity.ok().body(new ApiResponse(false, "false"));
 		}
 	}
+	
+	 public static int calculateWeekNumber(LocalDate today, LocalDate startDate, LocalDate endDate) {
+	        long daysBetween = ChronoUnit.DAYS.between(startDate, today);
+	        long totalDays = ChronoUnit.DAYS.between(startDate, endDate);
+
+	        if (daysBetween < 0 || daysBetween > totalDays) {
+	            throw new IllegalArgumentException("Today's date is outside the specified date range");
+	        }
+
+	        // Adding 1 to start from Week 1 instead of Week 0
+	        return (int) (daysBetween / 7) + 1;
+	 }
 }

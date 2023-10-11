@@ -12,6 +12,8 @@ public class RowcallRequest {
 	    private String pupil_fullname;     
 	       
 	    private String remark; 
+	    
+	    private String observation; 
 	
 	    private Integer status;  
 	    

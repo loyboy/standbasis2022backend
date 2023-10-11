@@ -135,7 +135,7 @@ public class EnrollmentService {
         List<Enrollment> nrols = null;
           
         if ( query.equals("") || query == null ) {
-        	if ( group == null ) {
+        	if ( group == null && owner == null ) {
         		nrols = enrollRepository.findAll();
         	}
         	else {
@@ -152,7 +152,7 @@ public class EnrollmentService {
         	}       	
         }
         else {
-        	if ( group == null ) {
+        	if ( group == null && owner == null ) {
         		nrols = enrollRepository.filterAll("%"+ query + "%");
         	}
         	else {    
@@ -195,11 +195,7 @@ public class EnrollmentService {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Enrollment> schs = null;
         
-        if ( query.equals("") || query == null ) {
-        	if ( owner == null && group == null ) {
-        		schs = enrollRepository.findAll(pageable);
-        	}
-        	else {
+        if ( query.equals("") || query == null ) {        	
         		
         		Optional<School> schownerobj = null;
         		Optional<SchoolGroup> schgroupobj = null ;
@@ -212,13 +208,9 @@ public class EnrollmentService {
         				schgroupobj == null ? null : schgroupobj.get(), 		
                 		pageable
         		);
-        	}        	
+        	        	
         }
-        else {
-        	if ( owner == null && group == null ) {
-        		schs = enrollRepository.filter("%"+ query + "%",  pageable);
-        	}
-        	else {    
+        else {  
         		
         		Optional<School> schownerobj = null;
         		Optional<SchoolGroup> schgroupobj = null ;
@@ -232,7 +224,7 @@ public class EnrollmentService {
                 		schgroupobj == null ? null : schgroupobj.get(),
         				pageable
         		);
-        	}
+        	
         }
 
         if(schs.getNumberOfElements() == 0) {
@@ -247,14 +239,11 @@ public class EnrollmentService {
         
         List<Enrollment> enrolarray = new ArrayList<Enrollment>();
         
-        enrolarray = schs.getContent();
-        
+        enrolarray = schs.getContent();       
        
-        
         Map<String, Object> response = new HashMap<>();
         response.put("enrollments", enrolarray);
         response.put("currentPage", schs.getNumber());
-       // 
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
          

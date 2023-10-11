@@ -42,6 +42,7 @@ import basepackage.stand.standbasisprojectonev1.model.Subject;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.AttendanceRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.RowcallRequest;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceActivityRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceManagementRepository;
 import basepackage.stand.standbasisprojectonev1.repository.AttendanceRepository;
@@ -693,6 +694,16 @@ public class AttendanceService {
 			//CommonActivity.copyNonNullProperties(attRequest, attval);
 			return attRepository.save(attval);
 		}  
+		return null;
+	}
+	
+	public Rowcall update(RowcallRequest rowRequest, long id) {
+		Optional<Rowcall> existing = rowRepository.findById(id);
+		if (existing.isPresent()) {			
+			Rowcall rowval = existing.get();	
+			rowval.setObservation(rowRequest.getObservation());
+			return rowRepository.save(rowval);
+		}
 		return null;
 	}
 
