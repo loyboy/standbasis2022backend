@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import basepackage.stand.standbasisprojectonev1.model.AttendanceManagement;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteManagement;
@@ -219,6 +220,55 @@ public class LessonnoteManagementService {
         return response;
     }
 	
+	public Map<String, Object> getExportOrdinaryTeacherLessonnotes( Optional<Long> schId, Optional<Integer> classId, Optional<Integer> week, Optional<Long> calendarId,  Optional<Long> teacherId, Optional<Long> subject, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
+		
+        Long schowner = schId.orElse(null);
+        Integer classowner = classId.orElse(null);
+        Integer weeknow = week.orElse(null);
+        Long subjectowner = subject.orElse(null);
+        Long teacherowner = teacherId.orElse(null);     
+        Long calval = calendarId.orElse(null);
+        
+        List<LessonnoteManagement> lessonnotes = null;
+        
+        		Optional<School> schownerobj = null;
+        		Optional<Teacher> teacherownerobj = null;
+        		Optional<Calendar> calendarownerobj = null;
+        		Optional<Subject> subjectownerobj = null;
+        		
+        		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
+        		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  }        		
+        		if(calval != null) { calendarownerobj = calRepository.findById( calval );  } 
+        		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  } 
+        		
+        		lessonnotes = lsnmanageRepository.findByTeacherExport(    				
+                		schownerobj == null ? null : schownerobj.get() , 
+                		classowner == null ? null : classowner, 
+                		weeknow,
+                		teacherownerobj == null ? null : teacherownerobj.get(),
+                		subjectownerobj == null ? null : subjectownerobj.get(),		
+                		calendarownerobj == null ? null : calendarownerobj.get(),
+                       
+                		datefrom.isEmpty() ? null : datefrom.get(),
+                        dateto.isEmpty() ? null : dateto.get()
+        		);
+        		
+        		if(lessonnotes.size() == 0) {
+		        	Map<String, Object> responseEmpty = new HashMap<>();
+		        	responseEmpty.put("lessonnotemanagement", Collections.emptyList());
+		        	responseEmpty.put("totalItems", 0 );        	
+		        	return responseEmpty;
+		        }
+		        
+		        List<LessonnoteManagement> calarray = new ArrayList<LessonnoteManagement>(lessonnotes);
+		        
+		        Map<String, Object> response = new HashMap<>();
+		        response.put("lessonnotemanagement", calarray );
+		        response.put("totalItems", calarray.size() );
+		        
+		        return response;
+        
+	}
 	
 	public Map<String, Object> getOrdinaryTeacherLessonnotes(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Integer> classId,  Optional<Integer> week, Optional<String> year, Optional<Integer> term, Optional<Long> teacherId, Optional<Long> subjectId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
         

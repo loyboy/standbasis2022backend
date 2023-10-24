@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
+import basepackage.stand.standbasisprojectonev1.model.LessonnoteManagement;
 import basepackage.stand.standbasisprojectonev1.model.Rowcall;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
@@ -568,6 +569,60 @@ public class AttendanceService {
         response.put("totalExcused", excusedAttendances);
         return response;
     }
+	
+
+	public Map<String, Object> getExportOrdinaryStudentAttendances( Optional<Long> schId, Optional<Long> classId, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Long> studentId, Optional<Long> subject, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
+		
+		        Long schowner = schId.orElse(null);
+		        Long classowner = classId.orElse(null);		        
+		        Long calendarowner = calendarId.orElse(null);  
+		        Long teacherowner = teacherId.orElse(null);
+		        Long studentowner = studentId.orElse(null);
+		        Long subjectowner = subject.orElse(null);
+		        
+		        List<Rowcall> attendances = null;        
+        		
+        		Optional<School> schownerobj = null;
+        		Optional<ClassStream> classownerobj = null;
+        		Optional<Calendar> calendarownerobj = null;
+        		Optional<Teacher> teacherownerobj = null;
+        		Optional<Student> studentownerobj = null;
+        		Optional<Subject> subjectownerobj = null;        		
+        		
+        		if(schowner != null) { schownerobj     =   schRepository.findById( schowner );  } 
+        		if(classowner != null) { classownerobj = 	   clsRepository.findById( classowner );  }
+        		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
+        		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
+        		if(studentowner != null) { studentownerobj = pupRepository.findById( studentowner );  }
+        		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  }
+        		
+        		attendances = attRepository.findByStudentExport( 
+                				schownerobj == null ? null : schownerobj.get() , 
+                				classownerobj == null ? null : classownerobj.get(), 
+                				calendarownerobj == null ? null : calendarownerobj.get(), 
+                				teacherownerobj == null ? null : teacherownerobj.get(), 		
+                				studentownerobj == null ? null : studentownerobj.get(),
+                				subjectownerobj == null ? null : subjectownerobj.get(),
+                				datefrom.isEmpty() ? null : datefrom.get(),
+                		        dateto.isEmpty() ? null : dateto.get()
+        		);
+        		
+        		if(attendances.size() == 0) {
+		        	Map<String, Object> responseEmpty = new HashMap<>();
+		        	responseEmpty.put("attendance", Collections.emptyList());
+		        	responseEmpty.put("totalItems", 0 );        	
+		        	return responseEmpty;
+		        }
+		        
+		        List<Rowcall> calarray = new ArrayList<Rowcall>(attendances);
+		        
+		        Map<String, Object> response = new HashMap<>();
+		        response.put("attendance", calarray );
+		        response.put("totalItems", calarray.size() );
+		        
+		        return response;        		
+        		
+	}
 	
 	public Map<String, Object> getOrdinaryStudentAttendances(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Long> classId, Optional<Long> calendarId, Optional<Long> studentId, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
                 

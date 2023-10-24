@@ -69,6 +69,31 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     );
     //-------------------------------------------------------------------------------------------------
     
+    @Query("select rw from Rowcall rw "
+    		+ "JOIN Attendance att ON att = rw.attendance "
+    		+ "WHERE " 
+    		+ "AND ( att.timetable.school = :sch OR :sch is null) "
+    		+ "AND ( att.timetable.class_stream = :cls OR :cls is null) "
+    		+ "AND ( att.timetable.calendar = :cal OR :cal is null) "
+    		+ "AND ( att.timetable.teacher = :tea OR :tea is null) "
+    		+ "AND ( att.timetable.subject = :sub OR :sub is null) "
+    		+ "AND ( rw.student = :pup OR :pup is null) "
+    		+ "AND ( DATE(att._date) >= :datefrom OR :datefrom is null) "
+    		+ "AND ( DATE(att._date) <= :dateto OR :dateto is null) "
+       	 )
+    
+    List<Rowcall> findByStudentExport(    		
+    		@Param("sch") School sch, 
+    		@Param("cls") ClassStream cls, 
+    		@Param("cal") Calendar cal,
+    		@Param("tea") Teacher tea,
+    		@Param("pup") Student pup,
+    		@Param("sub") Subject sub,
+    		
+    		@Param("datefrom") Date datefrom,
+    		@Param("dateto") Date dateto
+    	);
+    
     @Query("select att from Attendance att where att.timetable.school.owner = :owner "
     		+ "AND ( :sch is null OR att.timetable.school = :sch ) "
     		+ "AND ( :cls is null OR att.timetable.class_stream = :cls ) "

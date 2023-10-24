@@ -227,7 +227,7 @@ public class AttendanceController {
 	 
 	 	@SuppressWarnings("unchecked")
 		@GetMapping("/exportTeachers")
-		 public ResponseEntity<?> getMNETeacherAttendances(				
+		 public ResponseEntity<?> getExportTeacherAttendances(				
 				 @RequestParam(value = "school", required=false) Optional<Long> school,
 				 @RequestParam(value = "class", required=false) Optional<Long> classid,
 				 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
@@ -243,6 +243,30 @@ public class AttendanceController {
 					
 				 	//Map<String, Object> newResponse = new HashMap<>();
 				 	return new ResponseEntity<>(attManageResponse, HttpStatus.OK);
+			 	} catch (Exception e) {					
+					e.printStackTrace();
+					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
+			 	}
+	    }
+	 	
+	 	@SuppressWarnings("unchecked")
+		@GetMapping("/exportRowcalls")
+		 public ResponseEntity<?> getExportRowcallAttendances(
+				 @RequestParam(value = "school", required=false) Optional<Long> school,
+				 @RequestParam(value = "class", required=false) Optional<Long> classid,
+				 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
+				 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
+				 @RequestParam(value = "student", required=false) Optional<Long> student,
+				 @RequestParam(value = "subject", required=false) Optional<Long> subject,
+				 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
+				 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
+		 ) {
+		 
+	 			try {
+				 	Map<String, Object> attResponse = service.getExportOrdinaryStudentAttendances(  school, classid, calendar, teacher,  student, subject, datefrom, dateto );
+					
+				 	//Map<String, Object> newResponse = new HashMap<>();
+				 	return new ResponseEntity<>(attResponse, HttpStatus.OK);
 			 	} catch (Exception e) {					
 					e.printStackTrace();
 					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));

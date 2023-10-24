@@ -522,6 +522,50 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                       	}
                 }
                 
+                if ( attributes.get("dashboard") != null  ) {
+                	Permissions perm = (Permissions) attributes.get("dashboard");                	
+                	System.out.println("Within dashboard.....");
+                	if ( request.getRequestURI().contains("/api/dashboard") == true && 
+                		 perm.getRead() != true && 
+                		 request.getMethod().toLowerCase().equals("get")
+                	   ) 
+                		{                		 
+                		 System.out.println("This user does not have read permissions for the dashboard data. ");
+                		 filterChain.doFilter(request, response);
+                		 return;
+                		}
+                	
+                	if ( request.getRequestURI().contains("/api/dashboard") == true && 
+                      		 perm.getCreate() != true && 
+                      		 request.getMethod().toLowerCase().equals("post")	
+                      	   ) 
+                      	{                		 
+                      	 	System.out.println("This user does not have create permissions for the dashboard data. ");
+                      	 	filterChain.doFilter(request, response);
+                   		 return;
+                      	}
+                	
+                	if ( request.getRequestURI().contains("/api/dashboard") == true && 
+                   		 perm.getEdit() != true && 
+                   		 request.getMethod().toLowerCase().equals("put")	
+                   	   ) 
+                   		{                		 
+                   		 System.out.println("This user does not have edit permissions for the dashboard data. ");
+                   		filterChain.doFilter(request, response);
+               		 return;
+                   		}
+                	
+                	if ( request.getRequestURI().contains("/api/dashboard") == true && 
+                      		 perm.getDelete() != true && 
+                      		 request.getMethod().toLowerCase().equals("delete")	
+                      	   ) 
+                      	{                		 
+                      	 System.out.println("This user does not have delete permissions for the dashboard data. ");
+                      	filterChain.doFilter(request, response);
+               		 return;
+                      	}
+                }
+                
                 
                            
                 

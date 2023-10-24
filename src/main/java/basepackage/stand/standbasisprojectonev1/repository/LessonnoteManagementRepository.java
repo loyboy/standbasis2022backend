@@ -51,6 +51,32 @@ public interface LessonnoteManagementRepository extends JpaRepository<Lessonnote
 	       	 )
 		Page<LessonnoteManagement> filter( @Param("filter") String filter, Pageable pg); 
 		
+		
+		@Query("select lsnmanage from LessonnoteManagement lsnmanage "
+				+ "JOIN Lessonnote lsn ON lsn = lsnmanage.lsn_id "
+				+ "where "
+	    		+ "lsn.calendar.school = :sch OR :sch is null "
+	    		+ "AND (lsn.class_index = :cls OR :cls is null) "
+	    		+ "AND (lsn.teacher = :tea OR :tea is null) "
+	    		+ "AND (lsn.calendar = :cal OR :cal is null) "
+	    		+ "AND (lsn.subject = :sub OR :sub is null) "
+	    		+ "AND (lsn.week = :week OR :week is null) "
+	    		
+	    		+ "AND ( DATE(lsn.submission) >= :datefrom OR :datefrom is null) "
+	    		+ "AND ( DATE(lsn.submission) <= :dateto OR :dateto is null) "
+	    	   )
+		List<LessonnoteManagement> findByTeacherExport( 	    		
+	    		@Param("sch") School sch, 
+	    		@Param("cls") Integer cls, 
+	    		@Param("week") Integer week, 
+	    		@Param("tea") Teacher tea,
+	    		@Param("sub") Subject sub,	    		
+	    		@Param("cal") Calendar cal,
+	    		
+	    		@Param("datefrom") Timestamp datefrom,
+	    		@Param("dateto") Timestamp dateto
+	    );
+		
 		@Query(
 				 "select lsnmanage from LessonnoteManagement lsnmanage "
 					+ "JOIN Lessonnote lsn ON lsn = lsnmanage.lsn_id "

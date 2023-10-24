@@ -176,6 +176,28 @@ public class LessonnoteController {
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 
+	 @GetMapping("/exportTeachers")
+	 public ResponseEntity<?> getExportedTeacherLessonnotes(
+			 @RequestParam(value = "school", required=false) Optional<Long> school,
+			 @RequestParam(value = "class", required=false) Optional<Integer> classid,
+			 @RequestParam(value = "week", required=false) Optional<Integer> week,
+			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,			 
+			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
+			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
+			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
+			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
+	 ) {
+		 
+		 	try {
+			 	Map<String, Object> lsnManageResponse = serviceManagement.getExportOrdinaryTeacherLessonnotes(  school, classid, week, calendar, teacher, subject, datefrom, dateto );
+				
+			 	return new ResponseEntity<>(lsnManageResponse, HttpStatus.OK);
+		 	} catch (Exception e) {					
+				e.printStackTrace();
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
+		 	}	        
+	 }
+	 
 	 @GetMapping("/management/paginateTeachers")
 	 public ResponseEntity<?> getPaginatedTeacherManagementLessonnotes(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
