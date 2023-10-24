@@ -15,9 +15,9 @@ import basepackage.stand.standbasisprojectonev1.model.School;
 
 //import basepackage.stand.standbasisprojectonev1.model.Calendar;
 
-public interface DashboardRepository extends JpaRepository<Object, Long> {
+public interface DashboardRepository extends JpaRepository<DashboardSsis, Long> {
 
-	  @Query("select das from DashboardSsis cal where "
+	  @Query("select das from DashboardSsis das where "
             + "das.school = :owner"
        	 )
 	  Optional<DashboardSsis> findBySchoolSSIS( @Param("owner") School ownerId );
@@ -33,14 +33,14 @@ public interface DashboardRepository extends JpaRepository<Object, Long> {
 	  
 	  ////////////////////////////////////////////////////////////////////////////////
 	  @Query("select das from DashboardSsis das where das.dashId = :owner")
-	  Optional<DashboardSsis> findBySsisId ( @Param("id") Long Id );
+	  Optional<DashboardSsis> findBySsisId ( @Param("owner") Long owner );
 	  
 	  @Query("select das from DashboardTeacher das where das.dashId = :owner")
-	  Optional<DashboardTeacher> findByTeacherId ( @Param("id") Long Id );
+	  Optional<DashboardTeacher> findByTeacherId ( @Param("owner") Long owner );
 	  
 	  @Query("select das from DashboardCurriculum das where das.dashId = :owner")
-	  Optional<DashboardCurriculum> findByCurriculumId ( @Param("id") Long Id );
+	  Optional<DashboardCurriculum> findByCurriculumId ( @Param("owner") Long owner );
 	  
 	  @Query("select das from DashboardAcademic das where das.dashId = :owner")
-	  Optional<DashboardAcademic> findByAcademicId ( @Param("id") Long Id );
+	  Optional<DashboardAcademic> findByAcademicId ( @Param("owner") Long owner );
 }

@@ -72,7 +72,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     @Query("select rw from Rowcall rw "
     		+ "JOIN Attendance att ON att = rw.attendance "
     		+ "WHERE " 
-    		+ "AND ( att.timetable.school = :sch OR :sch is null) "
+    		+ "( att.timetable.school = :sch OR :sch is null) "
     		+ "AND ( att.timetable.class_stream = :cls OR :cls is null) "
     		+ "AND ( att.timetable.calendar = :cal OR :cal is null) "
     		+ "AND ( att.timetable.teacher = :tea OR :tea is null) "
