@@ -21,7 +21,10 @@ import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardAcad
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardCurriculumRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardSsisRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardTeacherRequest;
-import basepackage.stand.standbasisprojectonev1.repository.DashboardRepository;
+import basepackage.stand.standbasisprojectonev1.repository.DashboardARepository;
+import basepackage.stand.standbasisprojectonev1.repository.DashboardCRepository;
+import basepackage.stand.standbasisprojectonev1.repository.DashboardSRepository;
+import basepackage.stand.standbasisprojectonev1.repository.DashboardTRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
@@ -29,7 +32,16 @@ import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 public class DashboardService {
 
 	@Autowired		
-    private DashboardRepository dashRepository;
+    private DashboardSRepository dashRepository;
+	
+	@Autowired		
+    private DashboardTRepository dashTRepository;
+	
+	@Autowired		
+    private DashboardCRepository dashCRepository;
+	
+	@Autowired		
+    private DashboardARepository dashARepository;
 	
 	@Autowired		
     private SchoolRepository schRepository;
@@ -45,7 +57,7 @@ public class DashboardService {
 	}
 	public DashboardTeacher findBySchoolT(long id) {
 		Optional<School> sch = schRepository.findById(id);
-		Optional<DashboardTeacher> das = dashRepository.findBySchoolTeacher(sch.get());
+		Optional<DashboardTeacher> das = dashTRepository.findBySchoolTeacher(sch.get());
 		if (das.isPresent()) {
 			DashboardTeacher dasval = das.get();			
 			return dasval;
@@ -55,7 +67,7 @@ public class DashboardService {
 	
 	public DashboardCurriculum findBySchoolC(long id) {
 		Optional<School> sch = schRepository.findById(id);
-		Optional<DashboardCurriculum> das = dashRepository.findBySchoolCurriculum(sch.get());
+		Optional<DashboardCurriculum> das = dashCRepository.findBySchoolCurriculum(sch.get());
 		if (das.isPresent()) {
 			DashboardCurriculum dasval = das.get();			
 			return dasval;
@@ -65,7 +77,7 @@ public class DashboardService {
 	
 	public DashboardAcademic findBySchoolA(long id) {
 		Optional<School> sch = schRepository.findById(id);
-		Optional<DashboardAcademic> das = dashRepository.findBySchoolAcademic(sch.get());
+		Optional<DashboardAcademic> das = dashARepository.findBySchoolAcademic(sch.get());
 		if (das.isPresent()) {
 			DashboardAcademic dasval = das.get();			
 			return dasval;
@@ -89,39 +101,39 @@ public class DashboardService {
 	}
 	
 	public DashboardTeacher updateT(DashboardTeacherRequest dashRequest,long id) {
-		Optional<DashboardTeacher> existing = dashRepository.findByTeacherId(id);
+		Optional<DashboardTeacher> existing = dashTRepository.findByTeacherId(id);
 		if (existing.isPresent()) {
 			DashboardTeacher dashval = existing.get();
 			
 			copyNonNullProperties(dashRequest, dashval);			
 			
-			return dashRepository.save(dashval);
+			return dashTRepository.save(dashval);
 		}   
 		
 		return null;
 	}
 	
 	public DashboardCurriculum updateC(DashboardCurriculumRequest dashRequest,long id) {
-		Optional<DashboardCurriculum> existing = dashRepository.findByCurriculumId(id);
+		Optional<DashboardCurriculum> existing = dashCRepository.findByCurriculumId(id);
 		if (existing.isPresent()) {
 			DashboardCurriculum dashval = existing.get();
 			
 			copyNonNullProperties(dashRequest, dashval);			
 			
-			return dashRepository.save(dashval);
+			return dashCRepository.save(dashval);
 		}   
 		
 		return null;
 	}
 	
 	public DashboardAcademic updateA(DashboardAcademicRequest dashRequest,long id) {
-		Optional<DashboardAcademic> existing = dashRepository.findByAcademicId(id);
+		Optional<DashboardAcademic> existing = dashARepository.findByAcademicId(id);
 		if (existing.isPresent()) {
 			DashboardAcademic dashval = existing.get();
 			
 			copyNonNullProperties(dashRequest, dashval);			
 			
-			return dashRepository.save(dashval);
+			return dashARepository.save(dashval);
 		}   
 		
 		return null;
