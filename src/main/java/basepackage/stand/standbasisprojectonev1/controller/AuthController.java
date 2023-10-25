@@ -220,6 +220,7 @@ public class AuthController {
 		            lgres.setAccess_token(jwt);
 		            lgres.setEmail(user.getEmail());
 		            lgres.setSchool_id( user.getSchool().getSchId() );
+		            lgres.setSchool_name( user.getSchool().getName() );
 		            lgres.setRole("dashboarduser");
 		            lgres.setData_id(null);
 		            lgres.setId(realId);
