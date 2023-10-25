@@ -39,10 +39,10 @@ public class DashboardAcademic {
 	private Integer _dragIndex_term_three; 
 	private Integer _dragIndex_external; 
 	
-	private Integer _grade_term_one;
-	private Integer _grade_term_two;
-	private Integer _grade_term_three;
-	private Integer _grade_external;
+	private String _grade_term_one;
+	private String _grade_term_two;
+	private String _grade_term_three;
+	private String _grade_external;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sch_id", nullable = false)
