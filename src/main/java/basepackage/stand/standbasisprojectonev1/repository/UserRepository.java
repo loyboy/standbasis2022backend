@@ -39,6 +39,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findFilterBySchool( @Param("filter") String filter, @Param("sch") School sch, @Param("group") SchoolGroup group,  Pageable pg );
     
     User findByUserId(Long userid);
+    
+    Optional<User> findByUsername(String username);
 
     Boolean existsByUsername(String username);
     

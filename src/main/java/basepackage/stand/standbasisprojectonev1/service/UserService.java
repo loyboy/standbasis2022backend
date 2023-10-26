@@ -19,6 +19,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import basepackage.stand.standbasisprojectonev1.exception.BadRequestException;
@@ -26,6 +33,8 @@ import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.model.User;
+import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserPasswordRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.UserAccountRequest;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
@@ -43,6 +52,12 @@ public class UserService {
 	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 	
 	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+    AuthenticationManager authenticationManager;
+	
+	@Autowired
     private UserRepository userRepository;	
 	
 	@Autowired		
@@ -51,17 +66,41 @@ public class UserService {
 	@Autowired
     private SchoolgroupRepository schgroupRepository;
 	
-	@Autowired		
-    private TimetableRepository timeRepository;
-	
-	@Autowired		
-    private TeacherRepository teaRepository;
-	
 	public Boolean checkUsername( CheckUserRequest checkuser ) {
 		Optional<User> u = userRepository.findByUsernameAndStatus( checkuser.getUsername(), 1 );
 		
 		return u.isPresent();
 	}
+	
+	public Boolean changePassword( CheckUserPasswordRequest passworduser ) {
+		try{ 
+			Authentication authentication = authenticationManager.authenticate(        
+	                new UsernamePasswordAuthenticationToken(
+	                		passworduser.getUsername(),
+	                		passworduser.getOldpassword()
+	                )
+	        );
+			
+			if (authentication != null) {
+				Optional<User> existing = userRepository.findByUsername(passworduser.getUsername());
+				if (existing.isPresent()) {
+					User userval = existing.get();
+					userval.setPassword( passwordEncoder.encode(passworduser.getNewpassword()) );
+					userRepository.save(userval);
+					return true;
+				}
+			}
+			else {
+				return false;
+			}
+			return false;
+		}
+	    catch (BadCredentialsException ex) {
+	        return false;
+	    }	
+		
+	}
+	
 	
 	public List<User> findAll() {
 		

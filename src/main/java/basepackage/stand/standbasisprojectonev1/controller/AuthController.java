@@ -3,10 +3,11 @@ package basepackage.stand.standbasisprojectonev1.controller;
 import basepackage.stand.standbasisprojectonev1.model.RoleName;
 import basepackage.stand.standbasisprojectonev1.model.User;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
+import basepackage.stand.standbasisprojectonev1.payload.ApiContentResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.payload.LoginRequest;
 import basepackage.stand.standbasisprojectonev1.payload.LoginResponse;
-
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserPasswordRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardRequest;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
@@ -26,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +37,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -216,7 +219,7 @@ public class AuthController {
 		        	realId = user.getUserId();
 		        	
 		        	lgres.setPermissions(user.getPermissionsJSON());
-		        	lgres.setUsername(user.getName());
+		        	lgres.setUsername(user.getUsername());
 		            lgres.setAccess_token(jwt);
 		            lgres.setEmail(user.getEmail());
 		            lgres.setSchool_id( user.getSchool().getSchId() );
@@ -279,7 +282,19 @@ public class AuthController {
 		}
 	}
 	
-	 public static int calculateWeekNumber(LocalDate today, LocalDate startDate, LocalDate endDate) {
+	@PostMapping("/changePassword")
+	public ResponseEntity<?> changePasswords(@Valid @RequestBody CheckUserPasswordRequest user) {
+		boolean status = userService.changePassword( user );
+		if (status) {
+			return ResponseEntity.ok().body(new ApiResponse(true, "Password Changed" ));
+		}
+		else {
+			return ResponseEntity.ok().body(new ApiResponse(false, "Password Not Changed"));
+		}	
+		
+	}
+	
+	public static int calculateWeekNumber(LocalDate today, LocalDate startDate, LocalDate endDate) {
 	        long daysBetween = ChronoUnit.DAYS.between(startDate, today);
 	        long totalDays = ChronoUnit.DAYS.between(startDate, endDate);
 
