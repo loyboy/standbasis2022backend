@@ -1,8 +1,10 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
 import basepackage.stand.standbasisprojectonev1.model.RoleName;
+import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.User;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
+import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.payload.ApiContentResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.payload.LoginRequest;
@@ -10,8 +12,10 @@ import basepackage.stand.standbasisprojectonev1.payload.LoginResponse;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserPasswordRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardRequest;
+import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.security.JwtTokenProvider;
+import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
 import basepackage.stand.standbasisprojectonev1.service.OnboardingService;
 import basepackage.stand.standbasisprojectonev1.service.CalendarService;
 import basepackage.stand.standbasisprojectonev1.service.UserService;
@@ -23,6 +27,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +43,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -57,6 +63,9 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+    
+    @Autowired
+	private EventManagerRepository eventRepository;
 
     @Autowired
     JwtTokenProvider tokenProvider;
@@ -283,9 +292,17 @@ public class AuthController {
 	}
 	
 	@PostMapping("/changePassword")
-	public ResponseEntity<?> changePasswords(@Valid @RequestBody CheckUserPasswordRequest user) {
+	public ResponseEntity<?> changePasswords(@AuthenticationPrincipal UserPrincipal userDetails, @Valid @RequestBody CheckUserPasswordRequest user) {
 		boolean status = userService.changePassword( user );
 		if (status) {
+			
+			Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+			//------------------------------------
+			saveEvent("dashboarduser", "edit", "The User with name: " + u.get().getUsername() + " has edited a Password instance. ", 
+					 new Date(), u.get(), u.get().getSchool()
+			);
+			 
 			return ResponseEntity.ok().body(new ApiResponse(true, "Password Changed" ));
 		}
 		else {
@@ -305,4 +322,18 @@ public class AuthController {
 	        // Adding 1 to start from Week 1 instead of Week 0
 	        return (int) (daysBetween / 7) + 1;
 	 }
+	
+	private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 
+	 	
+	 	EventManager _event = new EventManager();
+	 	
+	 	_event.setModule(module);
+ 		_event.setAction(action);
+ 		_event.setComment(comment);
+ 		_event.setDateofevent(d);	
+ 		_event.setUser(u);
+ 		_event.setSchool(sch);
+ 		
+ 		return eventRepository.save(_event);
+	}
 }

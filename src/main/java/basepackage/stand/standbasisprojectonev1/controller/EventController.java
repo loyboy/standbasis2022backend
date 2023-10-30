@@ -64,4 +64,16 @@ public class EventController {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	 }
+	 
+	 @GetMapping("/dashboard/{schoolid}")
+	 public ResponseEntity<?> getDashboardPasswordChange(@PathVariable(value = "schoolid") Long id) {
+		 try {
+			 EventManager val = service.findEditBySchool(id);
+			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Event has been retrieved successfully.", val));
+			
+		 }
+		 catch (Exception ex) {
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	 }
 }

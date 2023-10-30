@@ -85,7 +85,7 @@ public class School extends DateAudit {
 	    @Size(max = 100)
 	    private String logo, location, email, phone;
 	    
-	    private Integer sri, status = 0;
+	    private Integer sri, status, dashboarduser = 0;
 	    
 	    @Size(max = 100)
 	    private String mission, rating, tour, Calendar_upload, teachers_upload, students_upload, classroom_upload, timetable_upload, zone, jurisdiction, groupofschool;

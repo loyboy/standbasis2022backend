@@ -31,7 +31,7 @@ public class EventManager extends DateAudit{
     private Long eventId;
     
     @Column(name="module")
-    private String module; // attendance, lesson note
+    private String module; // attendance, lesson note, dashboarduser
     
     @Column(name="action")
     private String action; // create, edit, delete, update

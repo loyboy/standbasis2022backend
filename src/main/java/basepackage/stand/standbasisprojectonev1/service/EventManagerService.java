@@ -72,6 +72,19 @@ private static final Logger logger = LoggerFactory.getLogger(EventManagerService
 		return null;
 	}
 	
+	public EventManager findEditBySchool(long id) {		
+		Optional<School> sch = schRepository.findById(id);
+		if (sch.isPresent()) {
+			School schval = sch.get();
+			if ( eventmanagerRepository.findEditBySchool(schval).isPresent() ) {
+				return eventmanagerRepository.findEditBySchool(schval).get();
+			}else {
+				return null;
+			}			
+		}
+		return null;
+	}
+	
 	public EventManager saveOne(EventManagerRequest evtRequest) {
 		 ModelMapper modelMapper = new ModelMapper();   
 		 EventManager evt = modelMapper.map(evtRequest, EventManager.class);

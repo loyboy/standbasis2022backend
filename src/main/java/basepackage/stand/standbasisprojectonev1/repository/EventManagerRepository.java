@@ -22,6 +22,9 @@ public interface EventManagerRepository extends JpaRepository<EventManager, Long
 	    
 	    List<EventManager> findBySchool(School sch);
 	    
+	    @Query(" select evt from EventManager evt where evt.module = 'dashboarduser' and evt.action = 'edit' and evt.school = :sch ")
+	    Optional<EventManager> findEditBySchool( @Param("sch") School sch);
+	    
 	    @Query(" select evt from EventManager evt where evt.comment like :filter ")
 	    Page<EventManager> filter( @Param("filter") String filter, Pageable pg);
 	    
