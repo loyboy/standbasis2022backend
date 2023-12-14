@@ -46,18 +46,18 @@ public class DashboardService {
 	@Autowired		
     private SchoolRepository schRepository;
 	
-	public DashboardSsis findBySchoolS(long id) {
+	public DashboardSsis findBySchoolS(long id, Integer year) {
 		Optional<School> sch = schRepository.findById(id);
-		Optional<DashboardSsis> das = dashRepository.findBySchoolSSIS(sch.get());
+		Optional<DashboardSsis> das = dashRepository.findBySchoolSSIS(sch.get(), year);
 		if (das.isPresent()) {
 			DashboardSsis dasval = das.get();			
 			return dasval;
 		}
 		return null;
 	}
-	public DashboardTeacher findBySchoolT(long id) {
+	public DashboardTeacher findBySchoolT(long id, Integer year) {
 		Optional<School> sch = schRepository.findById(id);
-		Optional<DashboardTeacher> das = dashTRepository.findBySchoolTeacher(sch.get());
+		Optional<DashboardTeacher> das = dashTRepository.findBySchoolTeacher(sch.get(), year);
 		if (das.isPresent()) {
 			DashboardTeacher dasval = das.get();			
 			return dasval;
@@ -65,9 +65,9 @@ public class DashboardService {
 		return null;
 	}
 	
-	public DashboardCurriculum findBySchoolC(long id) {
+	public DashboardCurriculum findBySchoolC(long id, Integer year) {
 		Optional<School> sch = schRepository.findById(id);
-		Optional<DashboardCurriculum> das = dashCRepository.findBySchoolCurriculum(sch.get());
+		Optional<DashboardCurriculum> das = dashCRepository.findBySchoolCurriculum(sch.get(), year);
 		if (das.isPresent()) {
 			DashboardCurriculum dasval = das.get();			
 			return dasval;
@@ -75,9 +75,9 @@ public class DashboardService {
 		return null;
 	}
 	
-	public DashboardAcademic findBySchoolA(long id) {
+	public DashboardAcademic findBySchoolA(long id, Integer year) {
 		Optional<School> sch = schRepository.findById(id);
-		Optional<DashboardAcademic> das = dashARepository.findBySchoolAcademic(sch.get());
+		Optional<DashboardAcademic> das = dashARepository.findBySchoolAcademic(sch.get(), year);
 		if (das.isPresent()) {
 			DashboardAcademic dasval = das.get();			
 			return dasval;

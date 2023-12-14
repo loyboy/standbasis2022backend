@@ -17,8 +17,8 @@ import basepackage.stand.standbasisprojectonev1.model.School;
 
 public interface DashboardSRepository extends JpaRepository<DashboardSsis, Long> {
 
-	  @Query("select das from DashboardSsis das where das.school = :owner")
-	  Optional<DashboardSsis> findBySchoolSSIS( @Param("owner") School ownerId );
+	  @Query("select das from DashboardSsis das where das.school = :owner AND (das._year = :year OR :year is null) ")
+	  Optional<DashboardSsis> findBySchoolSSIS( @Param("owner") School ownerId, @Param("year") Integer y  );
 	  
 	  ////////////////////////////////////////////////////////////////////////////////
 	  @Query("select das from DashboardSsis das where das.dashId = :owner")

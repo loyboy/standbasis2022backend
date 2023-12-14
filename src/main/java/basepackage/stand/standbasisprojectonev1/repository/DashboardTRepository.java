@@ -11,8 +11,8 @@ import basepackage.stand.standbasisprojectonev1.model.School;
 
 public interface DashboardTRepository extends JpaRepository<DashboardTeacher, Long> {
 	  
-	  @Query("select das from DashboardTeacher das where das.school = :owner")
-	  Optional<DashboardTeacher> findBySchoolTeacher( @Param("owner") School ownerId );
+	  @Query("select das from DashboardTeacher das where das.school = :owner AND (das._year = :year OR :year is null)")
+	  Optional<DashboardTeacher> findBySchoolTeacher( @Param("owner") School ownerId, @Param("year") Integer y );
 	  
 	  ////////////////////////////////////////////////////////////////////////////////
 	  

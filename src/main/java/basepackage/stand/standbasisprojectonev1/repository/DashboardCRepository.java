@@ -15,8 +15,8 @@ import basepackage.stand.standbasisprojectonev1.model.School;
 
 public interface DashboardCRepository extends JpaRepository<DashboardCurriculum, Long> {
 	  
-	  @Query("select das from DashboardCurriculum das where das.school = :owner")
-	  Optional<DashboardCurriculum> findBySchoolCurriculum( @Param("owner") School ownerId );
+	  @Query("select das from DashboardCurriculum das where das.school = :owner AND (das._year = :year OR :year is null) ")
+	  Optional<DashboardCurriculum> findBySchoolCurriculum( @Param("owner") School ownerId , @Param("year") Integer y );
 	  
 	  ////////////////////////////////////////////////////////////////////////////////
 	 

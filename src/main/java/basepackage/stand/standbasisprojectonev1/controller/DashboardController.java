@@ -49,48 +49,70 @@ public class DashboardController {
 	 @Autowired
 	 private EventManagerRepository eventRepository;
 	 
-	 @GetMapping("/standards/school/{id}")
-	 public ResponseEntity<?> getStandardsBySchool( @PathVariable(value = "id") Long id ) {
+	 @GetMapping( value = {"/standards/school/{id}/year/{year}", "/standards/school/{id}" })
+	 public ResponseEntity<?> getStandardsBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year  ) {
 		 try {	 
-			 DashboardSsis val = service.findBySchoolS(id);
-			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for standards has been retrieved successfully.", val));
-				
+			 if (_year != null) {
+				 DashboardSsis val = service.findBySchoolS(id, Integer.parseInt(_year) );
+				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for standards has been retrieved successfully.", val));
+			 }	
+			 else {
+				 DashboardSsis val = service.findBySchoolS(id, null);
+				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for standards has been retrieved successfully.", val));
+		
+			 }
 		 }
 		 catch (Exception ex) {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	}
 	 
-	 @GetMapping("/teachers/school/{id}")
-	 public ResponseEntity<?> getTeachersBySchool( @PathVariable(value = "id") Long id ) {
-		 try {	 
-			 DashboardTeacher val = service.findBySchoolT(id);
-			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for teachers has been retrieved successfully.", val));
-				
+	 @GetMapping( value = {"/teachers/school/{id}/year/{year}", "/teachers/school/{id}" } )
+	 public ResponseEntity<?> getTeachersBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year ) {
+		 try {	
+			 if (_year != null) {
+				 DashboardTeacher val = service.findBySchoolT(id, Integer.parseInt(_year));
+				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for teachers has been retrieved successfully.", val));
+			 }
+			 else {
+				 DashboardTeacher val = service.findBySchoolT(id, null);
+				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for teachers has been retrieved successfully.", val));
+			 }
 		 }
 		 catch (Exception ex) {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	}
 	 
-	 @GetMapping("/curriculum/school/{id}")
-	 public ResponseEntity<?> getCurriculumBySchool( @PathVariable(value = "id") Long id ) {
+	 @GetMapping( value = {"/curriculum/school/{id}/year/{year}", "/curriculum/school/{id}" })
+	 public ResponseEntity<?> getCurriculumBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year ) {
 		 try {	 
-			 DashboardCurriculum val = service.findBySchoolC(id);
-			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for curriculum has been retrieved successfully.", val));
-				
+			 if (_year != null ) {
+				 DashboardCurriculum val = service.findBySchoolC(id, Integer.parseInt(_year));
+				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for curriculum has been retrieved successfully.", val));
+			 }
+			 else {
+				 DashboardCurriculum val = service.findBySchoolC(id, null);
+				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for curriculum has been retrieved successfully.", val));
+			
+			 }
 		 }
 		 catch (Exception ex) {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	}
 	 
-	 @GetMapping("/academic/school/{id}")
-	 public ResponseEntity<?> getAcademicBySchool( @PathVariable(value = "id") Long id ) {
+	 @GetMapping( value = {"/academic/school/{id}/year/{year}", "/academic/school/{id}" } )
+	 public ResponseEntity<?> getAcademicBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year ) {
 		 try {	 
-			 DashboardAcademic val = service.findBySchoolA(id);
-			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for academic has been retrieved successfully.", val));
-				
+			 if (_year != null ) {
+				DashboardAcademic val = service.findBySchoolA(id, Integer.parseInt(_year));
+				return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for academic has been retrieved successfully.", val));
+			 }
+			 else {
+				DashboardAcademic val = service.findBySchoolA(id, null);
+				return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for academic has been retrieved successfully.", val));
+			 }
 		 }
 		 catch (Exception ex) {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
