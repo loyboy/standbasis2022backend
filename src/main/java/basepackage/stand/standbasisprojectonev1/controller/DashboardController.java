@@ -52,7 +52,7 @@ public class DashboardController {
 	 @GetMapping( value = {"/standards/school/{id}/year/{year}", "/standards/school/{id}" })
 	 public ResponseEntity<?> getStandardsBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year  ) {
 		 try {	 
-			 if (_year != null) {
+			 if ( _year != null && _year != "null") {
 				 DashboardSsis val = service.findBySchoolS(id, Integer.parseInt(_year) );
 				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for standards has been retrieved successfully.", val));
 			 }	
@@ -63,6 +63,7 @@ public class DashboardController {
 			 }
 		 }
 		 catch (Exception ex) {
+			 System.out.println("Error in Standards " + ex.getMessage() );
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	}
@@ -70,7 +71,7 @@ public class DashboardController {
 	 @GetMapping( value = {"/teachers/school/{id}/year/{year}", "/teachers/school/{id}" } )
 	 public ResponseEntity<?> getTeachersBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year ) {
 		 try {	
-			 if (_year != null) {
+			 if ( _year != null && _year != "null" ) {
 				 DashboardTeacher val = service.findBySchoolT(id, Integer.parseInt(_year));
 				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for teachers has been retrieved successfully.", val));
 			 }
@@ -80,6 +81,7 @@ public class DashboardController {
 			 }
 		 }
 		 catch (Exception ex) {
+			 System.out.println("Error in Teacher " + ex.getMessage() );
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	}
@@ -87,7 +89,7 @@ public class DashboardController {
 	 @GetMapping( value = {"/curriculum/school/{id}/year/{year}", "/curriculum/school/{id}" })
 	 public ResponseEntity<?> getCurriculumBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year ) {
 		 try {	 
-			 if (_year != null ) {
+			 if ( _year != null && _year != "null") {
 				 DashboardCurriculum val = service.findBySchoolC(id, Integer.parseInt(_year));
 				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for curriculum has been retrieved successfully.", val));
 			 }
@@ -98,6 +100,7 @@ public class DashboardController {
 			 }
 		 }
 		 catch (Exception ex) {
+			 System.out.println("Error in Curriculum " + ex.getMessage() );
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	}
@@ -105,7 +108,7 @@ public class DashboardController {
 	 @GetMapping( value = {"/academic/school/{id}/year/{year}", "/academic/school/{id}" } )
 	 public ResponseEntity<?> getAcademicBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year ) {
 		 try {	 
-			 if (_year != null ) {
+			 if ( _year != null && _year != "null" ) {
 				DashboardAcademic val = service.findBySchoolA(id, Integer.parseInt(_year));
 				return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for academic has been retrieved successfully.", val));
 			 }
@@ -115,6 +118,7 @@ public class DashboardController {
 			 }
 		 }
 		 catch (Exception ex) {
+			 System.out.println("Error in Academic " + ex.getMessage() );
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	}
