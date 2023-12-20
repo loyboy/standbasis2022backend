@@ -714,9 +714,7 @@ public class LessonnoteController {
 				 String val = service.updateFile(id, newFileName);			 
 				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Teacher Lessonnote File has been added/updated successfully.", val));	
 		 }
-		 catch (Exception ex) {
-			 
-			 
+		 catch (Exception ex) {		 
 			 System.out.println( "Error in lsn upload: " + ex.getMessage() );
 			 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }

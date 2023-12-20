@@ -599,31 +599,36 @@ public class LessonnoteService {
 		Optional<Lessonnote> existing = lsnRepository.findById(id);
 		
 		if (existing.isPresent()) {
+			Date currentDate = new Date();				        
+			java.util.Calendar calendar = java.util.Calendar.getInstance();
+	        calendar.setTime(currentDate);
+	        calendar.add(java.util.Calendar.HOUR_OF_DAY, 1);
+	        
 			Lessonnote lsnval = existing.get();			
 			if (lsnRequest.getAction() != null) {
 				if (lsnRequest.getAction().equals("submit") ) {
-					if( lsnval.getSubmission() == null ) {					;
-						lsnval.setSubmission( CommonActivity.parseTimestamp( CommonActivity.todayDate() ) );
+					if( lsnval.getSubmission() == null ) {					
+						lsnval.setSubmission( new Timestamp(calendar.getTime().getTime()) );
 						lsnval.setCycle_count( lsnval.getCycle_count() + 1 );
 					}				
 				}
 				if (lsnRequest.getAction().equals("resubmit") ) {
 					if( lsnval.getResubmission() == null ) {
 						lsnval.setRevert(null);
-						lsnval.setResubmission( CommonActivity.parseTimestamp( CommonActivity.todayDate() ) );
+						lsnval.setResubmission( new Timestamp(calendar.getTime().getTime()) );
 						lsnval.setCycle_count( lsnval.getCycle_count() + 1 );
 					}				
 				}
 				else if (lsnRequest.getAction().equals("revert")) {
 					if( lsnval.getRevert() == null ) {
 						lsnval.setResubmission(null);
-						lsnval.setRevert( CommonActivity.parseTimestamp( CommonActivity.todayDate() ) );
+						lsnval.setRevert( new Timestamp(calendar.getTime().getTime()) );
 						lsnval.setCycle_count( lsnval.getCycle_count() + 1 );
 					}
 				}			
 				else if (lsnRequest.getAction().equals("approval")) {
 					if( lsnval.getApproval() == null ) {
-						lsnval.setApproval( CommonActivity.parseTimestamp( CommonActivity.todayDate() ) );
+						lsnval.setApproval( new Timestamp(calendar.getTime().getTime()) );
 						lsnval.setCycle_count( lsnval.getCycle_count() + 1 );	
 						
 						List<Enrollment> enrolData = enrolRepository.findByClassIndex( lsnval.getClass_index(), lsnval.getCalendar().getSchool() );
@@ -702,18 +707,18 @@ public class LessonnoteService {
 				}
 				else if (lsnRequest.getAction().equals("launch")) {
 					if( lsnval.getLaunch() == null ) {
-						lsnval.setLaunch( CommonActivity.parseTimestamp( CommonActivity.todayDate() ) );
+						lsnval.setLaunch( new Timestamp(calendar.getTime().getTime()) );
 					}
 				}
 				else if (lsnRequest.getAction().equals("closure")) {
 					if( lsnval.getClosure() == null ) {
 						lsnval.setLaunch(null);
-						lsnval.setClosure( CommonActivity.parseTimestamp( CommonActivity.todayDate() ) );
+						lsnval.setClosure( new Timestamp(calendar.getTime().getTime()) );
 					}
 				}
 				else if (lsnRequest.getAction().equals("closed")) { //for only principal
 					if( lsnval.getPrincipal_closure() == null ) {						
-						lsnval.setPrincipal_closure( CommonActivity.parseTimestamp( CommonActivity.todayDate() ) );
+						lsnval.setPrincipal_closure( new Timestamp(calendar.getTime().getTime()) );
 					}
 				}
 			}
