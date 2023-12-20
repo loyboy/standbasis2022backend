@@ -688,7 +688,7 @@ public class LessonnoteController {
 		         String currentDir = System.getProperty("user.dir");
 		         String bucketName = "standb670";
 		         String filePath = currentDir + tempfilePath;
-			 	
+		         System.out.println( "directory current: " + currentDir );
 			 	 S3Client client = S3Client.builder().build();
 		        
 			 	 PutObjectRequest request = PutObjectRequest.builder()
@@ -705,7 +705,10 @@ public class LessonnoteController {
 				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Teacher Lessonnote File has been added/updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+			 
+			 
+			 System.out.println( "Error in lsn upload: " + ex.getMessage() );
+			 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	 }
 	 
