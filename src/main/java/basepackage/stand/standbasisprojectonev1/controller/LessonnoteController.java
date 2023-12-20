@@ -32,15 +32,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import basepackage.stand.standbasisprojectonev1.model.Assessment;
-import basepackage.stand.standbasisprojectonev1.model.Attendance;
-import basepackage.stand.standbasisprojectonev1.model.AttendanceActivity;
-import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteActivity;
 import basepackage.stand.standbasisprojectonev1.model.LessonnoteManagement;
 import basepackage.stand.standbasisprojectonev1.model.School;
-import basepackage.stand.standbasisprojectonev1.model.Subject;
 import basepackage.stand.standbasisprojectonev1.model.User;
 import basepackage.stand.standbasisprojectonev1.payload.ApiContentResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiDataResponse;
@@ -64,6 +60,7 @@ import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 import basepackage.stand.standbasisprojectonev1.util.FileUploadUtil;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import org.springframework.beans.factory.annotation.Value;
 //import software.amazon.awssdk.core.sync.RequestBody;
 
 @RestController
@@ -93,6 +90,15 @@ public class LessonnoteController {
 	 
 	 @Autowired		
 	 private CalendarRepository calRepository;
+	 
+	 @Value("${aws.region}")
+	 private String region;
+	 
+	 @Value("${aws.secretKey}")
+	 private String sk;
+	 
+	 @Value("${aws.accessKeyId}")
+	 private String accesskey;
 	 
 	 private final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	 
@@ -677,6 +683,10 @@ public class LessonnoteController {
 	 @RequestMapping(path = "/file/{id}", method = PUT, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
 	 public ResponseEntity<?> updateLessonnoteFile(@PathVariable(value = "id") Long id, @RequestPart("lsn") MultipartFile multipartFile) {
 		 try {
+				 System.setProperty("aws.accessKeyId", accesskey);
+				 System.setProperty("aws.secretKey", sk);
+				 System.setProperty("aws.region", region);
+				 
 			 	 String fileOriginalName = StringUtils.cleanPath(multipartFile.getOriginalFilename());		         
 			 	 String fileName = "0"+ id.toString() + "." + FileUploadUtil.findExtension(fileOriginalName).get();
 			 	
