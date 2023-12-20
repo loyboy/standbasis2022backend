@@ -2,6 +2,7 @@ package basepackage.stand.standbasisprojectonev1.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -61,6 +62,9 @@ import basepackage.stand.standbasisprojectonev1.service.TimetableService;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
 import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 import basepackage.stand.standbasisprojectonev1.util.FileUploadUtil;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+//import software.amazon.awssdk.core.sync.RequestBody;
 
 @RestController
 @RequestMapping("/api/lessonnote")
@@ -678,8 +682,26 @@ public class LessonnoteController {
 			 	
 		         String uploadDir = "teacher-lessonnote/" + id;		 
 		         FileUploadUtil.saveFile(uploadDir, fileName , multipartFile);
+		         
+		         String key = "lessonnote" + "/" + fileName;
+		         String tempfilePath = "/" + uploadDir + "/" + fileName;
+		         String currentDir = System.getProperty("user.dir");
+		         String bucketName = "standb670";
+		         String filePath = currentDir + tempfilePath;
+			 	
+			 	 S3Client client = S3Client.builder().build();
 		        
-				 String val = service.updateFile(id, fileName);			 
+			 	 PutObjectRequest request = PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(key)
+                        .acl("public-read")
+                        .build();
+         
+			 	 client.putObject(request, software.amazon.awssdk.core.sync.RequestBody.fromFile(new File(filePath)));		 	 
+			 	 
+			 	 //https://bucket-name.s3.region-name.amazonaws.com/object-key
+			 	 String newFileName = "https://"+bucketName+".s3.us-east-1.amazonaws.com/"+key;
+				 String val = service.updateFile(id, newFileName);			 
 				 return ResponseEntity.ok().body(new ApiDataResponse(true, "Teacher Lessonnote File has been added/updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
