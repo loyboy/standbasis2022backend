@@ -684,7 +684,7 @@ public class LessonnoteController {
 	 public ResponseEntity<?> updateLessonnoteFile(@PathVariable(value = "id") Long id, @RequestPart("lsn") MultipartFile multipartFile) {
 		 try {
 				 System.setProperty("aws.accessKeyId", accesskey);
-				 System.setProperty("aws.secretKey", sk);
+				 System.setProperty("aws.secretAccessKey", sk);
 				 System.setProperty("aws.region", region);
 				 
 			 	 String fileOriginalName = StringUtils.cleanPath(multipartFile.getOriginalFilename());		         
