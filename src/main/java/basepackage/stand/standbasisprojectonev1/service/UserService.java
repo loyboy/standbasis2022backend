@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,12 +32,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+
 import basepackage.stand.standbasisprojectonev1.exception.BadRequestException;
+import basepackage.stand.standbasisprojectonev1.model.RoleName;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.model.User;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
+import basepackage.stand.standbasisprojectonev1.payload.Permissions;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserPasswordRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.UserAccountRequest;
@@ -51,8 +59,13 @@ public class UserService {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 	
+	Gson gsonObj = new Gson();
+	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+    private JavaMailSender mailSender;
 	
 	@Autowired
     AuthenticationManager authenticationManager;
@@ -227,5 +240,91 @@ public class UserService {
 		}
 		return null;
 	}
+	
+	public User createSchoolViaDashboard(String standbasis_unique_number,String school_name, String school_email, String school_physical_address, String school_telephone_number, String contact_person_name, String designation ) {
+		
+		Optional<SchoolGroup> sg = schgroupRepository.findById( (long) 2 );
+		
+		School sch = new School();
+		sch.setOwner(sg.get());
+		sch.setName(school_name);
+		sch.setType_of("unknown");
+		sch.setState("unknown");
+		sch.setResidence("unknown");
+		sch.setOperator("unknown");
+		sch.setLga("unknown");
+		sch.setEmail(school_email);
+		sch.setPhone(school_telephone_number);
+		
+		School savedSchool = schRepository.save(sch);
+		
+		String from = "info@standbasis.com";
+		String to = school_email;
+		 
+		SimpleMailMessage message = new SimpleMailMessage();
+		String specialIdUser2 = createUuid("user-", savedSchool.getSchId() );
+		String specialIdUsername = createUuidUsername("dashboard");
+		String specialPassword = createUuidPassword();
+		
+			User _u = new User();
+		
+			_u.setId(specialIdUser2);
+    		_u.setUsername(specialIdUsername);
+    		_u.setStatus(1);
+    		_u.setEmail( school_email );//change
+    		_u.setName( school_name );
+    		_u.setRole(RoleName.DASHBOARDUSER);
+    		_u.setPassword( passwordEncoder.encode( specialPassword ) );
+    		_u.setSchool(savedSchool);
+    		
+    		Map<String, Object> _attributes = new HashMap<>();
+	    	
+	    	_attributes.put("school",  new Permissions( true, false, false, false));
+	    	_attributes.put("teacher", new Permissions( false, false, false, false));
+	    	_attributes.put("enrollment", new Permissions( false, false, false, false));
+	    	_attributes.put("classroom", new Permissions( false, false, false, false));
+	    	_attributes.put("calendar", new Permissions( false, false, false, false));
+	    	_attributes.put("timetable", new Permissions( false, false, false, false));
+	    	_attributes.put("user", new Permissions( false, false, false, false));
+	    	_attributes.put("attendance", new Permissions( false, false, false, false));
+	    	_attributes.put("lessonnote", new Permissions( false, false, false, false));
+	    	
+	    	String jsonStr2 = gsonObj.toJson(_attributes);		
+	    	
+	    	_u.setPermissionsJSON(jsonStr2);
+	    	
+	    	message.setFrom(from);
+    		message.setTo(to);
+    		message.setSubject("Welcome to Standbasis :: You are the Contact Person from " + savedSchool.getName() + " school" );
+    		message.setText("Hello sir/mrs! This is to congratulate you on your successful dashboard onboarding process into the Standbasis school standards management system. Your login details are: " + System.lineSeparator() + "Username: " + specialIdUsername +  System.lineSeparator() + "Password: " + specialPassword + System.lineSeparator() + "This is a temporary password that you will need to change as soon as possible." );
+    		mailSender.send(message);
+    		
+    		User savedUser = userRepository.save(_u);
+    		//TimeUnit.SECONDS.sleep(1);
+		
+		return savedUser;
+		
+	}
+	
+	private String createUuid( String type, Long schId ) {
+    	String uuid = UUID.randomUUID().toString();
+    	String[] uniqueCode = uuid.split("-");    	
+    	String baseId = type + schId.toString() + "-" + uniqueCode[4].substring(6);
+    	return baseId;
+    }
+    
+    private String createUuidUsername( String type ) {
+    	String uuid = UUID.randomUUID().toString();
+    	String[] uniqueCode = uuid.split("-");    	
+    	String baseId = type + "-" + uniqueCode[4].substring(4);
+    	return baseId;
+    }
+    
+    private String createUuidPassword() {
+    	String uuid = UUID.randomUUID().toString();
+    	String[] uniqueCode = uuid.split("-");    	
+    	String newPass =  uniqueCode[4].substring(5);
+    	return newPass;
+    }
 	
 }

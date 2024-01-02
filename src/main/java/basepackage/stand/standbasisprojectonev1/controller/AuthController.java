@@ -11,6 +11,7 @@ import basepackage.stand.standbasisprojectonev1.payload.LoginRequest;
 import basepackage.stand.standbasisprojectonev1.payload.LoginResponse;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserPasswordRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardOnboardRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardRequest;
 import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
@@ -292,6 +293,26 @@ public class AuthController {
 		}
 	}
 	
+	@PostMapping("/uploadDashboardOnboard")
+    public ResponseEntity<?> uploadDashboardOnboard(@Valid @RequestBody DashboardOnboardRequest dashboard) {
+		
+		User newuser = userService.createSchoolViaDashboard( 
+				dashboard.getFormData().getStandbasis_unique_number(),
+				dashboard.getFormData().getSchool_name(),
+				dashboard.getFormData().getSchool_email(),
+				dashboard.getFormData().getSchool_physical_address(),
+				dashboard.getFormData().getSchool_telephone_number(),
+				dashboard.getFormData().getContact_person_name(),
+				dashboard.getFormData().getDesignation()
+		);
+		if (newuser != null) {
+			return ResponseEntity.ok().body(new ApiResponse(true, "true" ));
+		}
+		else {
+			return ResponseEntity.ok().body(new ApiResponse(false, "false"));
+		}
+	}
+	
 	@PostMapping("/changePassword")
 	public ResponseEntity<?> changePasswords(@AuthenticationPrincipal UserPrincipal userDetails, @Valid @RequestBody CheckUserPasswordRequest user) {
 		boolean status = userService.changePassword( user );
@@ -313,6 +334,8 @@ public class AuthController {
 		}	
 		
 	}
+	
+	
 	
 	public static int calculateWeekNumber(LocalDate today, LocalDate startDate, LocalDate endDate) {
 	        long daysBetween = ChronoUnit.DAYS.between(startDate, today);
