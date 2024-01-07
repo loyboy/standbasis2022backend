@@ -13,6 +13,6 @@ public interface DashboardAgentRepository extends JpaRepository<DashboardAgent, 
 	  @Query("select das from DashboardAgent das where das.id = :id")
 	  Optional<DashboardAgent> findByAgentId ( @Param("id") Long id );
 	  
-	  @Query("select das from DashboardAgent das where das.code = :code")
+	  @Query("select das from DashboardAgent das where lower(das.code) = lower(:code) ")
 	  Optional<DashboardAgent> findByCode ( @Param("code") String code );
 }

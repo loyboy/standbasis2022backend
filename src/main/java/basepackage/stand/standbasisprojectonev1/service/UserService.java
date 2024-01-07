@@ -233,7 +233,7 @@ public class UserService {
 	
 	public User createSchoolViaDashboard(String standbasis_unique_number,String school_name, String school_email, String school_physical_address, String school_telephone_number, String contact_person_name, String designation ) {
 		
-		Optional<DashboardAgent> da = dashagentRespository.findByCode(standbasis_unique_number);
+		Optional<DashboardAgent> da = dashagentRespository.findByCode( new String( standbasis_unique_number ).toLowerCase() );
 		
 		if (da.isPresent()) {
 				Optional<SchoolGroup> sg = schgroupRepository.findById( (long) 2 );
@@ -298,6 +298,7 @@ public class UserService {
 				return savedUser;
 		}
 		else {
+			System.out.println("User not created after running createSchoolViaDashboard");
 			return null;
 		}
 		
