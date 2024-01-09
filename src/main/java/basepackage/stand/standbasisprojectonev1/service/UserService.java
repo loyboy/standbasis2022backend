@@ -89,6 +89,7 @@ public class UserService {
 				if (existing.isPresent()) {
 					User userval = existing.get();
 					userval.setPassword( passwordEncoder.encode(passworduser.getNewpassword()) );
+					userval.setTemp_pass(0);
 					userRepository.save(userval);
 					return true;
 				}
@@ -266,6 +267,7 @@ public class UserService {
 		    		_u.setStatus(1);
 		    		_u.setEmail( school_email );//change
 		    		_u.setName( school_name );
+		    		_u.setTemp_pass(1);
 		    		_u.setRole(RoleName.DASHBOARDUSER);
 		    		_u.setPassword( passwordEncoder.encode( specialPassword ) );
 		    		_u.setSchool(savedSchool);

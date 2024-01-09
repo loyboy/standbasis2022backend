@@ -56,6 +56,8 @@ public class User extends DateAudit {
     
     private Integer status;
     
+    private Integer temp_pass;
+    
     @Email
     private String email;
     
