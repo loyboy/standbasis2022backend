@@ -300,8 +300,8 @@ public class MyScheduler {
 	//private CalendarRepository calRepository;
 	
 	// "0 0/10 * * * *" - 10 minutes interval
-	// "0 0 0 * * *" - Everyday at 0:00
-	@Scheduled(cron = "0 0 1 * * *")
+	// "0 0 1 * * *" - Everyday at 1:00
+	@Scheduled(cron = "0 55 9 * * *")
     public void insertAttendances() {       
 		
 		//Check what day of the week is this
@@ -347,8 +347,9 @@ public class MyScheduler {
 	
 	// "0 0 0 * * 0" -- once a week
 	// 0 0 0 ? * WED
+	// 35 * * 31 11 * default
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "35 * * 31 11 *")
+	@Scheduled(cron = "0 55 9 * * *")
     public void insertLessonnotes() {
 		
 		 Map<Integer, String> classMap = new HashMap<>();
