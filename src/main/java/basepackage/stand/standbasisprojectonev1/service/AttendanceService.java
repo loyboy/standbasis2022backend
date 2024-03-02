@@ -1001,14 +1001,14 @@ public class AttendanceService {
         int daysUntilMonday = dayOfWeek == DayOfWeek.SUNDAY ? 1 : DayOfWeek.MONDAY.getValue() - dayOfWeek.getValue();
         
         // Calculate the number of days until Friday of the same week
-        int daysUntilFriday = DayOfWeek.FRIDAY.getValue() - dayOfWeek.getValue();
+        int daysUntilFriday = DayOfWeek.SATURDAY.getValue() - dayOfWeek.getValue();
         
         // Calculate the Monday and Friday dates of the same week
         LocalDate mondayDate = date.plusDays(daysUntilMonday);
-        LocalDate fridayDate = date.plusDays(daysUntilFriday);
+        LocalDate saturdayDate = date.plusDays(daysUntilFriday);//changed to Saturday
         
         Date mD = CommonActivity.localDateToDate(mondayDate);
-        Date fD = CommonActivity.localDateToDate(fridayDate);
+        Date fD = CommonActivity.localDateToDate(saturdayDate);
         
         mondayAndFridayDates.add(mD);
         mondayAndFridayDates.add(fD);
