@@ -4,28 +4,39 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import basepackage.stand.standbasisprojectonev1.model.Assessment;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.DashboardAcademic;
 import basepackage.stand.standbasisprojectonev1.model.DashboardCurriculum;
 import basepackage.stand.standbasisprojectonev1.model.DashboardSsis;
+import basepackage.stand.standbasisprojectonev1.model.DashboardAcademicInput;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacher;
+import basepackage.stand.standbasisprojectonev1.model.DashboardTeacherInput;
+import basepackage.stand.standbasisprojectonev1.model.Enrollment;
+import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.School;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.AssessmentRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CalendarRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardAcademicRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardAcademicInputRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardCurriculumRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardSsisRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardTeacherInputRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardTeacherRequest;
 import basepackage.stand.standbasisprojectonev1.repository.DashboardARepository;
 import basepackage.stand.standbasisprojectonev1.repository.DashboardCRepository;
 import basepackage.stand.standbasisprojectonev1.repository.DashboardSRepository;
+import basepackage.stand.standbasisprojectonev1.repository.DashboardTInputRepository;
 import basepackage.stand.standbasisprojectonev1.repository.DashboardTRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
+import basepackage.stand.standbasisprojectonev1.repository.DashboardAInputRepository;
 import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
 @Service
@@ -44,7 +55,27 @@ public class DashboardService {
     private DashboardARepository dashARepository;
 	
 	@Autowired		
+    private DashboardAInputRepository dashAIRepository;
+	
+	@Autowired		
+    private DashboardTInputRepository dashTIRepository;
+	
+	@Autowired		
     private SchoolRepository schRepository;
+	
+	public DashboardAcademicInput saveOne(DashboardAcademicInputRequest dashRequest) {
+		 ModelMapper modelMapper    = new ModelMapper();   
+		 DashboardAcademicInput val = modelMapper.map(dashRequest, DashboardAcademicInput.class);
+		 return dashAIRepository.save(val);		 
+	}
+	
+	public DashboardTeacherInput saveOne(DashboardTeacherInputRequest dashRequest) {
+		 ModelMapper modelMapper    = new ModelMapper();   
+		 DashboardTeacherInput val = modelMapper.map(dashRequest, DashboardTeacherInput.class);
+		 return dashTIRepository.save(val);		 
+	}
+	
+	///////////////////////////////////////////////////////////
 	
 	public DashboardSsis findBySchoolS(long id, Integer year) {
 		Optional<School> sch = schRepository.findById(id);

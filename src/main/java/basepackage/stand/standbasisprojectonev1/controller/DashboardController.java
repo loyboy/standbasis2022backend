@@ -1,7 +1,6 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,15 +10,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import basepackage.stand.standbasisprojectonev1.model.Calendar;
-import basepackage.stand.standbasisprojectonev1.payload.ApiContentResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiDataResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
-import basepackage.stand.standbasisprojectonev1.payload.onboarding.CalendarRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardAcademicInputRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardTeacherInputRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardAcademicRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardCurriculumRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardSsisRequest;
@@ -29,9 +28,11 @@ import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
 import basepackage.stand.standbasisprojectonev1.service.DashboardService;
 import basepackage.stand.standbasisprojectonev1.model.DashboardAcademic;
+import basepackage.stand.standbasisprojectonev1.model.DashboardAcademicInput;
 import basepackage.stand.standbasisprojectonev1.model.DashboardCurriculum;
 import basepackage.stand.standbasisprojectonev1.model.DashboardSsis;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacher;
+import basepackage.stand.standbasisprojectonev1.model.DashboardTeacherInput;
 import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.User;
@@ -197,6 +198,43 @@ public class DashboardController {
 	     }
 	 }
 	 
+	 @PostMapping("/academic")
+	 public ResponseEntity<?> createDashboardAcademic(@AuthenticationPrincipal UserPrincipal userDetails, @RequestBody DashboardAcademicInputRequest dasRequest) {
+		 try {
+			 DashboardAcademicInput val = service.saveOne(dasRequest);
+			 
+			 Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+			 //------------------------------------
+			 saveEvent("dashboard", "create", "The User with name: " + u.get().getName() + "has created a Dashboard Academic instance with ID:" + val.getDashId(), 
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
+			 );
+			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for academic has been created successfully.", val));	
+		 }
+		 catch (Exception ex) {
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	 }
+	 
+	 @PostMapping("/teacher")
+	 public ResponseEntity<?> createDashboardTeacher(@AuthenticationPrincipal UserPrincipal userDetails, @RequestBody DashboardTeacherInputRequest dasRequest) {
+		 try {
+			 DashboardTeacherInput val = service.saveOne(dasRequest);
+			 
+			 Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+			 //------------------------------------
+			 saveEvent("dashboard", "create", "The User with name: " + u.get().getName() + "has created a Dashboard Teacher instance with ID:" + val.getDashId(), 
+					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
+			 );
+			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for teacher has been created successfully.", val));	
+		 }
+		 catch (Exception ex) {
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	 }
+	 
+	       
 	 private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 
 		 	
 		 	EventManager _event = new EventManager();
