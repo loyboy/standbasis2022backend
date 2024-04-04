@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -11,19 +12,13 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import basepackage.stand.standbasisprojectonev1.model.Assessment;
-import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.DashboardAcademic;
 import basepackage.stand.standbasisprojectonev1.model.DashboardCurriculum;
 import basepackage.stand.standbasisprojectonev1.model.DashboardSsis;
 import basepackage.stand.standbasisprojectonev1.model.DashboardAcademicInput;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacher;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacherInput;
-import basepackage.stand.standbasisprojectonev1.model.Enrollment;
-import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
 import basepackage.stand.standbasisprojectonev1.model.School;
-import basepackage.stand.standbasisprojectonev1.payload.onboarding.AssessmentRequest;
-import basepackage.stand.standbasisprojectonev1.payload.onboarding.CalendarRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardAcademicRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardAcademicInputRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardCurriculumRequest;
@@ -37,7 +32,6 @@ import basepackage.stand.standbasisprojectonev1.repository.DashboardTInputReposi
 import basepackage.stand.standbasisprojectonev1.repository.DashboardTRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.repository.DashboardAInputRepository;
-import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
 @Service
 public class DashboardService {
@@ -73,6 +67,26 @@ public class DashboardService {
 		 ModelMapper modelMapper    = new ModelMapper();   
 		 DashboardTeacherInput val = modelMapper.map(dashRequest, DashboardTeacherInput.class);
 		 return dashTIRepository.save(val);		 
+	}
+	
+	public List<DashboardAcademicInput> findAcademicExists(long id) {
+		Optional<School> sch = schRepository.findById(id);
+		if ( sch.isPresent() ) {
+			School val = sch.get();
+			List<DashboardAcademicInput> dalist = dashAIRepository.findBySchoolAcademicOnly(val); 
+			return dalist;
+		}
+		return null;	
+	}
+	
+	public List<DashboardTeacherInput> findTeacherExists(long id) {
+		Optional<School> sch = schRepository.findById(id);
+		if ( sch.isPresent() ) {
+			School val = sch.get();
+			List<DashboardTeacherInput> dalist = dashTIRepository.findBySchoolTeacherOnly(val); 
+			return dalist;
+		}
+		return null;	
 	}
 	
 	///////////////////////////////////////////////////////////

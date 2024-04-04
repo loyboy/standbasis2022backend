@@ -1,5 +1,6 @@
 package basepackage.stand.standbasisprojectonev1.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,5 +19,8 @@ public interface DashboardTInputRepository extends JpaRepository<DashboardTeache
 	  ////////////////////////////////////////////////////////////////////////////////
 	 
 	  @Query("select das from DashboardTeacherInput das where das.dashId = :owner")
-	  Optional<DashboardAcademicInput> findByTeacherId ( @Param("owner") Long owner );
+	  Optional<DashboardTeacherInput> findByTeacherId ( @Param("owner") Long owner );
+	  
+	  @Query("select das from DashboardTeacherInput das where das.school = :sch ")
+	  List<DashboardTeacherInput> findBySchoolTeacherOnly ( @Param("sch") School sch );
 }

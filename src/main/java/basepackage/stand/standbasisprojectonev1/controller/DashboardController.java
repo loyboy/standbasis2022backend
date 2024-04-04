@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import basepackage.stand.standbasisprojectonev1.payload.ApiContentResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiDataResponse;
 import basepackage.stand.standbasisprojectonev1.payload.ApiResponse;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardAcademicInputRequest;
@@ -33,6 +36,7 @@ import basepackage.stand.standbasisprojectonev1.model.DashboardCurriculum;
 import basepackage.stand.standbasisprojectonev1.model.DashboardSsis;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacher;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacherInput;
+import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.EventManager;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.User;
@@ -49,6 +53,18 @@ public class DashboardController {
 	 
 	 @Autowired
 	 private EventManagerRepository eventRepository;
+	 
+	 @GetMapping("/academicinput")
+	 public ResponseEntity<?> getAcademicInput( @RequestParam(value = "sch") Long sch ) {
+		 List<DashboardAcademicInput> list = service.findAcademicExists(sch);
+		 return ResponseEntity.ok().body(new ApiContentResponse<DashboardAcademicInput>(true, "List of Dashboard Academic Input gotten successfully.", list));		
+	 }
+	 
+	 @GetMapping("/teacherinput")
+	 public ResponseEntity<?> getTeacherInput( @RequestParam(value = "sch") Long sch ) {
+		 List<DashboardTeacherInput> list = service.findTeacherExists(sch);
+		 return ResponseEntity.ok().body(new ApiContentResponse<DashboardTeacherInput>(true, "List of Dashboard Teacher Input gotten successfully.", list));		
+	 }
 	 
 	 @GetMapping( value = {"/standards/school/{id}/year/{year}", "/standards/school/{id}" })
 	 public ResponseEntity<?> getStandardsBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year  ) {
