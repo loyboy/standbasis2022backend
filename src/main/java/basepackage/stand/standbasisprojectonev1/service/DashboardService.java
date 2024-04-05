@@ -60,12 +60,18 @@ public class DashboardService {
 	public DashboardAcademicInput saveOne(DashboardAcademicInputRequest dashRequest) {
 		 ModelMapper modelMapper    = new ModelMapper();   
 		 DashboardAcademicInput val = modelMapper.map(dashRequest, DashboardAcademicInput.class);
+		 School newschool = new School();
+		 newschool.setSchId(dashRequest.getSch_id());
+		 val.setSchool(newschool);
 		 return dashAIRepository.save(val);		 
 	}
 	
 	public DashboardTeacherInput saveOne(DashboardTeacherInputRequest dashRequest) {
-		 ModelMapper modelMapper    = new ModelMapper();   
+		 ModelMapper modelMapper   = new ModelMapper();   
 		 DashboardTeacherInput val = modelMapper.map(dashRequest, DashboardTeacherInput.class);
+		 School newschool = new School();
+		 newschool.setSchId(dashRequest.getSch_id());
+		 val.setSchool(newschool);
 		 return dashTIRepository.save(val);		 
 	}
 	
