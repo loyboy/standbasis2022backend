@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ import basepackage.stand.standbasisprojectonev1.model.DashboardTeacher;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacherInput;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
+import basepackage.stand.standbasisprojectonev1.model.Rowcall;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.AssessmentRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CalendarRequest;
@@ -64,15 +66,19 @@ public class DashboardService {
     private SchoolRepository schRepository;
 	
 	public DashboardAcademicInput saveOne(DashboardAcademicInputRequest dashRequest) {
-		 ModelMapper modelMapper    = new ModelMapper();   
-		 DashboardAcademicInput val = modelMapper.map(dashRequest, DashboardAcademicInput.class);
-		 return dashAIRepository.save(val);		 
+		ModelMapper modelMapper    = new ModelMapper();   
+		DashboardAcademicInput val = modelMapper.map(dashRequest, DashboardAcademicInput.class);
+		return dashAIRepository.save(val);		 
 	}
 	
 	public DashboardTeacherInput saveOne(DashboardTeacherInputRequest dashRequest) {
-		 ModelMapper modelMapper    = new ModelMapper();   
-		 DashboardTeacherInput val = modelMapper.map(dashRequest, DashboardTeacherInput.class);
-		 return dashTIRepository.save(val);		 
+		ModelMapper modelMapper    = new ModelMapper();   
+		DashboardTeacherInput val = modelMapper.map(dashRequest, DashboardTeacherInput.class);
+		return dashTIRepository.save(val);		 
+	}
+
+	public List<DashboardTeacherInput> saveAll( List<DashboardTeacherInput> dti  ) {		
+		return dashTIRepository.saveAll(dti);
 	}
 	
 	///////////////////////////////////////////////////////////

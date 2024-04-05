@@ -1,8 +1,11 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,7 @@ import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepositor
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
 import basepackage.stand.standbasisprojectonev1.service.DashboardService;
+import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.DashboardAcademic;
 import basepackage.stand.standbasisprojectonev1.model.DashboardAcademicInput;
 import basepackage.stand.standbasisprojectonev1.model.DashboardCurriculum;
@@ -34,7 +38,9 @@ import basepackage.stand.standbasisprojectonev1.model.DashboardSsis;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacher;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacherInput;
 import basepackage.stand.standbasisprojectonev1.model.EventManager;
+import basepackage.stand.standbasisprojectonev1.model.Rowcall;
 import basepackage.stand.standbasisprojectonev1.model.School;
+import basepackage.stand.standbasisprojectonev1.model.Student;
 import basepackage.stand.standbasisprojectonev1.model.User;
 
 @RestController
@@ -217,18 +223,32 @@ public class DashboardController {
 	 }
 	 
 	 @PostMapping("/teacher")
-	 public ResponseEntity<?> createDashboardTeacher(@AuthenticationPrincipal UserPrincipal userDetails, @RequestBody DashboardTeacherInputRequest dasRequest) {
+	 public ResponseEntity<?> createDashboardTeacher(@AuthenticationPrincipal UserPrincipal userDetails, @RequestBody List<DashboardTeacherInputRequest> dasRequest ) {
 		 try {
-			 DashboardTeacherInput val = service.saveOne(dasRequest);
+			ModelMapper modelMapper = new ModelMapper(); 
+			List<DashboardTeacherInput> dtlist = dasRequest.stream().map(t -> 
+			 	{
+					DashboardTeacherInput dti = modelMapper.map(t, DashboardTeacherInput.class);
+			 		School sch = new School();			 		
+			 		sch.setSchId(t.getSch_id());
+			 		dti.setSchool(sch);
+			 		return dti;
+			 	
+			 	}).collect(Collectors.toList());
+		    	
+			List<DashboardTeacherInput> val = service.saveAll(dtlist);
+
+			// DashboardTeacherInput val = service.saveOne(dasRequest);
 			 
-			 Optional<User> u = userRepository.findById( userDetails.getId() );
+			// Optional<User> u = userRepository.findById( userDetails.getId() );
 				
 			 //------------------------------------
-			 saveEvent("dashboard", "create", "The User with name: " + u.get().getName() + "has created a Dashboard Teacher instance with ID:" + val.getDashId(), 
+			/* saveEvent("dashboard", "create", "The User with name: " + u.get().getName() + "has created a Dashboard Teacher instance with ID:" + val.getDashId(), 
 					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
-			 );
-			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for teacher has been created successfully.", val));	
-		 }
+			 );*/
+			// return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for teacher has been created successfully.", val));	
+			return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard input data has been updated", "Dashboard input data updated is " + val.size() ));
+		}
 		 catch (Exception ex) {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
