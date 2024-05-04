@@ -32,18 +32,14 @@ import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepositor
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.security.UserPrincipal;
 import basepackage.stand.standbasisprojectonev1.service.DashboardService;
-import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.DashboardAcademic;
 import basepackage.stand.standbasisprojectonev1.model.DashboardAcademicInput;
 import basepackage.stand.standbasisprojectonev1.model.DashboardCurriculum;
 import basepackage.stand.standbasisprojectonev1.model.DashboardSsis;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacher;
 import basepackage.stand.standbasisprojectonev1.model.DashboardTeacherInput;
-import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.EventManager;
-import basepackage.stand.standbasisprojectonev1.model.Rowcall;
 import basepackage.stand.standbasisprojectonev1.model.School;
-import basepackage.stand.standbasisprojectonev1.model.Student;
 import basepackage.stand.standbasisprojectonev1.model.User;
 
 @RestController
@@ -86,7 +82,7 @@ public class DashboardController {
 		 }
 		 catch (Exception ex) {
 			 System.out.println("Error in Standards " + ex.getMessage() );
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	}
 	 
@@ -104,7 +100,7 @@ public class DashboardController {
 		 }
 		 catch (Exception ex) {
 			 System.out.println("Error in Teacher " + ex.getMessage() );
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	}
 	 
@@ -123,7 +119,7 @@ public class DashboardController {
 		 }
 		 catch (Exception ex) {
 			 System.out.println("Error in Curriculum " + ex.getMessage() );
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	}
 	 
@@ -141,7 +137,7 @@ public class DashboardController {
 		 }
 		 catch (Exception ex) {
 			 System.out.println("Error in Academic " + ex.getMessage() );
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	}
 	 
@@ -161,7 +157,7 @@ public class DashboardController {
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for standards has been updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	 }
 	 
@@ -179,7 +175,7 @@ public class DashboardController {
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for teachers has been updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	 }
 	 
@@ -197,7 +193,7 @@ public class DashboardController {
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for curriculum has been updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	 }
 	 
@@ -215,7 +211,7 @@ public class DashboardController {
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for academic has been updated successfully.", val));	
 		 }
 		 catch (Exception ex) {
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	 }
 	 
@@ -233,7 +229,7 @@ public class DashboardController {
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for academic has been created successfully.", val));	
 		 }
 		 catch (Exception ex) {
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	 }
 	 
@@ -253,19 +249,10 @@ public class DashboardController {
 		    	
 			List<DashboardTeacherInput> val = service.saveAll(dtlist);
 
-			// DashboardTeacherInput val = service.saveOne(dasRequest);
-			 
-			// Optional<User> u = userRepository.findById( userDetails.getId() );
-				
-			 //------------------------------------
-			/* saveEvent("dashboard", "create", "The User with name: " + u.get().getName() + "has created a Dashboard Teacher instance with ID:" + val.getDashId(), 
-					 new Date(), u.get(), u.get().getSchool() == null ? val.getSchool() : u.get().getSchool()
-			 );*/
-			// return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard for teacher has been created successfully.", val));	
 			return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard input data has been updated", "Dashboard input data updated is " + val.size() ));
 		}
 		 catch (Exception ex) {
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	 }
 
@@ -279,7 +266,7 @@ public class DashboardController {
 		 }
 		 catch (Exception ex) {
 			System.out.println("Error in Academic Input " + ex.getMessage() );
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	}
 
@@ -293,7 +280,7 @@ public class DashboardController {
 		 }
 		 catch (Exception ex) {
 			System.out.println("Error in Teacher Input " + ex.getMessage() );
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	}
 	 
