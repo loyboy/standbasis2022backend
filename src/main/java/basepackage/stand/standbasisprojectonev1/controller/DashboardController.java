@@ -55,17 +55,6 @@ public class DashboardController {
 	 @Autowired
 	 private EventManagerRepository eventRepository;
 	 
-	 @GetMapping("/academicinput")
-	 public ResponseEntity<?> getAcademicInput( @RequestParam(value = "sch") Long sch ) {
-		 List<DashboardAcademicInput> list = service.findAcademicExists(sch);
-		 return ResponseEntity.ok().body(new ApiContentResponse<DashboardAcademicInput>(true, "List of Dashboard Academic Input gotten successfully.", list));		
-	 }
-	 
-	 @GetMapping("/teacherinput")
-	 public ResponseEntity<?> getTeacherInput( @RequestParam(value = "sch") Long sch ) {
-		 List<DashboardTeacherInput> list = service.findTeacherExists(sch);
-		 return ResponseEntity.ok().body(new ApiContentResponse<DashboardTeacherInput>(true, "List of Dashboard Teacher Input gotten successfully.", list));		
-	 }
 	 
 	 @GetMapping( value = {"/standards/school/{id}/year/{year}", "/standards/school/{id}" })
 	 public ResponseEntity<?> getStandardsBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year  ) {
@@ -260,8 +249,8 @@ public class DashboardController {
 	 public ResponseEntity<?> getAcademicInputBySchool( @PathVariable(value = "id") Long id ) {
 		 try 
 		 {	 
-			DashboardAcademicInput val = service.findBySchoolAI(id, null);
-			return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard Input for academic has been retrieved successfully.", val));
+			List<DashboardAcademicInput> list = service.findAcademicExists(id);
+			return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard Input for academic has been retrieved successfully.", list));
 			 
 		 }
 		 catch (Exception ex) {
@@ -274,8 +263,8 @@ public class DashboardController {
 	 public ResponseEntity<?> getTeacherInputBySchool( @PathVariable(value = "id") Long id ) {
 		 try 
 		 {	 
-			DashboardTeacherInput val = service.findBySchoolTI(id, null);
-			return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard Input for teacher has been retrieved successfully.", val));
+			List<DashboardTeacherInput> list = service.findTeacherExists(id);
+			return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard Input for teacher has been retrieved successfully.", list));
 			 
 		 }
 		 catch (Exception ex) {
