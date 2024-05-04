@@ -426,40 +426,40 @@ public class MyScheduler {
 	}	
 	
 	 private String todayDate() {
-			Date d = new Date();
-	        String date = DATE_TIME_FORMAT.format(d);
-	        return date;
-	  }
-	 
-	 private java.sql.Timestamp parseTimestamp(String timestamp) {
-		    try {
-		        return new Timestamp(DATE_TIME_FORMAT.parse(timestamp).getTime());
-		    } catch (ParseException e) {
-		        throw new IllegalArgumentException(e);
-		    }
-	 }
-	 
-		 private String createUuid( String type, Long schId ) {
-		    	String uuid = UUID.randomUUID().toString();
-		    	String[] uniqueCode = uuid.split("-");    	
-		    	String baseId = type + schId.toString() + "-" + uniqueCode[4].substring(6);
-		    	return baseId;
-		 }
-	 
-	 	private Long dayToMiliseconds(int days){
-		    Long result = Long.valueOf(days * 24 * 60 * 60 * 1000);
-		    return result;
-		}
+		Date d = new Date();
+		String date = DATE_TIME_FORMAT.format(d);
+		return date;
+	}
 
-		private Timestamp addDays(int days, Timestamp t1) throws Exception{
-		    if(days < 0){
-		        throw new Exception("Day in wrong format.");
-		    }
-		    java.util.Calendar cal = java.util.Calendar.getInstance();
-	        cal.setTime(t1);
-	        cal.add(java.util.Calendar.DATE, days); //minus number would decrement the days
-	        return new Timestamp(cal.getTime().getTime());
+	private java.sql.Timestamp parseTimestamp(String timestamp) {
+		try {
+			return new Timestamp(DATE_TIME_FORMAT.parse(timestamp).getTime());
+		} catch (ParseException e) {
+			throw new IllegalArgumentException(e);
 		}
+	}
+
+	private String createUuid(String type, Long schId) {
+		String uuid = UUID.randomUUID().toString();
+		String[] uniqueCode = uuid.split("-");
+		String baseId = type + schId.toString() + "-" + uniqueCode[4].substring(6);
+		return baseId;
+	}
+
+	private Long dayToMiliseconds(int days) {
+		Long result = Long.valueOf(days * 24 * 60 * 60 * 1000);
+		return result;
+	}
+
+	private Timestamp addDays(int days, Timestamp t1) throws Exception {
+		if (days < 0) {
+			throw new Exception("Day in wrong format.");
+		}
+		java.util.Calendar cal = java.util.Calendar.getInstance();
+		cal.setTime(t1);
+		cal.add(java.util.Calendar.DATE, days); // minus number would decrement the days
+		return new Timestamp(cal.getTime().getTime());
+	}
 	 
 	 
 	 /*

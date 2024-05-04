@@ -12,8 +12,8 @@ import basepackage.stand.standbasisprojectonev1.model.School;
 
 public interface DashboardAInputRepository extends JpaRepository<DashboardAcademicInput, Long>{
 
-	  @Query("select das from DashboardAcademicInput das where das.school = :owner AND (das._year = :year OR :year is null) ")
-	  Optional<DashboardAcademicInput> findBySchoolAcademic( @Param("owner") School ownerId , @Param("year") Integer y );
+	  @Query("select das from DashboardAcademicInput das where das.school = :sch AND (das._year = :year OR :year is null) ")
+	  Optional<DashboardAcademicInput> findBySchoolAcademic( @Param("sch") School schId , @Param("year") Integer y );
 	  
 	  ////////////////////////////////////////////////////////////////////////////////
 	  

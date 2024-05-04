@@ -268,6 +268,34 @@ public class DashboardController {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	 }
+
+	 @GetMapping( value = {"/academicinput/{id}" } )
+	 public ResponseEntity<?> getAcademicInputBySchool( @PathVariable(value = "id") Long id ) {
+		 try 
+		 {	 
+			DashboardAcademicInput val = service.findBySchoolAI(id, null);
+			return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard Input for academic has been retrieved successfully.", val));
+			 
+		 }
+		 catch (Exception ex) {
+			System.out.println("Error in Academic Input " + ex.getMessage() );
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	}
+
+	@GetMapping( value = {"/teacherinput/{id}" } )
+	 public ResponseEntity<?> getTeacherInputBySchool( @PathVariable(value = "id") Long id ) {
+		 try 
+		 {	 
+			DashboardTeacherInput val = service.findBySchoolTI(id, null);
+			return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard Input for teacher has been retrieved successfully.", val));
+			 
+		 }
+		 catch (Exception ex) {
+			System.out.println("Error in Teacher Input " + ex.getMessage() );
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	}
 	 
 	       
 	 private EventManager saveEvent( String module, String action, String comment, Date d, User u, School sch ) {		 

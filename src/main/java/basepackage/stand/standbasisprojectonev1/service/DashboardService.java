@@ -142,6 +142,27 @@ public class DashboardService {
 		}
 		return null;
 	}
+
+	public DashboardAcademicInput findBySchoolAI(long id, Integer year) {
+		Optional<School> sch = schRepository.findById(id);
+		Optional<DashboardAcademicInput> das = dashAIRepository.findBySchoolAcademic(sch.get(), year);
+		if (das.isPresent()) {
+			DashboardAcademicInput dasval = das.get();			
+			return dasval;
+		}
+		return null;
+	}
+
+	public DashboardTeacherInput findBySchoolTI(long id, Integer year) {
+		Optional<School> sch = schRepository.findById(id);
+		Optional<DashboardTeacherInput> das = dashTIRepository.findBySchoolTeacher(sch.get(), year);
+		if (das.isPresent()) {
+			DashboardTeacherInput dasval = das.get();			
+			return dasval;
+		}
+		return null;
+	}
+	
 	
 	////////////////////////////////////////////////////////////////////////
 	
