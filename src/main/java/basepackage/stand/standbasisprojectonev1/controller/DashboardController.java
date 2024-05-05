@@ -1,7 +1,9 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -250,7 +252,11 @@ public class DashboardController {
 		 try 
 		 {	 
 			List<DashboardAcademicInput> list = service.findAcademicExists(id);
-			return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard Input for academic has been retrieved successfully.", list));
+			Map<String, Object> response = new HashMap<>();
+			
+			response.put("data", list);			
+			
+			return new ResponseEntity<>(response, HttpStatus.OK);	
 			 
 		 }
 		 catch (Exception ex) {
@@ -264,8 +270,10 @@ public class DashboardController {
 		 try 
 		 {	 
 			List<DashboardTeacherInput> list = service.findTeacherExists(id);
-			return ResponseEntity.ok().body(new ApiDataResponse(true, "Dashboard Input for teacher has been retrieved successfully.", list));
-			 
+			Map<String, Object> response = new HashMap<>();
+			
+			response.put("data", list); 
+			return new ResponseEntity<>(response, HttpStatus.OK);	
 		 }
 		 catch (Exception ex) {
 			System.out.println("Error in Teacher Input " + ex.getMessage() );
