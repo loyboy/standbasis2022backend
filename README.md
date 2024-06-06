@@ -15,7 +15,7 @@
 
 ## About the Project
 
-Provide a brief description of your project, its purpose, and what it does. Include any relevant screenshots or demo links if available.
+This is the Standbasis backend repo that manages the curiculum delivery process management system.
 
 ## Getting Started
 
@@ -33,19 +33,19 @@ Ensure you have the following software installed:
 
 1. Clone the repository:
 
-   ```sh
-   git clone https://github.com/loyboy/standbasis2022backend.git
-  ```
+   ```
+     git clone https://github.com/loyboy/standbasis2022backend.git
+   ```
 2. Navigate to the project directory:
 
     ```
-    cd standbasis2022backend
+      cd standbasis2022backend
     ```
 
 3. Install the dependencies:
     ```
-   mvn clean install
-  ```
+     mvn clean install
+    ```
 
 ## Usage
 
