@@ -57,9 +57,81 @@ public class DashboardController {
 	 @Autowired
 	 private EventManagerRepository eventRepository;
 	 
-	 
-	 @GetMapping( value = {"/standards/school/{id}/year/{year}", "/standards/school/{id}" })
-	 public ResponseEntity<?> getStandardsBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year  ) {
+	@GetMapping( value = {"/displaytaqcolumn/{id}"})
+	public ResponseEntity<?> getDisplayTaqColumn( @PathVariable(value = "id") Long id ) {
+		 try {	 
+				Map<String, Object> newResponse = service.calculateITeacherBar(id);
+				return new ResponseEntity<>(newResponse, HttpStatus.OK);
+		 }
+		 catch (Exception ex) {
+			 System.out.println("Error in displaytaqcolumn " + ex.getMessage() );
+	         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
+	     }
+	}
+
+	@GetMapping( value = {"/displaytaqline/{id}"})
+	public ResponseEntity<?> getDisplayTaqLine( @PathVariable(value = "id") Long id ) {
+		try {	 
+			   Map<String, Object> newResponse = service.calculateITeacherLine(id);
+			   return new ResponseEntity<>(newResponse, HttpStatus.OK);
+		}
+		catch (Exception ex) {
+			System.out.println("Error in displaytaqline " + ex.getMessage() );
+			return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
+		}
+    }
+
+	@GetMapping( value = {"/displaytshscolumn/{id}"})
+	public ResponseEntity<?> getDisplayTshsColumn( @PathVariable(value = "id") Long id ) {
+		try {	 
+			   Map<String, Object> newResponse = service.calculateIRatingBar(id);
+			   return new ResponseEntity<>(newResponse, HttpStatus.OK);
+		}
+		catch (Exception ex) {
+			System.out.println("Error in displaytshscolumn " + ex.getMessage() );
+			return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
+		}
+    }
+
+	@GetMapping( value = {"/displaytshsline/{id}"})
+	public ResponseEntity<?> getDisplayTshsLine( @PathVariable(value = "id") Long id ) {
+		try {	 
+			   Map<String, Object> newResponse = service.calculateIRatingLine(id);
+			   return new ResponseEntity<>(newResponse, HttpStatus.OK);
+		}
+		catch (Exception ex) {
+			System.out.println("Error in displaytshsline " + ex.getMessage() );
+			return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
+		}
+    }
+
+	@GetMapping( value = {"/displayacademiccolumn/{id}/year/{year}"})
+	public ResponseEntity<?> getDisplayAcademicColumn( @PathVariable(value = "id") Long id, @PathVariable(value = "year") String _year ) {
+		try {	 
+			   Map<String, Object> newResponse = service.calculateAIAcademicBar( id , Integer.valueOf(_year) );
+			   return new ResponseEntity<>(newResponse, HttpStatus.OK);
+		}
+		catch (Exception ex) {
+			System.out.println("Error in displayacademiccolumn " + ex.getMessage() );
+			return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
+		}
+    }
+
+	@GetMapping( value = {"/displayacademicline/{id}/year/{year}"})
+	public ResponseEntity<?> getDisplayAcademicLine( @PathVariable(value = "id") Long id, @PathVariable(value = "year") String _year ) {
+		try {	 
+			   Map<String, Object> newResponse = service.calculateAIAcademicLine( id , Integer.valueOf(_year) );
+			   return new ResponseEntity<>(newResponse, HttpStatus.OK);
+		}
+		catch (Exception ex) {
+			System.out.println("Error in displayacademicline " + ex.getMessage() );
+			return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
+		}
+    }
+
+	//////////////////////////////////////////////////////////////////////////////
+	@GetMapping( value = {"/standards/school/{id}/year/{year}", "/standards/school/{id}" })
+	public ResponseEntity<?> getStandardsBySchool( @PathVariable(value = "id") Long id, @PathVariable(value = "year", required = false) String _year  ) {
 		 try {	 
 			 if ( _year != null && _year != "null") {
 				 DashboardSsis val = service.findBySchoolS(id, Integer.parseInt(_year) );
@@ -209,6 +281,24 @@ public class DashboardController {
 	 @PostMapping("/academic")
 	 public ResponseEntity<?> createDashboardAcademic(@AuthenticationPrincipal UserPrincipal userDetails, @RequestBody DashboardAcademicInputRequest dasRequest) {
 		 try {
+			 Integer overall_total = dasRequest.getA1_grade_count() + dasRequest.getB2_grade_count() + 
+			 dasRequest.getB3_grade_count() +  dasRequest.getC4_grade_count() + dasRequest.getC5_grade_count()
+			 + dasRequest.getC6_grade_count() + dasRequest.getD7_grade_count() + dasRequest.getE8_grade_count()
+			 + dasRequest.getF9_grade_count() + dasRequest.getAbsent_count();
+
+			if ( overall_total > dasRequest.getEnrollment_count() ){
+				return ResponseEntity.ok().body(new ApiDataResponse(false, "Dashboard Total Enrollment Total is less than the inputted value.", null));
+			}
+
+			 Double grade_a = Double.valueOf( dasRequest.getA1_grade_count() / dasRequest.getEnrollment_count() );
+			 Double grade_b = Double.valueOf( ( dasRequest.getB2_grade_count() + dasRequest.getB3_grade_count() ) / dasRequest.getEnrollment_count() );	
+			 Double grade_c = Double.valueOf( ( dasRequest.getC4_grade_count() + dasRequest.getC5_grade_count() + dasRequest.getC6_grade_count() ) / dasRequest.getEnrollment_count() );	
+			 Double grade_d = Double.valueOf( ( dasRequest.getD7_grade_count() + dasRequest.getE8_grade_count() + dasRequest.getF9_grade_count() ) / dasRequest.getEnrollment_count() );	
+			 
+			 if (1.00 > (grade_a + grade_b + grade_c + grade_d) ){
+				return ResponseEntity.ok().body(new ApiDataResponse(false, "The addition of the grades are greather than 1.", null));
+		
+			 }
 			 DashboardAcademicInput val = service.saveOne(dasRequest);
 			 
 			 Optional<User> u = userRepository.findById( userDetails.getId() );
@@ -260,7 +350,6 @@ public class DashboardController {
 			 
 		 }
 		 catch (Exception ex) {
-			System.out.println("Error in Academic Input " + ex.getMessage() );
 	        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	}
@@ -276,7 +365,6 @@ public class DashboardController {
 			return new ResponseEntity<>(response, HttpStatus.OK);	
 		 }
 		 catch (Exception ex) {
-			System.out.println("Error in Teacher Input " + ex.getMessage() );
 	        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiResponse(false, ex.getMessage()));
 	     }
 	}

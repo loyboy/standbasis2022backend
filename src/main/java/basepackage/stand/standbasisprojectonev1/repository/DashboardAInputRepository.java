@@ -24,5 +24,9 @@ public interface DashboardAInputRepository extends JpaRepository<DashboardAcadem
 	  
 	  @Query("select das from DashboardAcademicInput das where das.school = :sch ")
 	  List<DashboardAcademicInput> findBySchoolAcademicOnly ( @Param("sch") School sch );
+
+	  //////////////////////////////////////////////////////////////////////////////
+	  @Query("select das from DashboardAcademicInput das where das.school = :sch  AND (das._year = :year OR :year is null) ")
+	  List<DashboardAcademicInput> findBySchoolAndYearAcademic ( @Param("sch") School sch , @Param("year") Integer y );
 	  
 }

@@ -43,6 +43,7 @@ public class DashboardAcademicInput {
 	private Integer absent_count;
 	private Integer english_pass_count;
 	private Integer maths_pass_count;
+	private Integer hit_pass_count;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sch_id", nullable = false)
