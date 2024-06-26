@@ -56,7 +56,7 @@ public class ScheduledConsole {
     
     //for schools data
     @Transactional
-    @Scheduled(cron = "0 50 16 * * *")
+    @Scheduled(cron = "0 10 17 * * *")
     public void schoolsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
