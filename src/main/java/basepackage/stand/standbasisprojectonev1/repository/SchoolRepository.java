@@ -70,9 +70,10 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
             + "or s.faith like :filter "
             + "or s.gender like :filter "
             + "or s.operator like :filter "
+            + "or (DATE(s.createdAt) = :realDate OR :realDate is null) "
             + "and s.owner = :owner "
        	  )    
-    List<School> findFilterByOwner(@Param("filter") String filter, @Param("owner") SchoolGroup ownerId);
+    List<School> findFilterByOwner(@Param("filter") String filter, @Param("owner") SchoolGroup ownerId, @Param("realDate") Timestamp realDate);
     
     @Query("SELECT COUNT(s.schId) from School s where s.sri = :active ")
     long countBySri(@Param("active") Long active);
@@ -86,6 +87,6 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
     @Query("SELECT DATE(s.createdAt) AS createdDate, COUNT(s) AS count FROM School s " +
 	           "WHERE DATE(s.createdAt) >= :startDate AND DATE(s.createdAt) <= :endDate " +
 	           "GROUP BY DATE(s.createdAt)")
-	 List<Object[]> countSchoolsCreatedPerDay(Timestamp startDate, Timestamp endDate);
+	 List<Object[]> countSchoolsCreatedPerDay(@Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 
 }

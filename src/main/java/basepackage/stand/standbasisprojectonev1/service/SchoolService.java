@@ -103,10 +103,10 @@ public class SchoolService {
 		return null;
 	}
 	
-	public Map<String, Object> getOrdinarySchools( String query, Optional<Long> groupval) {
+	public Map<String, Object> getOrdinarySchools( String query, Optional<Long> groupval, Optional<Timestamp> realDate) {
 		    
         Long group = groupval.orElse(null);
-        
+        Timestamp realDateVal = realDate.orElse(null);
 		// Retrieve Teachers
         
         List<School> schs = null;
@@ -136,7 +136,8 @@ public class SchoolService {
         		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }
         		
         		schs = schRepository.findFilterByOwner( "%"+ query + "%", 
-    	        		schgroupobj == null ? null : schgroupobj.get() 
+    	        		schgroupobj == null ? null : schgroupobj.get(),
+						realDateVal == null ? null : realDateVal
     	         );
         	}
         }
@@ -154,7 +155,7 @@ public class SchoolService {
         response.put("schools", calarray);      
         
         return response;
-    }
+    } 
 	
 	public Map<String, Object> getPaginatedSchools(int page, int size, String query, Optional<Long> ownerval) {
         validatePageNumberAndSize(page, size);
@@ -204,7 +205,7 @@ public class SchoolService {
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         
-        Map<String, Object> response2 = getOrdinarySchools(query, ownerval);
+        Map<String, Object> response2 = getOrdinarySchools(query, ownerval,null);
         
         @SuppressWarnings("unchecked")
 		List<School> listSchool = (List<School>) response2.get("schools");
