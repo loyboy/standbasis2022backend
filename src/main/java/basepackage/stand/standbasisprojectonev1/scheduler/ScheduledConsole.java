@@ -53,7 +53,7 @@ public class ScheduledConsole {
     private final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
     //for schools data
-    @Scheduled(cron = "0 15 16 * * *")
+    @Scheduled(cron = "0 40 16 * * *")
     public void schoolsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
