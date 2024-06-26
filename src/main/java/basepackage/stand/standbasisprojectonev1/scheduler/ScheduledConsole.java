@@ -72,7 +72,9 @@ public class ScheduledConsole {
 	            .stream()
 	            .collect(Collectors.toList());
 
+       
         for (TimeTable it : ttnew) {
+            System.out.println("Inside for loop 1");
             Timestamp realDate = parseTimestamp(todayDate());
             Optional<Long> optionalOwner = Optional.of(it.getSchool().getOwner().getId());
             Optional<Timestamp> optionalTimestamp = Optional.of(realDate);
@@ -118,6 +120,7 @@ public class ScheduledConsole {
                 e1.printStackTrace();
             }	
 
+            System.out.println("Inside for loop 2");
             // Generate file name for S3
             String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketName = "standb670";
@@ -137,7 +140,7 @@ public class ScheduledConsole {
                         .build();
 
             client.putObject(request, software.amazon.awssdk.core.sync.RequestBody.fromFile(new File(zipFile)));
-
+            System.out.println("Inside for loop 3 " + zipFile);
             // Clean up local files
             new File(csvFile).delete();
             new File(zipFile).delete();
