@@ -56,7 +56,7 @@ public class ScheduledConsole {
     
     //for schools data
     @Transactional
-    @Scheduled(cron = "0 30 12 * * *")
+    @Scheduled(cron = "0 50 12 * * *")
     public void schoolsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -176,6 +176,22 @@ public class ScheduledConsole {
             catch (Exception e1) {
                 e1.printStackTrace();
             }
+
+            // Generate file name for S3
+            String datelogs = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+            String bucketNameLog = "standb670";
+            String schoolIdLog = String.valueOf(it.getSchool().getId());
+            String s3FileNameLog = datelogs + "_" + schoolIdLog + "_logs_snapshot.zip";
+
+            S3Client clientLog = S3Client.builder().build();
+		        
+			PutObjectRequest requestLog = PutObjectRequest.builder()
+                        .bucket(bucketNameLog)
+                        .key(s3FileNameLog)
+                        .acl("public-read")
+                        .build();
+
+            clientLog.putObject(requestLog, software.amazon.awssdk.core.sync.RequestBody.fromFile(new File(ziplogFile)));
 
              // Clean up local files
              new File(csvlogFile).delete();
