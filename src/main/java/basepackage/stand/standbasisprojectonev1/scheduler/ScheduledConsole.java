@@ -3,7 +3,7 @@ package basepackage.stand.standbasisprojectonev1.scheduler;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,12 +11,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-//import javax.transaction.Transactional;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -56,12 +56,13 @@ public class ScheduledConsole {
     
     //for schools data
     @Transactional
-    @Scheduled(cron = "0 10 17 * * *")
+    @Scheduled(cron = "0 30 12 * * *")
     public void schoolsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
         System.setProperty("aws.region", region);
-         // Get Timetable data for this day with Current calendar
+        
+        // Get Timetable data for this day with Current calendar
 	    List<TimeTable> tt = timeRepository.findByActiveCalendarInConsole(1, 1, "government", 1);
 	    
 	    // Get Unique timetable data based on school values
@@ -77,7 +78,6 @@ public class ScheduledConsole {
 
        
         for (TimeTable it : ttnew) {
-            System.out.println("Inside for loop 1");
             Timestamp realDate = parseTimestamp(todayDate());
             Optional<Long> optionalOwner = Optional.of(it.getSchool().getOwner().getId());
             Optional<Timestamp> optionalTimestamp = Optional.of(realDate);
@@ -123,16 +123,11 @@ public class ScheduledConsole {
                 e1.printStackTrace();
             }	
 
-            System.out.println("Inside for loop 2");
             // Generate file name for S3
             String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketName = "standb670";
             String schoolId = String.valueOf(it.getSchool().getId());
             String s3FileName = date + "_" + schoolId + "_console_snapshot.zip";
-
-            // Upload to S3
-           // AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
-           // s3Client.putObject(new PutObjectRequest(bucketName, s3FileName, new File(zipFile)));
 
             S3Client client = S3Client.builder().build();
 		        
@@ -143,10 +138,48 @@ public class ScheduledConsole {
                         .build();
 
             client.putObject(request, software.amazon.awssdk.core.sync.RequestBody.fromFile(new File(zipFile)));
-            System.out.println("Inside for loop 3 " + zipFile);
+          
             // Clean up local files
             new File(csvFile).delete();
             new File(zipFile).delete();
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+            String csvlogFile = "logs.csv";
+            String ziplogFile = "logs.zip";
+    
+            // Create CSV
+            try (CSVWriter writer = new CSVWriter(new FileWriter(csvlogFile))) {
+                // Write headers
+                writer.writeNext(getHeaders(School.class));
+    
+                // Write data
+                for (School school : listSchoolTotal) {
+                    writer.writeNext(getSchoolData(school));
+                }
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }
+
+            // Zip the CSV
+            try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(ziplogFile));
+                    FileInputStream fis = new FileInputStream(csvlogFile)) {
+                ZipEntry zipEntry = new ZipEntry(csvlogFile);
+                zipOut.putNextEntry(zipEntry);
+
+                byte[] bytes = new byte[1024];
+                int length;
+                while ((length = fis.read(bytes)) >= 0) {
+                    zipOut.write(bytes, 0, length);
+                }
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }
+
+             // Clean up local files
+             new File(csvlogFile).delete();
+             new File(ziplogFile).delete();
         }
     }
 
@@ -163,4 +196,26 @@ public class ScheduledConsole {
 			throw new IllegalArgumentException(e);
 		}
 	}
+
+    private String[] getHeaders(Class<?> clazz) {
+        List<String> headers = new ArrayList<>();
+        for (Field field : clazz.getDeclaredFields()) {
+            headers.add(field.getName());
+        }
+        return headers.toArray(new String[0]);
+    }
+
+    private String[] getSchoolData(School school) {
+        List<String> data = new ArrayList<>();
+        for (Field field : School.class.getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(school);
+                data.add(value != null ? value.toString() : "");
+            } catch (IllegalAccessException e) {
+                data.add("");
+            }
+        }
+        return data.toArray(new String[0]);
+    }
 }
