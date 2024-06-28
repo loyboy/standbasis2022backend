@@ -106,9 +106,9 @@ public class SchoolService {
 	public Map<String, Object> getOrdinarySchools( String query, Optional<Long> groupval, Optional<Timestamp> realDate) {
 		    
         Long group = groupval.orElse(null);
-        Timestamp realDateVal = realDate.orElse(null);
+        Timestamp realDateVal = realDate != null ? realDate.orElse(null) : null;
 		// Retrieve Teachers
-        
+        // 
         List<School> schs = null;
         
         if ( query.equals("") || query == null ) {

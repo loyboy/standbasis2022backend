@@ -43,7 +43,7 @@ public interface TimetableRepository extends JpaRepository<TimeTable, Long> {
     @Query("select tt from TimeTable tt WHERE tt.calendar.status = :status ")
     List<TimeTable> findByActiveCalendar(@Param("status") Integer status );
 
-    @Query("select tt from TimeTable tt WHERE tt.calendar.status = :calendar_status AND tt.school.status = :school_status AND tt.school.operator = :school_operator AND tt.school.sri = :school_sri ")
+    @Query("select tt from TimeTable tt WHERE tt.calendar.status = :calendar_status AND tt.school.status = :school_status AND tt.school.operator = :school_operator AND tt.school.sri = :school_sri AND tt.school.owner.status = 1 ")
     List<TimeTable> findByActiveCalendarInConsole(@Param("calendar_status") Integer calendar_status, @Param("school_status") Integer school_status, @Param("school_operator") String school_operator, @Param("school_sri") Integer school_sri  );
     
     @Query("select tt from TimeTable tt where tt.tea_name like :filter " 
