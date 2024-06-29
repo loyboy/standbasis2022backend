@@ -70,10 +70,9 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
             + "or s.faith like :filter "
             + "or s.gender like :filter "
             + "or s.operator like :filter "
-            + "or (DATE(s.createdAt) = :realDate OR :realDate is null) "
             + "and s.owner = :owner "
        	  )    
-    List<School> findFilterByOwner(@Param("filter") String filter, @Param("owner") SchoolGroup ownerId, @Param("realDate") Timestamp realDate);
+    List<School> findFilterByOwner(@Param("filter") String filter, @Param("owner") SchoolGroup ownerId);
     
     @Query("SELECT COUNT(s.schId) from School s where s.sri = :active ")
     long countBySri(@Param("active") Long active);

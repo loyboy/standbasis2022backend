@@ -103,10 +103,9 @@ public class SchoolService {
 		return null;
 	}
 	
-	public Map<String, Object> getOrdinarySchools( String query, Optional<Long> groupval, Optional<Timestamp> realDate) {
+	public Map<String, Object> getOrdinarySchools( String query, Optional<Long> groupval) {
 		    
         Long group = groupval.orElse(null);
-        Timestamp realDateVal = realDate != null ? realDate.orElse(null) : null;
 		// Retrieve Teachers
         // 
         List<School> schs = null;
@@ -136,8 +135,7 @@ public class SchoolService {
         		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }
         		
         		schs = schRepository.findFilterByOwner( "%"+ query + "%", 
-    	        		schgroupobj == null ? null : schgroupobj.get(),
-						realDateVal == null ? null : realDateVal
+    	        		schgroupobj == null ? null : schgroupobj.get()
     	         );
         	}
         }
@@ -205,7 +203,7 @@ public class SchoolService {
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         
-        Map<String, Object> response2 = getOrdinarySchools(query, ownerval,null);
+        Map<String, Object> response2 = getOrdinarySchools(query, ownerval);
         
         @SuppressWarnings("unchecked")
 		List<School> listSchool = (List<School>) response2.get("schools");

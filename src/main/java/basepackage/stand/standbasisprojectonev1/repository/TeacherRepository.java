@@ -64,7 +64,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
                + "or t.qualification like :filter "
                + "and t.school.owner = :group AND ( t.school = :owner OR :owner is null ) )"
           	)       
-       List<Teacher> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group);
+       List<Teacher> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group );
        
        @Query("select t from Teacher t where t.office = 'Teacher' AND ( t.fname like :filter " 
                + "or t.lname like :filter " 

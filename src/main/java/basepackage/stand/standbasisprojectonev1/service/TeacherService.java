@@ -144,11 +144,10 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 		
         Long owner = ownerval.orElse(null);     
         Long group = groupval.orElse(null);
+		//Timestamp realDateVal = realDate != null ? realDate.orElse(null) : null;
         
-		// Retrieve Teachers
-        
+		// Retrieve Teachers        
         List<Teacher> teas = null;
-      //  System.out.println("Long is set "+ owner);
         
         if ( query.equals("") || query == null ) {
         	if ( group == null && owner == null ) {
@@ -181,7 +180,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         		
         		teas = teaRepository.findFilterBySchool( "%"+ query + "%", 
         				schownerobj == null ? null : schownerobj.get(), 
-    	        		schgroupobj == null ? null : schgroupobj.get() 
+    	        		schgroupobj == null ? null : schgroupobj.get()
     	         );
         	}
         }
@@ -307,7 +306,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 			        .filter(distinctByKey(pr -> Arrays.asList(pr.getSubject(), pr.getTeacher(), pr.getClass_stream() )))
 			        .collect(Collectors.toList());
 			 
-			 System.out.println("countTimetableTeacherHas >> " + teaT.getTeaId() + " : " + countTimetableTeacherHas.size() );
+			//System.out.println("countTimetableTeacherHas >> " + teaT.getTeaId() + " : " + countTimetableTeacherHas.size() );
 			
 			/* List<Attendance> countAttendanceTeacherHas = listAttendance.stream()
 					 	.filter(tt -> tt.getTeacher().getTeaId() == teaT.getTeaId() )
@@ -325,7 +324,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 				        .filter(distinctByKey(pr -> Arrays.asList(pr.getTimetable().getSubject(), pr.getTeacher(), pr.getTimetable().getClass_stream() )))
 				        .collect(Collectors.toList());
 			 
-			 System.out.println("countAttendanceTeacherHas >> " + teaT.getTeaId() + " : " + countAttendanceTeacherHas.size() );	
+			 //System.out.println("countAttendanceTeacherHas >> " + teaT.getTeaId() + " : " + countAttendanceTeacherHas.size() );	
 			 
 			if (countTimetableTeacherHas.size() > 0) {
 				deployed++;

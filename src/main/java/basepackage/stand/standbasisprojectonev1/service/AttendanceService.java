@@ -315,7 +315,7 @@ public class AttendanceService {
         return response;
     }
 	
-	public Map<String, Object> getOrdinaryTeacherAttendances(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Long> classId, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Long> subject, Optional<Timestamp> datefrom, Optional<Timestamp> dateto  ) {
+	public Map<String, Object> getOrdinaryTeacherAttendances(String query, Optional<Long> schgroupId, Optional<Long> schId, Optional<Long> classId, Optional<Long> calendarId, Optional<Long> teacherId, Optional<Long> subject, Optional<Timestamp> datefrom, Optional<Timestamp> dateto ) {
         
         Long schgroup = schgroupId.orElse(null);
         Long schowner = schId.orElse(null);
@@ -323,6 +323,7 @@ public class AttendanceService {
         Long teacherowner = teacherId.orElse(null);     
         Long calendarowner = calendarId.orElse(null);
         Long subjectowner = subject.orElse(null);
+		//Timestamp realDateVal = realDate != null ? realDate.orElse(null) : null;
         
         List<Attendance> attendances = null;
         

@@ -1,5 +1,6 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -225,6 +226,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         
         Long owner = ownerval.orElse(null);
         Long group = groupval.orElse(null);
+		//Timestamp realDateVal = realDate != null ? realDate.orElse(null) : null;
         
         List<TimeTable> timetables = null;
         
@@ -233,7 +235,6 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         		timetables = timeRepository.findAll();
         	}
         	else {
-        		//System.out.println("TImetable teachei is here" +  teacher);
         		
         		Optional<School> schownerobj = null;
         		Optional<SchoolGroup> schgroupobj = null ;

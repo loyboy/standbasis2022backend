@@ -180,6 +180,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		+ "AND (att.done = :status OR :status is null) "
     		+ "AND (DATE(att._date) >= :datefrom OR :datefrom is null) "
     		+ "AND (DATE(att._date) <= :dateto OR :dateto is null) "
+			
     		+ "AND (att._desc like :filter OR :filter is null) "
        	 )
     

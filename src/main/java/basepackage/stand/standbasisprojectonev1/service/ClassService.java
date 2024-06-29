@@ -221,8 +221,7 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
         
         Map<String, Object> response = new HashMap<>();
         response.put("classrooms", teaarray);
-        response.put("currentPage", schs.getNumber());
-        
+        response.put("currentPage", schs.getNumber());        
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         

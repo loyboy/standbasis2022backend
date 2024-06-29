@@ -1,5 +1,6 @@
 package basepackage.stand.standbasisprojectonev1.repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
