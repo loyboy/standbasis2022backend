@@ -83,7 +83,7 @@ public class ScheduledConsole {
     
     //for schools data
     @Transactional
-    @Scheduled(cron = "0 50 12 * * *")
+    @Scheduled(cron = "0 25 9 * * *")
     public void schoolsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -227,7 +227,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 12 * * *")
+    @Scheduled(cron = "0 25 9 * * *")
     public void teachersSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -394,7 +394,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 12 * * *")
+    @Scheduled(cron = "0 25 9 * * *")
     public void enrollmentsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -552,7 +552,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 12 * * *")
+    @Scheduled(cron = "0 25 9 * * *")
     public void classroomsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -716,7 +716,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 12 * * *")
+    @Scheduled(cron = "0 25 9 * * *")
     public void timetablesSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -856,7 +856,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 12 * * *")
+    @Scheduled(cron = "0 25 9 * * *")
     public void calendarsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -996,148 +996,7 @@ public class ScheduledConsole {
         }
     }
 
-    @Transactional
-    @Scheduled(cron = "0 50 12 * * *")
-    public void attendanceMneSnapshot() {
-        System.setProperty("aws.accessKeyId", accesskey);
-        System.setProperty("aws.secretAccessKey", sk);
-        System.setProperty("aws.region", region);
-      
-        // Get Timetable data for this day with Current calendar
-	    List<TimeTable> tt = timeRepository.findByActiveCalendarInConsole(1, 1, "government", 1);
-	    
-	    // Get Unique timetable data based on school values
-	    List<TimeTable> ttnew = tt.stream()
-	            .collect(Collectors.toMap(
-	                    obj -> obj.getSchool(),  // Composite key
-	                    Function.identity(),  // Keep the original object
-	                    (obj1, obj2) -> obj1  // Merge function (in case of duplicate keys)
-	            ))
-	            .values()
-	            .stream()
-	            .collect(Collectors.toList());
-
-       
-        for (TimeTable it : ttnew) {
-           
-            Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
-            Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
-               
-            Map<String, Object> response2 = calService.getOrdinaryCalendars("", optionalOwner, optionalGroup);
-        
-            @SuppressWarnings("unchecked")
-            List<Calendar> listCalendar = (List<Calendar>) response2.get("calendars");
-            
-            long activeCalendars = listCalendar.stream().filter(sch -> sch.getStatus() == 1).count();       
-            long inactiveCalendars = listCalendar.stream().filter(sch -> sch.getStatus() == 0).count();
-            
-            // Create CSV
-            String csvFile = "data.csv";
-            try (CSVWriter writer = new CSVWriter(new FileWriter(csvFile))) {
-                String[] header = {"Total Count", "Total Active Calendars", "Total Inactive Calendars"};
-                writer.writeNext(header);
-                
-                String[] data = { String.valueOf(listCalendar.size()), String.valueOf(activeCalendars), String.valueOf(inactiveCalendars)};
-                writer.writeNext(data);
-            }
-            catch (Exception e1) {
-                e1.printStackTrace();
-            }	
-
-            // Zip the CSV
-            String zipFile = "data.zip";
-            try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile));
-                FileInputStream fis = new FileInputStream(csvFile)) {
-                ZipEntry zipEntry = new ZipEntry(csvFile);
-                zipOut.putNextEntry(zipEntry);
-
-                byte[] bytes = new byte[1024];
-                int length;
-                while ((length = fis.read(bytes)) >= 0) {
-                    zipOut.write(bytes, 0, length);
-                }
-            }
-            catch (Exception e1) {
-                e1.printStackTrace();
-            }	
-
-            // Generate file name for S3
-            String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-            String bucketName = "standb670";
-            String schoolId = String.valueOf(it.getSchool().getId());
-            String s3FileName = date + "_" + "calendars" + "_" + schoolId + "_console_snapshot.zip";
-
-            S3Client client = S3Client.builder().build();
-		        
-			PutObjectRequest request = PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(s3FileName)
-                        .acl("public-read")
-                        .build();
-
-            client.putObject(request, software.amazon.awssdk.core.sync.RequestBody.fromFile(new File(zipFile)));
-          
-            // Clean up local files
-            new File(csvFile).delete();
-            new File(zipFile).delete();
-
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            String csvlogFile = "logs.csv";
-            String ziplogFile = "logs.zip";
     
-            // Create CSV
-            try (CSVWriter writer = new CSVWriter(new FileWriter(csvlogFile))) {
-                // Write headers
-                writer.writeNext(getHeaders(Calendar.class));
-    
-                // Write data
-                for (Calendar cal : listCalendar) {
-                    writer.writeNext(getCalendarData(cal));
-                }
-            }
-            catch (Exception e1) {
-                e1.printStackTrace();
-            }
-
-            // Zip the CSV
-            try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(ziplogFile));
-                    FileInputStream fis = new FileInputStream(csvlogFile)) {
-                ZipEntry zipEntry = new ZipEntry(csvlogFile);
-                zipOut.putNextEntry(zipEntry);
-
-                byte[] bytes = new byte[1024];
-                int length;
-                while ((length = fis.read(bytes)) >= 0) {
-                    zipOut.write(bytes, 0, length);
-                }
-            }
-            catch (Exception e1) {
-                e1.printStackTrace();
-            }
-
-            // Generate file name for S3
-            String datelogs = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-            String bucketNameLog = "standb670";
-            String schoolIdLog = String.valueOf(it.getSchool().getId());
-            String s3FileNameLog = datelogs + "_" + "calendars" + "_" + schoolIdLog + "_logs_snapshot.zip";
-
-            S3Client clientLog = S3Client.builder().build();
-		        
-			PutObjectRequest requestLog = PutObjectRequest.builder()
-                        .bucket(bucketNameLog)
-                        .key(s3FileNameLog)
-                        .acl("public-read")
-                        .build();
-
-            clientLog.putObject(requestLog, software.amazon.awssdk.core.sync.RequestBody.fromFile(new File(ziplogFile)));
-
-             // Clean up local files
-             new File(csvlogFile).delete();
-             new File(ziplogFile).delete();
-        }
-    }
-
-
     private String[] getHeaders(Class<?> clazz) {
         List<String> headers = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
