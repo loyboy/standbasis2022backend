@@ -91,7 +91,7 @@ public class ScheduledConsole {
     
     //for schools data
     @Transactional
-    @Scheduled(cron = "0 15 15 * * *")
+    @Scheduled(cron = "0 50 15 * * *")
     public void schoolsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -235,7 +235,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 15 15 * * *")
+    @Scheduled(cron = "0 50 15 * * *")
     public void teachersSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -402,7 +402,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 15 15 * * *")
+    @Scheduled(cron = "0 50 15 * * *")
     public void enrollmentsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -560,7 +560,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 15 15 * * *")
+    @Scheduled(cron = "0 50 15 * * *")
     public void classroomsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -724,7 +724,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 15 15 * * *")
+    @Scheduled(cron = "0 50 15 * * *")
     public void timetablesSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -864,7 +864,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 15 15 * * *")
+    @Scheduled(cron = "0 50 15 * * *")
     public void calendarsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1005,7 +1005,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 15 15 * * *")
+    @Scheduled(cron = "0 50 15 * * *")
     public void lessonnoteMneSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1091,7 +1091,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 15 15 * * *")
+    @Scheduled(cron = "0 50 15 * * *")
     public void attendanceMneSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1180,7 +1180,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 15 15 * * *")
+    @Scheduled(cron = "0 50 15 * * *")
     public void lessonnoteFlagsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1211,8 +1211,9 @@ public class ScheduledConsole {
 
             Optional<Integer> nullVal  = Optional.ofNullable(null);     
             Optional<Long>    nullVal3 = Optional.ofNullable(null);     
+            Optional<Timestamp>    nullVal4 = Optional.ofNullable(null);     
 
-            Map<String, Object> response = mneService.getOrdinaryLessonnoteFlags( "", optionalGroup, optionalOwner, optionalYear, optionalTerm, nullVal, nullVal, nullVal3, nullVal3, optionalDatefrom, null );
+            Map<String, Object> response = mneService.getOrdinaryLessonnoteFlags( "", optionalGroup, optionalOwner, optionalYear, optionalTerm, nullVal, nullVal, nullVal3, nullVal3, optionalDatefrom, nullVal4 );
             
             String teacher_management = (String) response.get("total_lessonnotes");
             String teacher_submitted = (String) response.get("teacher_submitted");
@@ -1279,7 +1280,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 15 15 * * *")
+    @Scheduled(cron = "0 50 15 * * *")
     public void attendanceFlagsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1309,8 +1310,9 @@ public class ScheduledConsole {
             Optional<Timestamp> optionalDatefrom = Optional.of( parseTimestamp(todayDate()) );
            // Optional<Integer> nullVal  = Optional.ofNullable(null);     
             Optional<Long>    nullVal3 = Optional.ofNullable(null);     
+            Optional<Timestamp>    nullVal4 = Optional.ofNullable(null);
 
-            Map<String, Object> response = mneService.getOrdinaryAttendanceFlags( "", optionalGroup, optionalOwner, nullVal3, optionalCalendar, nullVal3, nullVal3, nullVal3, optionalDatefrom, null );
+            Map<String, Object> response = mneService.getOrdinaryAttendanceFlags( "", optionalGroup, optionalOwner, nullVal3, optionalCalendar, nullVal3, nullVal3, nullVal3, optionalDatefrom, nullVal4 );
       
             String student_absence = (String) response.get("student_absence");
             String student_excused_absence = (String) response.get("student_excused_absence");
