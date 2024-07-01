@@ -1323,7 +1323,7 @@ public class ScheduledConsole {
             int teacher_absent = (int) response.get("teacher_absent");
             int teacher_expected = (int) response.get("teacher_expected");
             int student_expected = (int) response.get("student_expected");
-            int endorsement_expected = (int) response.get("endorsement_expected");
+            long endorsement_expected = (long) response.get("endorsement_expected");
 
             // Create CSV
             String csvFile = "data.csv";
