@@ -91,7 +91,7 @@ public class ScheduledConsole {
     
     //for schools data
     @Transactional
-    @Scheduled(cron = "0 50 15 * * *")
+    @Scheduled(cron = "0 10 18 * * *")
     public void schoolsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -235,7 +235,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 15 * * *")
+    @Scheduled(cron = "0 10 18 * * *")
     public void teachersSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -402,7 +402,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 15 * * *")
+    @Scheduled(cron = "0 10 18 * * *")
     public void enrollmentsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -560,7 +560,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 15 * * *")
+    @Scheduled(cron = "0 10 18 * * *")
     public void classroomsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -724,7 +724,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 15 * * *")
+    @Scheduled(cron = "0 10 18 * * *")
     public void timetablesSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -864,7 +864,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 15 * * *")
+    @Scheduled(cron = "0 10 18 * * *")
     public void calendarsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1005,7 +1005,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 15 * * *")
+    @Scheduled(cron = "0 10 18 * * *")
     public void lessonnoteMneSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1091,7 +1091,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 15 * * *")
+    @Scheduled(cron = "0 10 18 * * *")
     public void attendanceMneSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1180,7 +1180,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 15 * * *")
+    @Scheduled(cron = "0 10 18 * * *")
     public void lessonnoteFlagsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1215,15 +1215,15 @@ public class ScheduledConsole {
 
             Map<String, Object> response = mneService.getOrdinaryLessonnoteFlags( "", optionalGroup, optionalOwner, optionalYear, optionalTerm, nullVal, nullVal, nullVal3, nullVal3, optionalDatefrom, nullVal4 );
             
-            String teacher_management = (String) response.get("total_lessonnotes");
-            String teacher_submitted = (String) response.get("teacher_submitted");
-            String teacher_late_submitted = (String) response.get("teacher_late_submitted");
-            String teacher_late_approval = (String) response.get("teacher_late_approval");
-            String teacher_no_approval = (String) response.get("teacher_no_approval");
-            String teacher_queried = (String) response.get("teacher_queried");
-            String teacher_late_closure = (String) response.get("teacher_late_closure");
-            String teacher_bad_cycles = (String) response.get("teacher_bad_cycles");
-            String teacher_no_closure = (String) response.get("teacher_no_closure");
+            int teacher_management = (int) response.get("total_lessonnotes");
+            int teacher_submitted = (int) response.get("teacher_submitted");
+            int teacher_late_submitted = (int) response.get("teacher_late_submitted");
+            int teacher_late_approval = (int) response.get("teacher_late_approval");
+            int teacher_no_approval = (int) response.get("teacher_no_approval");
+            int teacher_queried = (int) response.get("teacher_queried");
+            int teacher_late_closure = (int) response.get("teacher_late_closure");
+            int teacher_bad_cycles = (int) response.get("teacher_bad_cycles");
+            int teacher_no_closure = (int) response.get("teacher_no_closure");
 
             // Create CSV
             String csvFile = "data.csv";
@@ -1231,7 +1231,7 @@ public class ScheduledConsole {
                 String[] header = {"Date of Flags", "Total Lessonnotes", "Submitted", "Late Submitted", "Late Approval", "No Approval", "Queried", "Late Closure", "Bad Cycles", "No Closure"};
                 writer.writeNext(header);
                 
-                String[] data = { String.valueOf(todayDate()), teacher_management, teacher_submitted, teacher_late_submitted, teacher_late_approval, teacher_no_approval, teacher_queried, teacher_late_closure, teacher_bad_cycles, teacher_no_closure };
+                String[] data = { String.valueOf(todayDate()), String.valueOf(teacher_management), String.valueOf(teacher_submitted), String.valueOf(teacher_late_submitted), String.valueOf(teacher_late_approval), String.valueOf(teacher_no_approval), String.valueOf(teacher_queried), String.valueOf(teacher_late_closure), String.valueOf(teacher_bad_cycles), String.valueOf(teacher_no_closure) };
                 writer.writeNext(data);
             }
             catch (Exception e1) {
@@ -1280,7 +1280,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 50 15 * * *")
+    @Scheduled(cron = "0 10 18 * * *")
     public void attendanceFlagsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1304,27 +1304,26 @@ public class ScheduledConsole {
         for (TimeTable it : ttnew) {
            
             Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
-            Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
-           // Optional<String> optionalYear = Optional.of( getYearFromTimestamp(it.getCalendar().getStartdate()));
+            Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());           
             Optional<Long> optionalCalendar = Optional.of( it.getCalendar().getCalendarId() );
             Optional<Timestamp> optionalDatefrom = Optional.of( parseTimestamp(todayDate()) );
-           // Optional<Integer> nullVal  = Optional.ofNullable(null);     
+               
             Optional<Long>    nullVal3 = Optional.ofNullable(null);     
             Optional<Timestamp>    nullVal4 = Optional.ofNullable(null);
 
             Map<String, Object> response = mneService.getOrdinaryAttendanceFlags( "", optionalGroup, optionalOwner, nullVal3, optionalCalendar, nullVal3, nullVal3, nullVal3, optionalDatefrom, nullVal4 );
       
-            String student_absence = (String) response.get("student_absence");
-            String student_excused_absence = (String) response.get("student_excused_absence");
-            String queried_attendance = (String) response.get("queried_attendance");
-            String late_attendance = (String) response.get("late_attendance");
-            String void_attendance = (String) response.get("void_attendance");
-            String approval_delays = (String) response.get("approval_delays");
-            String approval_done = (String) response.get("approval_done");
-            String teacher_absent = (String) response.get("teacher_absent");
-            String teacher_expected = (String) response.get("teacher_expected");
-            String student_expected = (String) response.get("student_expected");
-            String endorsement_expected = (String) response.get("endorsement_expected");
+            int student_absence = (int) response.get("student_absence");
+            int student_excused_absence = (int) response.get("student_excused_absence");
+            int queried_attendance = (int) response.get("queried_attendance");
+            int late_attendance = (int) response.get("late_attendance");
+            int void_attendance = (int) response.get("void_attendance");
+            int approval_delays = (int) response.get("approval_delays");
+            int approval_done = (int) response.get("approval_done");
+            int teacher_absent = (int) response.get("teacher_absent");
+            int teacher_expected = (int) response.get("teacher_expected");
+            int student_expected = (int) response.get("student_expected");
+            int endorsement_expected = (int) response.get("endorsement_expected");
 
             // Create CSV
             String csvFile = "data.csv";
@@ -1332,7 +1331,7 @@ public class ScheduledConsole {
                 String[] header = {"Date of Flags", "Student Absence", "Student Excused Absence", "Queried Attendance", "Late Attendance", "Void Attendance", "Approval Delays", "Approval Done", "Teacher Absent", "Teacher Expected", "Student Expected", "Endorsement Expected"};
                 writer.writeNext(header);
                 
-                String[] data = { String.valueOf(todayDate()), student_absence, student_excused_absence, queried_attendance, late_attendance, void_attendance, approval_delays, approval_done, teacher_absent, teacher_expected, student_expected, endorsement_expected };
+                String[] data = { String.valueOf(todayDate()), String.valueOf(student_absence), String.valueOf(student_excused_absence), String.valueOf(queried_attendance), String.valueOf(late_attendance), String.valueOf(void_attendance), String.valueOf(approval_delays), String.valueOf(approval_done), String.valueOf(teacher_absent), String.valueOf(teacher_expected), String.valueOf(student_expected), String.valueOf(endorsement_expected) };
                 writer.writeNext(data);
             }
             catch (Exception e1) {
@@ -1379,7 +1378,6 @@ public class ScheduledConsole {
             /////////////////////////////////////////////////////////////////////////////////////////////////////
         }
     }
-
 
     private String todayDate() {
 		Date d = new Date();
