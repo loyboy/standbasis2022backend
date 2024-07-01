@@ -54,6 +54,7 @@ import basepackage.stand.standbasisprojectonev1.service.AssessmentService;
 import basepackage.stand.standbasisprojectonev1.service.LessonnoteActivityService;
 import basepackage.stand.standbasisprojectonev1.service.LessonnoteManagementService;
 import basepackage.stand.standbasisprojectonev1.service.LessonnoteService;
+import basepackage.stand.standbasisprojectonev1.service.MneService;
 import basepackage.stand.standbasisprojectonev1.service.TimetableService;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
 import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
@@ -66,6 +67,9 @@ import org.springframework.beans.factory.annotation.Value;
 @RestController
 @RequestMapping("/api/lessonnote")
 public class LessonnoteController {
+
+	 @Autowired
+	 MneService mneService;
 
 	 @Autowired
 	 LessonnoteService service;
@@ -255,7 +259,6 @@ public class LessonnoteController {
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 
-	 @SuppressWarnings("unchecked")
 	 @GetMapping("/mneTeachers") //flags
 	 public ResponseEntity<?> getMNETeacherLessonnotes(
 			 @RequestParam(value = "q", required=false) String query,
@@ -270,61 +273,14 @@ public class LessonnoteController {
 			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
 			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
-			 ) {
+			 ) 
+			{
 		 
-		 Map<String, Object> response = service.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, schoolyear, schoolterm, teacher, subject, datefrom, dateto );
-		 Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, schoolyear, schoolterm, teacher, subject, datefrom, dateto );
-		// Map<String, Object> lsnActivityResponse = serviceActivity.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week,  calendar, teacher, datefrom, dateto );
-				 
-		 List<Lessonnote> ordinaryArray = (List<Lessonnote>) response.get("lessonnotes");
-		 List<LessonnoteManagement> ordinaryArrayManagement = (List<LessonnoteManagement>) lsnManageResponse.get("lessonnotemanagement");
-		 //List<LessonnoteActivity> ordinaryArrayLessonnote = (List<LessonnoteActivity>) lsnActivityResponse.get("Lessonnoteactivity");
-			
-		 Map<String, Object> newResponse = new HashMap<>();
-		 
-		 for (Lessonnote lsn : ordinaryArray) {	
-			 
-			// System.out.println("Week: " + week.get() + " " + "SchoolYear&Term: " + schoolyear.get() + "@" + schoolterm.get() );
-			 System.out.println("LSN ID: " + lsn.getLessonnoteId() );
-		 }
-		 
-		 Integer max = ordinaryArray.size(); 
-		// Integer maxManage = ordinaryArrayManagement.size();
-		 //Integer maxActivity = ordinaryArrayLessonnote.size();
-				 
-		 Long teacherTotalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null ).count();
-		 Long teacherLateLessonnotes = ordinaryArray.stream().filter(o -> (o.getResubmission() != null && o.getResubmission().compareTo( o.getExpected_submission() ) > 0) || (o.getSubmission() != null && o.getSubmission().compareTo( o.getExpected_submission() ) > 0) ).count();
-		 
-		 Long teacherLateApprovalLessonnotes = ordinaryArray.stream().filter(o -> ( o.getResubmission() != null && ( o.getApproval() != null && o.getRevert() == null ) && o.getResubmission().compareTo( o.getExpected_submission() ) > 0 && o.getResubmission().compareTo( addDays(2,o.getExpected_submission()) ) < 0 ) 
-				 || ( o.getSubmission() != null && ( o.getApproval() != null && o.getRevert() == null ) && o.getSubmission().compareTo( o.getExpected_submission() ) > 0 && o.getSubmission().compareTo( addDays(2,o.getExpected_submission()) ) < 0 ) ).count();
-		 
-		 Long teacherNoApprovalLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && ( o.getApproval() != null && o.getRevert() == null ) && o.getApproval().compareTo( addDays(2,o.getExpected_submission()) ) > 0 ).count();
-		 
-		 Long teacherRevertedLessonnotes = ordinaryArray.stream().filter(o -> o.getSubmission() != null && o.getRevert() != null ).count();
-		 Long teacherBadCycles = ordinaryArrayManagement.stream().filter(o -> o.getLsn_id().getSubmission() != null && o.getQuality() < 50 && o.getQuality() != 0).count(); 
-		 
-		/* Long teacherLateClosure = ordinaryArray.stream().filter(o -> { 			 
-			 if (o.getLaunch() != null) {
-				 Date thedate = new Date( o.getLaunch().getTime() );
-				 return olderThanDays( thedate, 7 );
-			 }
-			 return false;			 
-		 }).count();*/
-		 Long teacherLateClosure = ordinaryArray.stream().filter(o -> o.getSubmission() != null && o.getClosure() != null && ( o.getApproval() != null ) && o.getPrincipal_closure().compareTo( o.getExpected_closure() ) > 0 ).count(); 
-		 Long teacherNoClosure   = ordinaryArray.stream().filter(o -> o.getSubmission() != null && o.getClosure() != null && ( o.getApproval() != null ) && o.getPrincipal_closure().compareTo( addDays(2,o.getExpected_closure())  ) > 0 ).count();			
-		 
-		 newResponse.put("total_lessonnotes", max );
-		 newResponse.put("teacher_submitted", teacherTotalLessonnotes.intValue() );
-		 newResponse.put("teacher_late_submitted", teacherLateLessonnotes.intValue() );
-		 newResponse.put("teacher_late_approval", teacherLateApprovalLessonnotes.intValue() );
-		 newResponse.put("teacher_no_approval", teacherNoApprovalLessonnotes.intValue() );
-		 newResponse.put("teacher_queried", teacherRevertedLessonnotes.intValue() );
-		 newResponse.put("teacher_late_closure", teacherLateClosure.intValue() );
-		 newResponse.put("teacher_bad_cycles", teacherBadCycles.intValue() );
-		 newResponse.put("teacher_no_closure", teacherNoClosure.intValue() );
-				 
-		 return new ResponseEntity<>(newResponse, HttpStatus.OK);	        
-	 }
+				Map<String, Object> newResponse = mneService.getOrdinaryLessonnoteFlags( query, schoolgroup, school, schoolyear, schoolterm, week, classid, teacher, subject, datefrom, dateto  );
+					
+				return new ResponseEntity<>(newResponse, HttpStatus.OK);
+        
+	 		}
 	 
 	 //
 	 
@@ -344,9 +300,7 @@ public class LessonnoteController {
 		 Map<String, Object> response = serviceManagement.getPaginatedTeacherLessonnotes( page, size, query, schoolgroup, school, classid, calendar, teacher, datefrom, dateto  );
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }*/
-	 
-	
-	 
+	 	 
 	 @GetMapping("/teachersLna")
 	 public ResponseEntity<?> getTeacherLessonnoteActivity(
 			 @RequestParam(value = "q" , required=false) String query,

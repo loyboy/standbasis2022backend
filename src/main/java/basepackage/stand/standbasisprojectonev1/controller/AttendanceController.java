@@ -53,6 +53,7 @@ import basepackage.stand.standbasisprojectonev1.service.AttendanceActivityServic
 import basepackage.stand.standbasisprojectonev1.service.AttendanceManagementService;
 import basepackage.stand.standbasisprojectonev1.service.AttendanceService;
 import basepackage.stand.standbasisprojectonev1.service.EnrollmentService;
+import basepackage.stand.standbasisprojectonev1.service.MneService;
 import basepackage.stand.standbasisprojectonev1.service.UserService;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
 import basepackage.stand.standbasisprojectonev1.util.FileUploadUtil;
@@ -72,6 +73,9 @@ public class AttendanceController {
 	 
 	 @Autowired
 	 UserService serviceUser;
+
+	 @Autowired
+	 MneService mneService;
 	 
 	 @Autowired
 	 EnrollmentService serviceEnrollment;
@@ -269,10 +273,8 @@ public class AttendanceController {
 					e.printStackTrace();
 					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Error encountered."));
 			 	}
-	    }
-	 
-	 
-	 @SuppressWarnings("unchecked")
+	    }	 
+	  
 	@GetMapping("/mneTeachers")
 	 public ResponseEntity<?> getMNETeacherAttendances(
 			 @RequestParam(value = "q", required=false) String query,
@@ -285,55 +287,11 @@ public class AttendanceController {
 			 @RequestParam(value = "student", required=false) Optional<Long> student,
 			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto
-	 ) {
-		 
-		 Map<String, Object> response = service.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, subject, datefrom, dateto  );
-		 Map<String, Object> attManageResponse = serviceManagement.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, subject, datefrom, dateto);
-		 Map<String, Object> attStudent = service.getOrdinaryStudentAttendances(query, schoolgroup, school, classid,  calendar, student, datefrom, dateto);
-		 Map<String, Object> attActivityResponse = serviceActivity.getOrdinaryTeacherAttendances(query, schoolgroup, school, classid, calendar, teacher, datefrom, dateto);
+	 ) {		 
+		
+		Map<String, Object> newResponse = mneService.getOrdinaryAttendanceFlags( query, schoolgroup, school, classid, calendar, teacher, subject, student, datefrom, dateto  );
 			 
-		 List<Attendance> ordinaryArray = (List<Attendance>) response.get("attendances");
-		 List<Rowcall> ordinaryStudentArray = (List<Rowcall>) attStudent.get("attendances");
-		 List<AttendanceManagement> ordinaryArrayManagement = (List<AttendanceManagement>) attManageResponse.get("attendancemanagement");
-		 List<AttendanceActivity> ordinaryArrayActivity = (List<AttendanceActivity>) attActivityResponse.get("attendanceactivity");
-			
-		 Map<String, Object> newResponse = new HashMap<>();
-		 int student_population = 0;
-		 for (Attendance att : ordinaryArray) {	
-			 List<Enrollment> ordinaryEnroll = serviceEnrollment.findEnrollmentFromClass(att.getTimetable().getClass_stream().getClsId());
-			 student_population += ordinaryEnroll.size();
-			// System.out.println("Student pop: " + ordinaryEnroll.size() );
-			// System.out.println("Attendance ID: " + att.getAttId() );
-		 }
-		 
-		 Integer max = ordinaryArray.size(); 
-		 Integer maxManage = ordinaryArrayManagement.size();
-		 Integer maxStudent = ordinaryStudentArray.size();
-		 Integer maxActivity = ordinaryArrayActivity.size();
-		 
-		 Long studentAbsence = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 1).count(); 
-		 Long studentExcusedAbsence = ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0 && o.getRemark() != null ).count(); 
-		 Long incompleteAttendance = ordinaryArrayManagement.stream().filter(o -> o.getCompleteness() == 50 ).count(); 
-		 Long lateAttendance = ordinaryArrayManagement.stream().filter(o -> o.getTiming() == 50).count(); 
-		 Long voidAttendance = ordinaryArrayManagement.stream().filter(o -> o.getTiming() == 0).count();
-		 Long Approvalslip  = ordinaryArrayActivity.stream().filter(o -> o.getSlip() == 1 && o.getOwnertype().equals("Principal")).count();
-		 Long Approvaldone  = ordinaryArrayActivity.stream().filter(o -> o.getOwnertype().equals("Principal") && o.getActual() != null ).count();
-		 Long ApprovalStatus  = ordinaryArrayActivity.stream().filter(o -> o.getOwnertype().equals("Principal") && o.getActual() != null && o.getAction().equals("queried") ).count();
-		 Long teacherAbsent = ordinaryArray.stream().filter(o -> o.getDone() == 0 ).count(); 
-					
-		 newResponse.put("student_absence", studentAbsence.intValue() );
-		 newResponse.put("student_excused_absence", studentExcusedAbsence.intValue() );
-		 newResponse.put("queried_attendance", ApprovalStatus.intValue() );
-		 newResponse.put("late_attendance", lateAttendance.intValue() );
-		 newResponse.put("void_attendance", voidAttendance.intValue() );
-		 newResponse.put("approval_delays", Approvalslip.intValue() );
-		 newResponse.put("approval_done", Approvaldone.intValue() );
-		 newResponse.put("teacher_absent", teacherAbsent.intValue() );
-		 newResponse.put("teacher_expected", max );
-		 newResponse.put("student_expected", student_population );
-		 newResponse.put("endorsement_expected", ordinaryArrayActivity.stream().filter(o -> o.getOwnertype().equals("Principal") ).count() );
-			
-		 return new ResponseEntity<>(newResponse, HttpStatus.OK);	        
+		return new ResponseEntity<>(newResponse, HttpStatus.OK);	        
 	 }
 	 
 	 
@@ -481,8 +439,6 @@ public class AttendanceController {
 	     }
 	 }
 	 
-	 //findAttendanceActivity
-	 
 	 //Teacher only
 	 @PutMapping("/{id}")
 	 public ResponseEntity<?> updateAttendance( 
@@ -524,8 +480,7 @@ public class AttendanceController {
 	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
 	     }
 	 }
-	 
-	 
+	  
 	 @PutMapping("/rowcall")
 	 public ResponseEntity<?> updateRowcall( 
 			 

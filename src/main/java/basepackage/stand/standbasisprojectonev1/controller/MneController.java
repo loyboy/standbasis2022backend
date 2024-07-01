@@ -56,6 +56,7 @@ import basepackage.stand.standbasisprojectonev1.service.ClassService;
 import basepackage.stand.standbasisprojectonev1.service.EnrollmentService;
 import basepackage.stand.standbasisprojectonev1.service.LessonnoteActivityService;
 import basepackage.stand.standbasisprojectonev1.service.LessonnoteManagementService;
+import basepackage.stand.standbasisprojectonev1.service.MneService;
 import basepackage.stand.standbasisprojectonev1.service.SchoolService;
 import basepackage.stand.standbasisprojectonev1.service.StudentService;
 import basepackage.stand.standbasisprojectonev1.service.SubjectService;
@@ -90,6 +91,9 @@ public class MneController {
 	 
 	 @Autowired
 	 SubjectService subjectservice;
+
+	 @Autowired
+	 MneService mneService;
 	 
 	 @Autowired
 	 CalendarService calendarservice;
@@ -715,8 +719,7 @@ public class MneController {
 				 j++;		     
 			     
 			 }
-	     }
-	     
+	     }	     
 	     
 	     double averagePerf = allAverage.stream()
 	                .mapToInt(Integer::intValue)
@@ -1013,7 +1016,6 @@ public class MneController {
 	     }
 	 }
 	 
-	 @SuppressWarnings("unchecked")
 	 @GetMapping("/lessonnote/proprietors")
 	 public ResponseEntity<?> getProprietorLessonnote(
 			 @RequestParam(value = "group") Optional<Long> schoolgroup,
@@ -1022,36 +1024,7 @@ public class MneController {
 			 @RequestParam(value = "week", required=false) Optional<Integer>  week
 	 ){
 		 
-			 Optional<Integer> termVal = Optional.ofNullable(null);
-		     Optional<String> yearVal = Optional.ofNullable(null);
-		     
-		     Optional<basepackage.stand.standbasisprojectonev1.model.Calendar> calendarownerobj = null;
-		     if(calendar.isPresent()) { calendarownerobj = calRepository.findById( calendar.get() );  } 
-		     if (calendar.isPresent()) { 
-		    	 termVal = Optional.ofNullable(calendarownerobj.get().getTerm());  
-		    	 yearVal = Optional.ofNullable(calendarownerobj.get().getSession());  
-		     }
-		     
-			 Optional<Long> WithNullableValue = Optional.ofNullable(null);
-			 Optional<Integer> WithNullableValueInt = Optional.ofNullable(null);
-			 Optional<Timestamp> WithNullableValueTime = Optional.ofNullable(null);
-			 
-			 Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes("", schoolgroup, school, WithNullableValueInt, week, yearVal, termVal, WithNullableValue, WithNullableValue, WithNullableValueTime, WithNullableValueTime );
-			 Map<String, Object> lsnActivityResponse = serviceActivity.getOrdinaryTeacherLessonnotes("", schoolgroup, school, WithNullableValueInt, week,  calendar, WithNullableValue, WithNullableValueTime, WithNullableValueTime );
-			 
-			 List<LessonnoteManagement> ordinaryArrayManagement = (List<LessonnoteManagement>) lsnManageResponse.get("lessonnotemanagement");
-			 List<LessonnoteActivity> ordinaryArrayActivity = (List<LessonnoteActivity>) lsnActivityResponse.get("Lessonnoteactivity");
-			 
-			 Map<String, Object> newResponse = new HashMap<>();
-			 
-			 Integer maxManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.size() : 10; 
-			 Integer maxActivity = ordinaryArrayActivity != null ? ordinaryArrayActivity.size() : 10; 
-			 
-			 Long teacherManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.stream().filter(o -> o.getManagement() >= 50).count() : 0; 
-			 Long headAdministration = ordinaryArrayActivity != null ? ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count() : 0; 
-			 
-			 newResponse.put("teacher_management", maxManagement > 0 ? (teacherManagement.intValue() * 100)/maxManagement : 0 );
-			 newResponse.put("head_admin", maxActivity > 0 ? (headAdministration.intValue() * 100)/maxActivity : 0 );
+			 Map<String, Object> newResponse = mneService.getOrdinaryLessonnoteMneProprietor( schoolgroup, school, calendar, week );
 			 
 			 return new ResponseEntity<>(newResponse, HttpStatus.OK);
 				
@@ -1065,62 +1038,12 @@ public class MneController {
 			 @RequestParam(value = "calendar", required=false) Optional<Long> calendar,
 			 @RequestParam(value = "week", required=false) Optional<Integer>  week
 	 ){
-		 try { 
-		 	 
+		 try { 		 	 
 			
-		 	 Optional<Timestamp> WithStartValueTime = Optional.ofNullable(null);
-		 	 Optional<Timestamp> WithEndValueTime = Optional.ofNullable(null);
-		 	 
-		 	 if (calendar.isPresent() && week.isPresent()) {
-		 		Calendar calobj = calendarservice.findCalendar(calendar.get());
-		 		LocalDate stDate = calobj.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
-				LocalDate endDate = calobj.getEnddate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
-				 
-				 List<LocalDate> weekrange = getWeekdayRange(week.get(), stDate, endDate);				 
-				 
-				 LocalDateTime localDateTime1 = weekrange.get(0).atStartOfDay();
-				 LocalDateTime localDateTime2 = weekrange.get(4).atStartOfDay();
-
-			     Timestamp timestampWeekStart = Timestamp.valueOf(localDateTime1);
-			     Timestamp timestampWeekEnd = Timestamp.valueOf(localDateTime2);
-			     
-			     WithStartValueTime = Optional.ofNullable(timestampWeekStart);
-			     WithEndValueTime = Optional.ofNullable(timestampWeekEnd);
-		 	 }
-		 
-			 Optional<Long> WithNullableValue = Optional.ofNullable(null);
-			 Optional<Integer> WithNullableValueInt = Optional.ofNullable(null);
+			Map<String, Object> newResponse = mneService.getOrdinaryAttendanceMneProprietor( schoolgroup, school, calendar, week );
 			 
-			 Map<String, Object> attResponse = serviceAtt.getOrdinaryTeacherAttendances("", schoolgroup, school, WithNullableValue, calendar, WithNullableValue, WithNullableValue, WithStartValueTime, WithEndValueTime );
-			 Map<String, Object> attManangeResponse = serviceAttManagement.getOrdinaryTeacherAttendances("", schoolgroup, school, WithNullableValue, calendar, WithNullableValue, WithNullableValue, WithStartValueTime, WithEndValueTime );
-			 Map<String, Object> attActivityResponse = serviceAttActivity.getOrdinaryTeacherAttendances( "", schoolgroup, school, WithNullableValue, calendar, WithNullableValue, WithStartValueTime, WithEndValueTime );
-			 Map<String, Object> attStudent = serviceAtt.getOrdinaryStudentAttendances("", schoolgroup, school, WithNullableValue,  calendar, WithNullableValue, WithStartValueTime, WithEndValueTime);
+			return new ResponseEntity<>(newResponse, HttpStatus.OK);
 			 
-			 List<Attendance> ordinaryArray = (List<Attendance>) attResponse.get("attendances");
-			 List<Rowcall> ordinaryStudentArray = (List<Rowcall>) attStudent.get("attendances");
-			 List<AttendanceManagement> ordinaryArrayManagement = (List<AttendanceManagement>) attManangeResponse.get("attendancemanagement");
-			 List<AttendanceActivity> ordinaryArrayActivity = (List<AttendanceActivity>) attActivityResponse.get("attendanceactivity");
-			 
-			 Map<String, Object> newResponse = new HashMap<>();
-			 
-			 Integer maxManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.size() : 10; 
-			 Integer max = ordinaryArray != null ? ordinaryArray.size() : 10;
-			 Integer maxActivity = ordinaryArrayActivity != null ? ordinaryArrayActivity.size() : 10;
-			 Integer maxStudent = ordinaryStudentArray != null ? ordinaryStudentArray.size() : 10;
-			 
-			 Long teacherAttendance = ordinaryArray != null ? ordinaryArray.stream().filter(o -> ( o.getDone() == 1 || o.getDone() == 2 ) ).count() : 0; 
-			 Long teacherAttendanceManagement = ordinaryArrayManagement != null ? ordinaryArrayManagement.stream().filter(o -> o.getScore() >= 50).count() : 0;
-			 Long studentAttendance = ordinaryStudentArray != null ? ordinaryStudentArray.stream().filter(o -> o.getStatus() == 1).count() : 0; 
-			 Long studentExcusedAttendance = ordinaryStudentArray != null ?  ordinaryStudentArray.stream().filter(o -> o.getStatus() == 0 && o.getRemark() != null).count() : 0; 
-			 Long headAdministration = ordinaryArrayActivity != null ? ordinaryArrayActivity.stream().filter(o -> o.getActual() != null && o.getSlip().equals(0) && o.getOwnertype().equals("Principal") ).count() : 0; 
-			 
-			 newResponse.put("teacher_attendance", max > 0 ? (teacherAttendance.intValue() * 100)/max : 0  );
-			 newResponse.put("teacher_management", maxManagement > 0 ? (teacherAttendanceManagement.intValue() * 100)/maxManagement : 0 );
-			 newResponse.put("student_att", maxStudent > 0 ? (studentAttendance.intValue() * 100)/maxStudent : 0 ) ;
-			 newResponse.put("student_att_excused", maxStudent > 0 ? (studentExcusedAttendance.intValue()  * 100)/maxStudent : 0 );
-			 newResponse.put("head_admin", maxActivity > 0 ? (headAdministration.intValue() * 100)/maxActivity : 0);
-			 
-			 return new ResponseEntity<>(newResponse, HttpStatus.OK);
 		 }
 		 catch (Exception ex) {
 			 ex.printStackTrace();

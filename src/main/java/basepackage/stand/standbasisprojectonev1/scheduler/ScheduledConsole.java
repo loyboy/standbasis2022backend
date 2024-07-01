@@ -1,8 +1,10 @@
 package basepackage.stand.standbasisprojectonev1.scheduler;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,7 +14,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -33,6 +37,7 @@ import basepackage.stand.standbasisprojectonev1.service.AttendanceService;
 import basepackage.stand.standbasisprojectonev1.service.CalendarService;
 import basepackage.stand.standbasisprojectonev1.service.ClassService;
 import basepackage.stand.standbasisprojectonev1.service.EnrollmentService;
+import basepackage.stand.standbasisprojectonev1.service.MneService;
 import basepackage.stand.standbasisprojectonev1.service.SchoolService;
 import basepackage.stand.standbasisprojectonev1.service.TeacherService;
 import basepackage.stand.standbasisprojectonev1.service.TimetableService;
@@ -70,6 +75,9 @@ public class ScheduledConsole {
     @Autowired
 	CalendarService calService;
 
+    @Autowired
+	MneService mneService;
+
     @Value("${aws.region}")
     private String region;
     
@@ -83,7 +91,7 @@ public class ScheduledConsole {
     
     //for schools data
     @Transactional
-    @Scheduled(cron = "0 25 9 * * *")
+    @Scheduled(cron = "0 15 15 * * *")
     public void schoolsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -154,7 +162,7 @@ public class ScheduledConsole {
             String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketName = "standb670";
             String schoolId = String.valueOf(it.getSchool().getId());
-            String s3FileName = date + "_" + "schools" + "_" + schoolId + "_console_snapshot.zip";
+            String s3FileName = "schools" + "/" + date + "_" + "schools" + "_" + schoolId + "_console_snapshot.zip";
 
             S3Client client = S3Client.builder().build();
 		        
@@ -208,7 +216,7 @@ public class ScheduledConsole {
             String datelogs = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketNameLog = "standb670";
             String schoolIdLog = String.valueOf(it.getSchool().getId());
-            String s3FileNameLog = datelogs + "_" + "schools" + "_" + schoolIdLog + "_logs_snapshot.zip";
+            String s3FileNameLog = "schools" + "/" + datelogs + "_" + "schools" + "_" + schoolIdLog + "_logs_snapshot.zip";
 
             S3Client clientLog = S3Client.builder().build();
 		        
@@ -227,7 +235,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 25 9 * * *")
+    @Scheduled(cron = "0 15 15 * * *")
     public void teachersSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -321,7 +329,7 @@ public class ScheduledConsole {
             String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketName = "standb670";
             String schoolId = String.valueOf(it.getSchool().getId());
-            String s3FileName = date + "_" + "teachers" + "_" + schoolId + "_console_snapshot.zip";
+            String s3FileName = "teachers" + "/" + date + "_" + "teachers" + "_" + schoolId + "_console_snapshot.zip";
 
             S3Client client = S3Client.builder().build();
 		        
@@ -375,7 +383,7 @@ public class ScheduledConsole {
             String datelogs = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketNameLog = "standb670";
             String schoolIdLog = String.valueOf(it.getSchool().getId());
-            String s3FileNameLog = datelogs + "_" + "teachers" + "_" + schoolIdLog + "_logs_snapshot.zip";
+            String s3FileNameLog = "teachers" + "/" + datelogs + "_" + "teachers" + "_" + schoolIdLog + "_logs_snapshot.zip";
 
             S3Client clientLog = S3Client.builder().build();
 		        
@@ -394,7 +402,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 25 9 * * *")
+    @Scheduled(cron = "0 15 15 * * *")
     public void enrollmentsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -479,7 +487,7 @@ public class ScheduledConsole {
             String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketName = "standb670";
             String schoolId = String.valueOf(it.getSchool().getId());
-            String s3FileName = date + "_" + "enrollments" + "_" + schoolId + "_console_snapshot.zip";
+            String s3FileName = "enrollments" + "/" + date + "_" + "enrollments" + "_" + schoolId + "_console_snapshot.zip";
 
             S3Client client = S3Client.builder().build();
 		        
@@ -533,7 +541,7 @@ public class ScheduledConsole {
             String datelogs = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketNameLog = "standb670";
             String schoolIdLog = String.valueOf(it.getSchool().getId());
-            String s3FileNameLog = datelogs + "_" + "enrollments" + "_" + schoolIdLog + "_logs_snapshot.zip";
+            String s3FileNameLog = "enrollments" + "/" + datelogs + "_" + "enrollments" + "_" + schoolIdLog + "_logs_snapshot.zip";
 
             S3Client clientLog = S3Client.builder().build();
 		        
@@ -552,7 +560,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 25 9 * * *")
+    @Scheduled(cron = "0 15 15 * * *")
     public void classroomsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -643,7 +651,7 @@ public class ScheduledConsole {
             String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketName = "standb670";
             String schoolId = String.valueOf(it.getSchool().getId());
-            String s3FileName = date + "_" + "classrooms" + "_" + schoolId + "_console_snapshot.zip";
+            String s3FileName = "classrooms" + "/" + date + "_" + "classrooms" + "_" + schoolId + "_console_snapshot.zip";
 
             S3Client client = S3Client.builder().build();
 		        
@@ -697,7 +705,7 @@ public class ScheduledConsole {
             String datelogs = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketNameLog = "standb670";
             String schoolIdLog = String.valueOf(it.getSchool().getId());
-            String s3FileNameLog = datelogs + "_" + "classrooms" + "_" + schoolIdLog + "_logs_snapshot.zip";
+            String s3FileNameLog = "classrooms" + "/" + datelogs + "_" + "classrooms" + "_" + schoolIdLog + "_logs_snapshot.zip";
 
             S3Client clientLog = S3Client.builder().build();
 		        
@@ -716,7 +724,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 25 9 * * *")
+    @Scheduled(cron = "0 15 15 * * *")
     public void timetablesSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -783,7 +791,7 @@ public class ScheduledConsole {
             String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketName = "standb670";
             String schoolId = String.valueOf(it.getSchool().getId());
-            String s3FileName = date + "_" + "timetables" + "_" + schoolId + "_console_snapshot.zip";
+            String s3FileName = "timetables" + "/" + date + "_" + "timetables" + "_" + schoolId + "_console_snapshot.zip";
 
             S3Client client = S3Client.builder().build();
 		        
@@ -837,7 +845,7 @@ public class ScheduledConsole {
             String datelogs = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketNameLog = "standb670";
             String schoolIdLog = String.valueOf(it.getSchool().getId());
-            String s3FileNameLog = datelogs + "_" + "timetables" + "_" + schoolIdLog + "_logs_snapshot.zip";
+            String s3FileNameLog = "timetables" + "/" + datelogs + "_" + "timetables" + "_" + schoolIdLog + "_logs_snapshot.zip";
 
             S3Client clientLog = S3Client.builder().build();
 		        
@@ -856,7 +864,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 25 9 * * *")
+    @Scheduled(cron = "0 15 15 * * *")
     public void calendarsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -924,7 +932,7 @@ public class ScheduledConsole {
             String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketName = "standb670";
             String schoolId = String.valueOf(it.getSchool().getId());
-            String s3FileName = date + "_" + "calendars" + "_" + schoolId + "_console_snapshot.zip";
+            String s3FileName = "calendars" + "/" + date + "_" + "calendars" + "_" + schoolId + "_console_snapshot.zip";
 
             S3Client client = S3Client.builder().build();
 		        
@@ -978,7 +986,7 @@ public class ScheduledConsole {
             String datelogs = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketNameLog = "standb670";
             String schoolIdLog = String.valueOf(it.getSchool().getId());
-            String s3FileNameLog = datelogs + "_" + "calendars" + "_" + schoolIdLog + "_logs_snapshot.zip";
+            String s3FileNameLog = "calendars" + "/" + datelogs + "_" + "calendars" + "_" + schoolIdLog + "_logs_snapshot.zip";
 
             S3Client clientLog = S3Client.builder().build();
 		        
@@ -996,6 +1004,394 @@ public class ScheduledConsole {
         }
     }
 
+    @Transactional
+    @Scheduled(cron = "0 15 15 * * *")
+    public void lessonnoteMneSnapshot() {
+        System.setProperty("aws.accessKeyId", accesskey);
+        System.setProperty("aws.secretAccessKey", sk);
+        System.setProperty("aws.region", region);
+      
+        // Get Timetable data for this day with Current calendar
+	    List<TimeTable> tt = timeRepository.findByActiveCalendarInConsole(1, 1, "government", 1);
+	    
+	    // Get Unique timetable data based on school values
+	    List<TimeTable> ttnew = tt.stream()
+	            .collect(Collectors.toMap(
+	                    obj -> obj.getSchool(),  // Composite key
+	                    Function.identity(),  // Keep the original object
+	                    (obj1, obj2) -> obj1  // Merge function (in case of duplicate keys)
+	            ))
+	            .values()
+	            .stream()
+	            .collect(Collectors.toList());
+
+       
+        for (TimeTable it : ttnew) {
+           
+            Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
+            Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
+               
+            Map<String, Object> response = mneService.getOrdinaryLessonnoteMneProprietor( optionalGroup, optionalOwner, null, null );
+            
+            String teacher_management = (String) response.get("teacher_management");
+            String head_admin = (String) response.get("head_admin");
+            
+            // Create CSV
+            String csvFile = "data.csv";
+            try (CSVWriter writer = new CSVWriter(new FileWriter(csvFile))) {
+                String[] header = {"Date of Mne", "Teacher Management", "Admin/Head Management"};
+                writer.writeNext(header);
+                
+                String[] data = { String.valueOf(todayDate()), teacher_management, head_admin };
+                writer.writeNext(data);
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }	
+
+            // Zip the CSV
+            String zipFile = "data.zip";
+            try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile));
+                FileInputStream fis = new FileInputStream(csvFile)) {
+                ZipEntry zipEntry = new ZipEntry(csvFile);
+                zipOut.putNextEntry(zipEntry);
+
+                byte[] bytes = new byte[1024];
+                int length;
+                while ((length = fis.read(bytes)) >= 0) {
+                    zipOut.write(bytes, 0, length);
+                }
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }	
+
+            // Generate file name for S3
+            String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+            String bucketName = "standb670";
+            String schoolId = String.valueOf(it.getSchool().getId());
+            String s3FileName = "lessonnoteMNE" + "/" + date  + "_" + schoolId + "_console_snapshot.zip";
+
+            S3Client client = S3Client.builder().build();
+		        
+			PutObjectRequest request = PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3FileName)
+                        .acl("public-read")
+                        .build();
+
+            client.putObject(request, software.amazon.awssdk.core.sync.RequestBody.fromFile(new File(zipFile)));
+          
+            // Clean up local files
+            new File(csvFile).delete();
+            new File(zipFile).delete();
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+        }
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 15 15 * * *")
+    public void attendanceMneSnapshot() {
+        System.setProperty("aws.accessKeyId", accesskey);
+        System.setProperty("aws.secretAccessKey", sk);
+        System.setProperty("aws.region", region);
+      
+        // Get Timetable data for this day with Current calendar
+	    List<TimeTable> tt = timeRepository.findByActiveCalendarInConsole(1, 1, "government", 1);
+	    
+	    // Get Unique timetable data based on school values
+	    List<TimeTable> ttnew = tt.stream()
+	            .collect(Collectors.toMap(
+	                    obj -> obj.getSchool(),  // Composite key
+	                    Function.identity(),  // Keep the original object
+	                    (obj1, obj2) -> obj1  // Merge function (in case of duplicate keys)
+	            ))
+	            .values()
+	            .stream()
+	            .collect(Collectors.toList());
+
+       
+        for (TimeTable it : ttnew) {
+           
+            Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
+            Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
+               
+            Map<String, Object> response = mneService.getOrdinaryAttendanceMneProprietor( optionalGroup, optionalOwner, null, null );
+            
+            String teacher_attendance = (String) response.get("teacher_attendance");
+            String teacher_management = (String) response.get("teacher_management");
+            String student_att = (String) response.get("student_att");
+            String student_att_excused = (String) response.get("student_att_excused");
+            String head_admin = (String) response.get("head_admin");
+            
+            // Create CSV
+            String csvFile = "data.csv";
+            try (CSVWriter writer = new CSVWriter(new FileWriter(csvFile))) {
+                String[] header = {"Date of Mne", "Teacher Attendance", "Teacher Management", "Student Attendance", "Student Attendance Excused", "Head Management"};
+                writer.writeNext(header);
+                
+                String[] data = { String.valueOf(todayDate()), teacher_attendance, teacher_management, student_att, student_att_excused, head_admin  };
+                writer.writeNext(data);
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }	
+
+            // Zip the CSV
+            String zipFile = "data.zip";
+            try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile));
+                FileInputStream fis = new FileInputStream(csvFile)) {
+                ZipEntry zipEntry = new ZipEntry(csvFile);
+                zipOut.putNextEntry(zipEntry);
+
+                byte[] bytes = new byte[1024];
+                int length;
+                while ((length = fis.read(bytes)) >= 0) {
+                    zipOut.write(bytes, 0, length);
+                }
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }	
+
+            // Generate file name for S3
+            String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+            String bucketName = "standb670";
+            String schoolId = String.valueOf(it.getSchool().getId());
+            String s3FileName = "attendanceMNE" + "/" + date  + "_" + schoolId + "_console_snapshot.zip";
+
+            S3Client client = S3Client.builder().build();
+		        
+			PutObjectRequest request = PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3FileName)
+                        .acl("public-read")
+                        .build();
+
+            client.putObject(request, software.amazon.awssdk.core.sync.RequestBody.fromFile(new File(zipFile)));
+          
+            // Clean up local files
+            new File(csvFile).delete();
+            new File(zipFile).delete();
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+        }
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 15 15 * * *")
+    public void lessonnoteFlagsSnapshot() {
+        System.setProperty("aws.accessKeyId", accesskey);
+        System.setProperty("aws.secretAccessKey", sk);
+        System.setProperty("aws.region", region);
+      
+        // Get Timetable data for this day with Current calendar
+	    List<TimeTable> tt = timeRepository.findByActiveCalendarInConsole(1, 1, "government", 1);
+	    
+	    // Get Unique timetable data based on school values
+	    List<TimeTable> ttnew = tt.stream()
+	            .collect(Collectors.toMap(
+	                    obj -> obj.getSchool(),  // Composite key
+	                    Function.identity(),  // Keep the original object
+	                    (obj1, obj2) -> obj1  // Merge function (in case of duplicate keys)
+	            ))
+	            .values()
+	            .stream()
+	            .collect(Collectors.toList());
+
+       
+        for (TimeTable it : ttnew) {
+           
+            Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
+            Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
+            Optional<String> optionalYear = Optional.of( getYearFromTimestamp(it.getCalendar().getStartdate()));
+            Optional<Integer> optionalTerm = Optional.of( it.getCalendar().getTerm() );
+            Optional<Timestamp> optionalDatefrom = Optional.of( parseTimestamp(todayDate()) );
+
+            Optional<Integer> nullVal  = Optional.ofNullable(null);     
+            Optional<Long>    nullVal3 = Optional.ofNullable(null);     
+
+            Map<String, Object> response = mneService.getOrdinaryLessonnoteFlags( "", optionalGroup, optionalOwner, optionalYear, optionalTerm, nullVal, nullVal, nullVal3, nullVal3, optionalDatefrom, null );
+            
+            String teacher_management = (String) response.get("total_lessonnotes");
+            String teacher_submitted = (String) response.get("teacher_submitted");
+            String teacher_late_submitted = (String) response.get("teacher_late_submitted");
+            String teacher_late_approval = (String) response.get("teacher_late_approval");
+            String teacher_no_approval = (String) response.get("teacher_no_approval");
+            String teacher_queried = (String) response.get("teacher_queried");
+            String teacher_late_closure = (String) response.get("teacher_late_closure");
+            String teacher_bad_cycles = (String) response.get("teacher_bad_cycles");
+            String teacher_no_closure = (String) response.get("teacher_no_closure");
+
+            // Create CSV
+            String csvFile = "data.csv";
+            try (CSVWriter writer = new CSVWriter(new FileWriter(csvFile))) {
+                String[] header = {"Date of Flags", "Total Lessonnotes", "Submitted", "Late Submitted", "Late Approval", "No Approval", "Queried", "Late Closure", "Bad Cycles", "No Closure"};
+                writer.writeNext(header);
+                
+                String[] data = { String.valueOf(todayDate()), teacher_management, teacher_submitted, teacher_late_submitted, teacher_late_approval, teacher_no_approval, teacher_queried, teacher_late_closure, teacher_bad_cycles, teacher_no_closure };
+                writer.writeNext(data);
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }	
+
+            // Zip the CSV
+            String zipFile = "data.zip";
+            try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile));
+                FileInputStream fis = new FileInputStream(csvFile)) {
+                ZipEntry zipEntry = new ZipEntry(csvFile);
+                zipOut.putNextEntry(zipEntry);
+
+                byte[] bytes = new byte[1024];
+                int length;
+                while ((length = fis.read(bytes)) >= 0) {
+                    zipOut.write(bytes, 0, length);
+                }
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }	
+
+            // Generate file name for S3
+            String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+            String bucketName = "standb670";
+            String schoolId = String.valueOf(it.getSchool().getId());
+            String s3FileName = "lessonnoteFlags" + "/" + date + "_" + schoolId + "_console_snapshot.zip";
+
+            S3Client client = S3Client.builder().build();
+		        
+			PutObjectRequest request = PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3FileName)
+                        .acl("public-read")
+                        .build();
+
+            client.putObject(request, software.amazon.awssdk.core.sync.RequestBody.fromFile(new File(zipFile)));
+          
+            // Clean up local files
+            new File(csvFile).delete();
+            new File(zipFile).delete();
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+        }
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 15 15 * * *")
+    public void attendanceFlagsSnapshot() {
+        System.setProperty("aws.accessKeyId", accesskey);
+        System.setProperty("aws.secretAccessKey", sk);
+        System.setProperty("aws.region", region);
+      
+        // Get Timetable data for this day with Current calendar
+	    List<TimeTable> tt = timeRepository.findByActiveCalendarInConsole(1, 1, "government", 1);
+	    
+	    // Get Unique timetable data based on school values
+	    List<TimeTable> ttnew = tt.stream()
+	            .collect(Collectors.toMap(
+	                    obj -> obj.getSchool(),  // Composite key
+	                    Function.identity(),  // Keep the original object
+	                    (obj1, obj2) -> obj1  // Merge function (in case of duplicate keys)
+	            ))
+	            .values()
+	            .stream()
+	            .collect(Collectors.toList());
+
+       
+        for (TimeTable it : ttnew) {
+           
+            Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
+            Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
+           // Optional<String> optionalYear = Optional.of( getYearFromTimestamp(it.getCalendar().getStartdate()));
+            Optional<Long> optionalCalendar = Optional.of( it.getCalendar().getCalendarId() );
+            Optional<Timestamp> optionalDatefrom = Optional.of( parseTimestamp(todayDate()) );
+           // Optional<Integer> nullVal  = Optional.ofNullable(null);     
+            Optional<Long>    nullVal3 = Optional.ofNullable(null);     
+
+            Map<String, Object> response = mneService.getOrdinaryAttendanceFlags( "", optionalGroup, optionalOwner, nullVal3, optionalCalendar, nullVal3, nullVal3, nullVal3, optionalDatefrom, null );
+      
+            String student_absence = (String) response.get("student_absence");
+            String student_excused_absence = (String) response.get("student_excused_absence");
+            String queried_attendance = (String) response.get("queried_attendance");
+            String late_attendance = (String) response.get("late_attendance");
+            String void_attendance = (String) response.get("void_attendance");
+            String approval_delays = (String) response.get("approval_delays");
+            String approval_done = (String) response.get("approval_done");
+            String teacher_absent = (String) response.get("teacher_absent");
+            String teacher_expected = (String) response.get("teacher_expected");
+            String student_expected = (String) response.get("student_expected");
+            String endorsement_expected = (String) response.get("endorsement_expected");
+
+            // Create CSV
+            String csvFile = "data.csv";
+            try (CSVWriter writer = new CSVWriter(new FileWriter(csvFile))) {
+                String[] header = {"Date of Flags", "Student Absence", "Student Excused Absence", "Queried Attendance", "Late Attendance", "Void Attendance", "Approval Delays", "Approval Done", "Teacher Absent", "Teacher Expected", "Student Expected", "Endorsement Expected"};
+                writer.writeNext(header);
+                
+                String[] data = { String.valueOf(todayDate()), student_absence, student_excused_absence, queried_attendance, late_attendance, void_attendance, approval_delays, approval_done, teacher_absent, teacher_expected, student_expected, endorsement_expected };
+                writer.writeNext(data);
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }	
+
+            // Zip the CSV
+            String zipFile = "data.zip";
+            try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile));
+                FileInputStream fis = new FileInputStream(csvFile)) {
+                ZipEntry zipEntry = new ZipEntry(csvFile);
+                zipOut.putNextEntry(zipEntry);
+
+                byte[] bytes = new byte[1024];
+                int length;
+                while ((length = fis.read(bytes)) >= 0) {
+                    zipOut.write(bytes, 0, length);
+                }
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }	
+
+            // Generate file name for S3
+            String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+            String bucketName = "standb670";
+            String schoolId = String.valueOf(it.getSchool().getId());
+            String s3FileName = "attendanceFlags" + "/" + date + "_" + schoolId + "_console_snapshot.zip";
+
+            S3Client client = S3Client.builder().build();
+		        
+			PutObjectRequest request = PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3FileName)
+                        .acl("public-read")
+                        .build();
+
+            client.putObject(request, software.amazon.awssdk.core.sync.RequestBody.fromFile(new File(zipFile)));
+          
+            // Clean up local files
+            new File(csvFile).delete();
+            new File(zipFile).delete();
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+        }
+    }
+
+
+    private String todayDate() {
+		Date d = new Date();
+		String date = DATE_TIME_FORMAT.format(d);
+		return date;
+	}
+    
+    private java.sql.Timestamp parseTimestamp(String timestamp) {
+		try {
+			return new Timestamp(DATE_TIME_FORMAT.parse(timestamp).getTime());
+		} catch (ParseException e) {
+			throw new IllegalArgumentException(e);
+		}
+	}
     
     private String[] getHeaders(Class<?> clazz) {
         List<String> headers = new ArrayList<>();
@@ -1089,9 +1485,14 @@ public class ScheduledConsole {
         return data.toArray(new String[0]);
     }
 
-    private ArrayList<Integer> convertMapValuesToList(Map<String, Integer> map) {
-	    return new ArrayList<>(map.values());
-	}
+    private String getYearFromTimestamp(Timestamp timestamp) {
+        if (timestamp == null) {
+            throw new IllegalArgumentException("Timestamp cannot be null");
+        }
+        
+        LocalDateTime dateTime = timestamp.toLocalDateTime();
+        return String.valueOf(dateTime.getYear());
+    }
 	
 	private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
 	    Map<Object, Boolean> seen = new ConcurrentHashMap<>();
