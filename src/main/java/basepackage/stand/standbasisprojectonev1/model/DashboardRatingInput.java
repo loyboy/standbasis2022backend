@@ -1,7 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.model;
 
 import java.math.BigDecimal;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -35,7 +35,7 @@ public class DashboardRatingInput {
     private BigDecimal academic_performance;
     private BigDecimal sshe;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,  cascade = CascadeType.REMOVE)
     @JoinColumn(name = "sch_id", nullable = false)
     private School school;
 	

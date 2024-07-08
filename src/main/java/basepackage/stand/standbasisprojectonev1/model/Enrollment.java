@@ -1,5 +1,6 @@
 package basepackage.stand.standbasisprojectonev1.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,7 +35,7 @@ public class Enrollment extends DateAudit{
     private String enrol_date;
     
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "pup_id", nullable = false)
     private Student student;
     

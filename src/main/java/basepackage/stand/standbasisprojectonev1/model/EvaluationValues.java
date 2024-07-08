@@ -2,6 +2,7 @@ package basepackage.stand.standbasisprojectonev1.model;
 
 import java.sql.Timestamp;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -38,7 +39,7 @@ public class EvaluationValues extends DateAudit{
     private Integer complete;
 	
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "school_id", nullable = false)
     private School school;
     

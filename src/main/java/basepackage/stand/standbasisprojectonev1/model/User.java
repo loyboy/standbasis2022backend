@@ -71,7 +71,7 @@ public class User extends DateAudit {
     private String supervisor_id;//01-SUBP-01-IKA (Group of School-Supervisor.Group-StateofOrigin-LocalGovernment)
     private String guardian_id;//02-0021-0034-1203 (Group of School-Pupil.ID-Pupil.ID-Pupil.ID)
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "sch_id", nullable = true)
     private School school;
     

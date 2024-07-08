@@ -1,5 +1,6 @@
 package basepackage.stand.standbasisprojectonev1.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -30,7 +31,7 @@ public class TimeTable extends DateAudit {
     private String id;
     
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "sch_id", nullable = false)
     private School school;
     

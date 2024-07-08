@@ -1,7 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.model;
 
 import java.util.Date;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -49,7 +49,7 @@ public class DashboardSsis {
 	private Integer _seven_min;
 	
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "sch_id", nullable = false)
     private School school;
 	

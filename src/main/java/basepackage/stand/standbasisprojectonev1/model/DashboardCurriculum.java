@@ -1,5 +1,6 @@
 package basepackage.stand.standbasisprojectonev1.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -38,7 +39,7 @@ public class DashboardCurriculum {
 	private Integer _five; //Quality Assurance interventions
 	private Integer _six; //Teaching resources capacity
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY,  cascade = CascadeType.REMOVE)
     @JoinColumn(name = "sch_id", nullable = false)
     private School school;
 	
