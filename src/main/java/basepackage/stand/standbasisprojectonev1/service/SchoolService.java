@@ -212,7 +212,7 @@ public class SchoolService {
 			 	.filter(ss -> ss.getType_of().equals("secondary") )
 		        .collect(Collectors.toList());
         List<School> countPrimary = listSchool.stream()
-			 	.filter(ss -> ss.getType_of().equals("primary") )
+			 	.filter(ss -> ss.getType_of().equals("junior_secondary") )
 		        .collect(Collectors.toList());
         
         response.put("totalSecondary", countSecondary.size());
