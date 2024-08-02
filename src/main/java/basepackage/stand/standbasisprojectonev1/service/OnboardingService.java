@@ -99,10 +99,11 @@ public class OnboardingService {
     		if(sg.isPresent()) {
     				String uuid = UUID.randomUUID().toString();
 		    		School prePersistSchool = prePersistFunction(sch);
+					String schStringId = prePersistSchool.getId();
 		    		prePersistSchool.setOwner(sg.get());
 		    		prePersistSchool.setStatus(1);
 		    		prePersistSchool.setSri(0);
-		    		prePersistSchool.setId( "school" + "-" + uuid.split("-")[4].substring(4) );
+		    		prePersistSchool.setId( schStringId + "-" + uuid.split("-")[4].substring(4) );
 		    		School savedSchool = schRepository.save(prePersistSchool);
 		    		TimeUnit.SECONDS.sleep(1);    		
 		    		
@@ -111,14 +112,12 @@ public class OnboardingService {
 		    		String myidcal = createUuid("calendar-", savedSchool.getSchId() );
 		    		_cal.setId(myidcal);
 		    		_cal.setTerm(-99);
-		    		_cal.setStartdate( parseTimestamp( "2023-01-03 00:00:00" ) );
-		    		_cal.setEnddate( parseTimestamp( "2023-04-21 00:00:00" ) );
+		    		_cal.setStartdate( parseTimestamp( "1999-01-03 00:00:00" ) );
+		    		_cal.setEnddate( parseTimestamp( "1999-04-21 00:00:00" ) );
 		    		_cal.setStatus(0);
-		    		_cal.setSession("2022/2023");
-		    		_cal.setSchool(savedSchool);
-		    		
-		    		Calendar savedCalendar = calRepository.save(_cal);
-		    		
+		    		_cal.setSession("1999/2000");
+		    		_cal.setSchool(savedSchool);		    		
+		    		Calendar savedCalendar = calRepository.save(_cal);		    		
 			    	
 		    		// Save all the teachers at once
 			    	List<Teacher> tea = teaRequest.stream().map(t -> modelMapper.map(t, Teacher.class)).collect(Collectors.toList());
@@ -142,10 +141,9 @@ public class OnboardingService {
 			            return c;
 			    	}).collect(Collectors.toList());
 			    	List<ClassStream> savedClasses = classRepository.saveAll(newClassObject);
-			    	TimeUnit.SECONDS.sleep(1);
-			    	
-			    	List<Subject> savedSubjects = subRepository.findAll();
-			    	
+			    	TimeUnit.SECONDS.sleep(1);	
+
+			    	List<Subject> savedSubjects = subRepository.findAll();			    	
 			    	// Then search in student list for each data, search for both class_name & class_arm , 
 		    		// use those 2 attributes to search in ClassStream for corresponding IDs and save the IDs of ClassStream
 			    	Map< String, List<ClassStream> > foundUniqueClass = new HashMap< String, List<ClassStream> >();
@@ -156,8 +154,7 @@ public class OnboardingService {
 					 	 
 					 	 if(foundMatch.size() > 0) {
 					 		List<ClassStream> noduplicateclass = foundMatch.stream().distinct().collect(Collectors.toList());
-					 		String mykey = c.getName().toString() + "_" + c.getGender().toString() + "_" + c.getRegno().toString();
-					 		
+					 		String mykey = c.getName().toString() + "_" + c.getGender().toString() + "_" + c.getRegno().toString();					 		
 					 		foundUniqueClass.put( mykey , noduplicateclass );
 					 	 }
 			    	}
@@ -229,7 +226,7 @@ public class OnboardingService {
 			    	User u = modelMapper.map(userRequest, User.class);
 			    	String specialIdUser = createUuid("user-", savedSchool.getSchId() );
 			    	u.setPassword( passwordencoder.encode( userRequest.getPassword() ) );
-			    	u.setRole(RoleName.PROPRIETOR);
+			    	u.setRole(RoleName.PRINCIPAL);
 			    	u.setId(specialIdUser);
 			    	u.setStatus(1);
 			    
@@ -251,7 +248,7 @@ public class OnboardingService {
 			    	u.setEmail( userRequest.getEmail() );   	
 			    	
 			    	Teacher _tea = new Teacher();
-		    		String myidcal2 = createUuid("teacher-", savedSchool.getSchId() );
+		    		String myidcal2 = createUuid("principal-", savedSchool.getSchId() );
 		    		_tea.setId(myidcal2);
 		    		_tea.setStatus(1);
 		    		_tea.setSchool(savedSchool);
@@ -259,12 +256,12 @@ public class OnboardingService {
 		    		_tea.setFname(userRequest.getName().split(" ")[0]);
 		    		_tea.setLname(userRequest.getName().split(" ")[1]);
 		    		_tea.setGender( "M" );
-		    		_tea.setOffice("Proprietor");
+		    		_tea.setOffice("Principal");
 		    		_tea.setEmail( userRequest.getEmail() );
 		    		
 		    		Teacher tt = teaRepository.save(_tea);
 		    		
-		    		u.setProprietor_id( tt.getTeaId() );
+		    		u.setPrincipal_id( tt.getTeaId() );
 		    		userRepository.save(u); 
 		    		
 		    		//Save the proprietor as a Teacher oBject		    		
@@ -276,14 +273,16 @@ public class OnboardingService {
 			    		String from = "loyboy606@gmail.com";
 			    		String to = t.getEmail();
 			    		 
-			    		SimpleMailMessage message = new SimpleMailMessage();
+			    		//SimpleMailMessage message = new SimpleMailMessage();
 			    		String specialIdUser2 = createUuid("user-", savedSchool.getSchId() );
-			    		String specialIdUsername = createUuidUsername("username");
-			    		String specialPassword = createUuidPassword();
 			    		
-			    		System.out.println( " User details >>>  " + specialIdUsername + " >>> " + specialPassword);
+			    		//String specialPassword = createUuidPassword();
+						String specialPassword = "mypassword";
+			    		
+			    	//	System.out.println( " User details >>>  " + specialIdUsername + " >>> " + specialPassword);
 			    		User _u = new User();
 			    		if (t.getOffice().equalsIgnoreCase("Teacher")) {
+							String specialIdUsername = createUuidUsername("teacher");
 			    			_u.setId(specialIdUser2);
 				    		_u.setUsername(specialIdUsername);
 				    		_u.setStatus(1);
@@ -312,6 +311,7 @@ public class OnboardingService {
 			    		}
 			    		else if (t.getOffice().equalsIgnoreCase("Principal")) {
 			    			_u.setId(specialIdUser2);
+							String specialIdUsername = createUuidUsername("head");
 				    		_u.setUsername(specialIdUsername);
 				    		_u.setStatus(1);
 				    		_u.setEmail( t.getEmail() );
@@ -338,33 +338,6 @@ public class OnboardingService {
 					    	_u.setPermissionsJSON(jsonStr2);
 			    		}
 			    		
-			    		else if (t.getOffice().equalsIgnoreCase("Proprietor")) {
-			    			_u.setId(specialIdUser2);
-				    		_u.setUsername(specialIdUsername);
-				    		_u.setStatus(1);
-				    		_u.setEmail( t.getEmail() );
-				    		_u.setName( t.getFname() + " " + t.getLname() );
-				    		_u.setRole(RoleName.PROPRIETOR);
-				    		_u.setPassword( passwordencoder.encode( specialPassword ) );
-				    		_u.setProprietor_id(t.getTeaId());
-				    		_u.setSchool(t.getSchool());
-				    		
-				    		Map<String, Object> _attributes = new HashMap<>();
-					    	
-					    	_attributes.put("school",  new Permissions( true, true, false, false));
-					    	_attributes.put("teacher", new Permissions( true, true, false, true));
-					    	_attributes.put("enrollment", new Permissions( true, true, false, false));
-					    	_attributes.put("classroom", new Permissions( true, true, false, false));
-					    	_attributes.put("calendar", new Permissions( true, false, false, false));
-					    	_attributes.put("timetable", new Permissions( true, false, false, false));
-					    	_attributes.put("user", new Permissions( true, true, false, true));
-					    	_attributes.put("attendance", new Permissions( true, true, false, false));
-					    	_attributes.put("lessonnote", new Permissions( true, true, false, false));
-					    	
-					    	String jsonStr2 = gsonObj.toJson(_attributes);		
-					    	
-					    	_u.setPermissionsJSON(jsonStr2);
-			    		}   		
 			    						    	
 			    		/*message.setFrom(from);
 			    		message.setTo(to);
@@ -484,30 +457,63 @@ public class OnboardingService {
     	schids.put("udung uko", "96227");
     	schids.put("ukanafun", "96228");
     	schids.put("uruan", "96229");
-    	schids.put("urue offong oruko", "96230"); //
-    	schids.put("uyo", "96231");
-    	
+    	schids.put("urue offong oruko", "96230"); 
+    	schids.put("uyo", "96231");//end akwa bom
+		schids.put("agege", "96001");
+		schids.put("alimosho", "96002");
+		schids.put("apapa", "96003");
+		schids.put("ifako-ijaye", "96004");
+		schids.put("ikeja", "96005");
+		schids.put("kosofe", "96006");
+		schids.put("mushin", "96007");
+		schids.put("oshodi-isolo", "96008");
+		schids.put("shomolu", "96009");
+		schids.put("eti-osa", "96010");
+		schids.put("lagos-island", "96011");
+		schids.put("lagos-mainland", "96012");
+		schids.put("surulere", "96013");
+		schids.put("ojo", "96014");
+		schids.put("ajeromi-ifelodun", "96015");
+		schids.put("amuwo-odofin", "96016");
+		schids.put("badagry", "96017");
+		schids.put("ikorodu", "96018");
+		schids.put("ibeju-lekki", "96019");
+		schids.put("epe", "96020");//end lagos
+		schids.put("aba-north", "96301");
+		schids.put("aba-south", "96302");
+		schids.put("arochukwu", "96303");
+		schids.put("bende", "96304");
+		schids.put("ikwuano", "96305");
+		schids.put("isiala-ngwa-north", "96306");
+		schids.put("isiala-ngwa-south", "96307");
+		schids.put("isiukwuato", "96308");
+		schids.put("obingwa", "96309");
+		schids.put("ohafia", "96310");
+		schids.put("osisioma-ngwa", "96311");
+		schids.put("ugwunagbo", "96312");
+		schids.put("ukwa-east", "96313");
+		schids.put("ukwa-west", "96314");
+		schids.put("umuahia-north", "96315");
+		schids.put("umuahia-south", "96316");
+		schids.put("umu-neochi", "96317");		
+		
     	String code = schids.get( schoolDefault.getLga().toLowerCase() );
-    	System.out.println( "Code ::" + schoolDefault.getOperator().toLowerCase() );
-    	
+		schoolDefault.setLga_code(code);
+		
         if( schoolDefault.getOperator().toLowerCase().equals("government") ){
             String newId = "100000";
-            String schId = code + newId;
-            
-            schoolDefault.setId(schId);
-           
+            String schId = code + newId;            
+            schoolDefault.setId(schId);           
         }
         else if( schoolDefault.getOperator().toLowerCase().equals("private single") ){
             String newId = "200000";
             String schId = code + newId;
-            schoolDefault.setId(schId);
-            
+            schoolDefault.setId(schId);            
         }	        
         else if( schoolDefault.getOperator().toLowerCase().equals("private group") ){
             String newId = "300000";
             String schId = code + newId;
-            schoolDefault.setId(schId);
-         
+            schoolDefault.setId(schId);         
         }
         
         return schoolDefault;

@@ -61,5 +61,5 @@ INSERT IGNORE INTO `subjects` (`sub_id`, `id`, `name`, `category`, `sch_id`, `cr
 (60, 160, 'Quantitative Reasoning', 'PRIMARY', NULL, '2022-09-01 00:59:00', '2022-09-01 00:59:00');
 
 INSERT IGNORE INTO `schoolgroups` (`id`, `name`, `created_at`, `updated_at`) VALUES
-(1, 'Akwa Ibom State Ministry of Education', '2022-09-01 00:59:00', '2022-09-01 00:59:00'),
+(1, 'Unity Schools (Federal Government)', '2022-09-01 00:59:00', '2022-09-01 00:59:00'),
 (2, 'Standbasis Group', '2022-09-01 00:59:00', '2022-09-01 00:59:00');

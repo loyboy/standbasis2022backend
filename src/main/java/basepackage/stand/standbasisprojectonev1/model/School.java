@@ -66,6 +66,9 @@ public class School extends DateAudit {
 	    
 	    @Size(max = 50)
 	    private String faith;
+
+		@Size(max = 50)
+		private String lga_code;
 	    
 	    @NotBlank
 	    @NotNull

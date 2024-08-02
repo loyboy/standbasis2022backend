@@ -91,7 +91,7 @@ public class ScheduledConsole {
     
     //for schools data
     @Transactional
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 18 31 11 *")
     public void schoolsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -235,7 +235,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 18 31 11 *")
     public void teachersSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -402,7 +402,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 18 31 11 *")
     public void enrollmentsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -560,7 +560,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 18 31 11 *")
     public void classroomsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -724,7 +724,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 18 31 11 *")
     public void timetablesSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -864,7 +864,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 18 31 11 *")
     public void calendarsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1005,7 +1005,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 18 31 11 *")
     public void lessonnoteMneSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1091,7 +1091,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 18 31 11 *")
     public void attendanceMneSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1180,7 +1180,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 18 31 11 *")
     public void lessonnoteFlagsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
@@ -1280,7 +1280,7 @@ public class ScheduledConsole {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 18 * * *")
+    @Scheduled(cron = "0 0 18 31 11 *")
     public void attendanceFlagsSnapshot() {
         System.setProperty("aws.accessKeyId", accesskey);
         System.setProperty("aws.secretAccessKey", sk);
