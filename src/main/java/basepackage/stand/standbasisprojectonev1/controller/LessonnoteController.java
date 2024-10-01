@@ -259,8 +259,8 @@ public class LessonnoteController {
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 
-	 @GetMapping("/mneTeachers") //flags
-	 public ResponseEntity<?> getMNETeacherLessonnotes(
+	 @GetMapping("/flagTeachers") //flags
+	 public ResponseEntity<?> getFlagTeacherLessonnotes(
 			 @RequestParam(value = "q", required=false) String query,
 			 @RequestParam(value = "schoolgroup" ) Optional<Long> schoolgroup,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
@@ -359,8 +359,8 @@ public class LessonnoteController {
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 
-	 @GetMapping("/mneStudents")
-	 public ResponseEntity<?> getMNEStudentLessonnotes(
+	 @GetMapping("/flagStudents")
+	 public ResponseEntity<?> getFlagStudentLessonnotes(
 			 @RequestParam(value = "q", required=false) String query,
 			 @RequestParam(value = "schoolgroup") Optional<Long> schoolgroup,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,	

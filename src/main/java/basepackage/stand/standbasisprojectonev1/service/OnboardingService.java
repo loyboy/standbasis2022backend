@@ -229,6 +229,7 @@ public class OnboardingService {
 			    	u.setRole(RoleName.PRINCIPAL);
 			    	u.setId(specialIdUser);
 			    	u.setStatus(1);
+					u.setSchool(savedSchool);
 			    
 			    	Map<String, Object> attributes = new HashMap<>();
 			    	Permissions perm = new Permissions( true, true, true, false);
@@ -247,7 +248,7 @@ public class OnboardingService {
 			    	u.setPermissionsJSON(jsonStr);
 			    	u.setEmail( userRequest.getEmail() );   	
 			    	
-			    	Teacher _tea = new Teacher();
+			    	/*Teacher _tea = new Teacher();
 		    		String myidcal2 = createUuid("principal-", savedSchool.getSchId() );
 		    		_tea.setId(myidcal2);
 		    		_tea.setStatus(1);
@@ -261,7 +262,7 @@ public class OnboardingService {
 		    		
 		    		Teacher tt = teaRepository.save(_tea);
 		    		
-		    		u.setPrincipal_id( tt.getTeaId() );
+		    		u.setPrincipal_id( tt.getTeaId() );*/
 		    		userRepository.save(u); 
 		    		
 		    		//Save the proprietor as a Teacher oBject		    		
@@ -308,8 +309,9 @@ public class OnboardingService {
 					    	String jsonStr2 = gsonObj.toJson(_attributes);		
 					    	
 					    	_u.setPermissionsJSON(jsonStr2);
+							userRepository.save(_u);
 			    		}
-			    		else if (t.getOffice().equalsIgnoreCase("Principal")) {
+			    		/*else if (t.getOffice().equalsIgnoreCase("Principal")) {
 			    			_u.setId(specialIdUser2);
 							String specialIdUsername = createUuidUsername("head");
 				    		_u.setUsername(specialIdUsername);
@@ -336,7 +338,7 @@ public class OnboardingService {
 					    	String jsonStr2 = gsonObj.toJson(_attributes);		
 					    	
 					    	_u.setPermissionsJSON(jsonStr2);
-			    		}
+			    		}*/
 			    		
 			    						    	
 			    		/*message.setFrom(from);
@@ -345,8 +347,8 @@ public class OnboardingService {
 			    		message.setText("Hello sir/mrs! This is to congratulate you on your successful onboarding process into the Standbasis school standards management system. Your login details are: " + System.lineSeparator() + "User: " + specialIdUsername +  System.lineSeparator() + "Password: " + specialPassword  );
 			    		mailSender.send(message);*/
 			    		
-			    		userRepository.save(_u);
-			    		TimeUnit.SECONDS.sleep(1);   
+			    		//userRepository.save(_u);
+			    		//TimeUnit.SECONDS.sleep(1);   
 			    		
 			    	}
 					return true;

@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceManagement;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
@@ -63,7 +62,7 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 		
 	 	@Query("select attmanage from AttendanceManagement attmanage "
 	    		+ "JOIN Attendance att ON att = attmanage.att_id "
-	 			+ "WHERE att.timetable.school.owner = :owner "
+	 			+ "WHERE (att.timetable.school.owner = :owner OR :owner is null) "
 	    		+ "AND (att.timetable.school = :sch OR :sch is null) "
 	    		+ "AND (att.timetable.class_stream = :cls OR :cls is null) "
 	    		+ "AND (att.timetable.teacher = :tea OR :tea is null) "
@@ -87,7 +86,7 @@ public interface AttendanceManagementRepository extends JpaRepository<Attendance
 	 	
 	 	@Query("select attmanage from AttendanceManagement attmanage "
 	    		+ "JOIN Attendance att ON att = attmanage.att_id "
-	 			+ "WHERE att.timetable.school.owner = :owner "
+	 			+ "WHERE (att.timetable.school.owner = :owner OR :owner is null ) "
 	    		+ "AND ( :sch is null OR att.timetable.school = :sch ) "
 	    		+ "AND ( :cls is null OR att.timetable.class_stream = :cls ) "
 	    		+ "AND ( :tea is null OR att.timetable.teacher = :tea ) "

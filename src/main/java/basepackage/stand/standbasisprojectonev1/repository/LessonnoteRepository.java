@@ -65,7 +65,7 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
 	
     //+ "AND ( (lsn.delaythis = 1 AND lsn.week <= :week) OR (lsn.week = :week AND lsn.delaythis is null) OR (lsn.week = :week + 1 AND lsn.delaythis is null) )  "
     //------------------------------------------------------------------------------------------
-    @Query("select lsn from Lessonnote lsn where lsn.calendar.school.owner = :owner "
+    @Query("select lsn from Lessonnote lsn where (lsn.calendar.school.owner = :owner OR :owner is null) "
     		+ "AND (lsn.calendar.school = :sch OR :sch is null) "
     		+ "AND (lsn.class_index = :cls OR :cls is null) "
     		+ "AND (lsn.week = :week OR :week is null) "
@@ -122,7 +122,7 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     
     ///-----------------------------------------------------------------------
     
-    @Query("select lsn from Lessonnote lsn where lsn.calendar.school.owner = :owner "
+    @Query("select lsn from Lessonnote lsn where (lsn.calendar.school.owner = :owner OR :owner is null) "
     		+ "AND (lsn.calendar.school = :sch OR :sch is null) "
     		+ "AND (lsn.class_index = :cls OR :cls is null) "
     		+ "AND (lsn.week = :week OR :week is null) "
@@ -187,7 +187,7 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     
     @Query("select assess from Assessment assess "
     		+ "JOIN Lessonnote lsn ON lsn = assess.lsn "
-    		+ "WHERE lsn.calendar.school.owner = :owner " 
+    		+ "WHERE (lsn.calendar.school.owner = :owner OR :owner is null) " 
     		+ "AND (lsn.calendar.school = :sch OR :sch is null) "
     		+ "AND (assess.enroll.classstream = :cls OR :cls is null) "
     		+ "AND (lsn.week = :week OR :week is null) "
@@ -247,7 +247,7 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     
     @Query("select assess from Assessment assess "
     		+ "JOIN Lessonnote lsn ON lsn = assess.lsn "
-    		+ "WHERE lsn.calendar.school.owner = :owner " 
+    		+ "WHERE (lsn.calendar.school.owner = :owner OR :owner is null) " 
     		+ "AND (lsn.calendar.school = :sch OR :sch is null) "
     		+ "AND (assess.enroll.classstream = :cls OR :cls is null) "
     		+ "AND (lsn.week = :week OR :week is null) "

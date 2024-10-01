@@ -44,6 +44,72 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
     List<School> filterAll(@Param("filter") String filter );  
    
     Page<School> findByOwner(SchoolGroup owner, Pageable pg);
+
+    @Query("SELECT s from School s WHERE " 
+         + "(s.lga_code = :lga OR :lga is null) " 
+         + "and (s.zone = :zone OR :zone is null) " 
+         + "and (s.state = :state OR :state is null) " 
+         + "and (s.type_of = :agency OR :agency is null) "
+    )
+    List<School> findBySupervisor(@Param("state")String state,
+                                  @Param("agency")String agency,
+                                  @Param("zone")String zone,
+                                  @Param("lga")String lga
+                                );
+
+    @Query("SELECT s from School s WHERE " 
+         + "(s.lga_code = :lga OR :lga is null) " 
+         + "and (s.zone = :zone OR :zone is null) " 
+         + "and (s.state = :state OR :state is null) " 
+         + "and (s.type_of = :agency OR :agency is null) "
+    )
+    Page<School> findBySupervisor(@Param("state")String state,
+                                  @Param("agency")String agency,
+                                  @Param("zone")String zone,
+                                  @Param("lga")String lga, 
+                                  Pageable pg
+                                );
+
+    @Query("SELECT s from School s WHERE " 
+        + "(s.lga_code = :lga OR :lga is null) " 
+        + "and (s.zone = :zone OR :zone is null) " 
+        + "and (s.state = :state OR :state is null) " 
+        + "and (s.type_of = :agency OR :agency is null) "
+        + "and (s.name like :filter " 
+            + "or s.lga like :filter " 
+            + "or s.town like :filter " 
+            + "or s.state like :filter " 
+            + "or s.faith like :filter "
+            + "or s.gender like :filter "
+            + "or s.operator like :filter )"
+    )
+    Page<School>  findFilterBySupervisor(@Param("filter") String filter, 
+                                         @Param("state")String state,
+                                         @Param("agency")String agency,
+                                         @Param("zone")String zone,
+                                         @Param("lga")String lga, 
+                                         Pageable pg
+                                );
+
+               @Query("SELECT s from School s WHERE " 
+                                + "(s.lga_code = :lga OR :lga is null) " 
+                                + "and (s.zone = :zone OR :zone is null) " 
+                                + "and (s.state = :state OR :state is null) " 
+                                + "and (s.type_of = :agency OR :agency is null) "
+                                + "and (s.name like :filter " 
+                                    + "or s.lga like :filter " 
+                                    + "or s.town like :filter " 
+                                    + "or s.state like :filter " 
+                                    + "or s.faith like :filter "
+                                    + "or s.gender like :filter "
+                                    + "or s.operator like :filter )"
+                            )
+                            List<School>  findFilterBySupervisor(@Param("filter") String filter, 
+                                                                 @Param("state")String state,
+                                                                 @Param("agency")String agency,
+                                                                 @Param("zone")String zone,
+                                                                 @Param("lga")String lga
+                                                        );
     
     List<School> findByOwner(SchoolGroup owner);
     

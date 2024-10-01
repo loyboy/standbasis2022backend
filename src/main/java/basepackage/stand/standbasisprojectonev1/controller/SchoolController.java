@@ -58,10 +58,15 @@ public class SchoolController {
 		 List<School> list = service.findAll();
 		 return ResponseEntity.ok().body(new ApiContentResponse<School>(true, "List of schools gotten successfully.", list));		
 	 }
-	 
-	 @GetMapping("/group/{id}")
-	 public ResponseEntity<?> getSchoolsFromSchoolGroup( @PathVariable(value = "id") Long id ) {
-		 List<School> list = service.findAllByGroup(id);
+	 @GetMapping(value = {"/group/{id}", "/group/{id}/supervisor/{state}"})
+	 public ResponseEntity<?> getSchoolsFromSchoolGroup( @PathVariable(value = "id") String id, @PathVariable(value = "state") Boolean state ) {
+		 List<School> list = null;
+		 if (state == true){			
+			list = service.findAllBySupervisor(id);
+		 }
+		 else{
+			list = service.findAllByGroup( Long.valueOf(id) );
+		 }		 
 		 return ResponseEntity.ok().body(new ApiContentResponse<School>(true, "List of schools by group gotten successfully.", list));		
 	 }
 	 
@@ -90,11 +95,11 @@ public class SchoolController {
 	 public ResponseEntity<?> getPaginatedSchools(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
 			 @RequestParam(value = "q", required=false) String query,
-			 @RequestParam(value = "owner", required=false) Optional<Long> owner
+			 @RequestParam(value = "owner", required=false) Optional<Long> owner,
+			 @RequestParam(value = "supervisor", required=false) Optional<String> supervisor
 			 ) {
-		// System.out.println("Long is set here "+ owner);
 		 
-		 Map<String, Object> response = service.getPaginatedSchools( page, size, query, owner );
+		 Map<String, Object> response = service.getPaginatedSchools( page, size, query, owner , supervisor);
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 

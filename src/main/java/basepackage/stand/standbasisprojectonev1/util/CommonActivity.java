@@ -76,4 +76,29 @@ public class CommonActivity {
          throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
      }
 	}
+
+	public static String[] parseStringForSupervisor(String input) {
+        // Define regex patterns for each of the four possible formats
+        String pattern1 = "^\\d{2}$"; // Matches "01"
+        String pattern2 = "^\\d{2}-\\w+$"; // Matches "01-subeb"
+        String pattern3 = "^\\d{2}-\\w+-\\w+$"; // Matches "01-subeb-A"
+        String pattern4 = "^\\d{2}-\\w+-\\w+-\\d+$"; // Matches "01-subeb-A-96301"
+
+        // Check if the input matches any of the four patterns
+        if (input.matches(pattern4)) {
+            // Matches "01-subeb-A-96301"
+            return input.split("-");
+        } else if (input.matches(pattern3)) {
+            // Matches "01-subeb-A"
+            return input.split("-");
+        } else if (input.matches(pattern2)) {
+            // Matches "01-subeb"
+            return input.split("-");
+        } else if (input.matches(pattern1)) {
+            // Matches "01"
+            return new String[]{input}; // Return the input as a single-element array
+        } else {
+            throw new IllegalArgumentException("Input string does not match any of the expected formats.");
+        }
+    }
 }

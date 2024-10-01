@@ -44,12 +44,56 @@ public interface CalendarRepository extends JpaRepository<Calendar, Long>{
 	       @Query("select cal from Calendar cal where (cal.school.owner = :group OR :group is null) AND ( cal.school = :owner OR :owner is null ) " )
 	       Page<Calendar> findBySchoolPage( @Param("owner") School owner, @Param("group") SchoolGroup group, Pageable pg);
 	       
+		   @Query("SELECT cal from Calendar cal "
+		    + "JOIN School s ON s = cal.school "
+			+ "WHERE (s.lga_code = :lga OR :lga is null) " 
+			+ "and (s.zone = :zone OR :zone is null) " 
+			+ "and (s.state = :state OR :state is null) " 
+			+ "and (s.type_of = :agency OR :agency is null) "
+		   )
+	       Page<Calendar> findBySupervisor(  @Param("state") String state,
+											 @Param("agency") String agency,
+											 @Param("zone") String zone,
+											 @Param("lga") String lga,
+											 Pageable pg
+										  );
+
+		   @Query("SELECT cal from Calendar cal "
+		    + "JOIN School s ON s = cal.school "
+			+ "WHERE (s.lga_code = :lga OR :lga is null) " 
+			+ "and (s.zone = :zone OR :zone is null) " 
+			+ "and (s.state = :state OR :state is null) " 
+			+ "and (s.type_of = :agency OR :agency is null) "
+		   )
+	       List<Calendar> findBySupervisor(  @Param("state") String state,
+											 @Param("agency") String agency,
+											 @Param("zone") String zone,
+											 @Param("lga") String lga
+										  );
+	       
 	       @Query("select cal from Calendar cal where ( cal.holiday like :filter " 
 	               + "OR cal.session like :filter ) "
 	               + "AND (cal.school.owner = :group OR :group is null) AND ( cal.school = :owner OR :owner is null ) "
 	          	 )	       
 	       Page<Calendar> findFilterBySchool(@Param("filter") String filter, @Param("owner") School ownerId, @Param("group") SchoolGroup group, Pageable pg);
 	       
+		   @Query("SELECT cal from Calendar cal "
+		   + "JOIN School s ON s = cal.school "
+		   + "WHERE ((s.lga_code = :lga OR :lga is null) " 
+		   + "and (s.zone = :zone OR :zone is null) " 
+		   + "and (s.state = :state OR :state is null) " 
+		   + "and (s.type_of = :agency OR :agency is null )) "
+		   + "AND ( cal.holiday like :filter OR cal.session like :filter ) "
+		  )
+		  Page<Calendar> findFilterBySupervisor( 
+											@Param("filter") String filter, 
+											@Param("state") String state,
+											@Param("agency") String agency,
+											@Param("zone") String zone,
+											@Param("lga") String lga,
+											Pageable pg
+										 );
+
 	       @Query("select cal from Calendar cal where (cal.school.owner = :group OR :group is null) AND ( cal.school = :owner OR :owner is null ) " )
 	       List<Calendar> findBySchoolPage( @Param("owner") School owner, @Param("group") SchoolGroup group);
 	       

@@ -1,18 +1,11 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,12 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import basepackage.stand.standbasisprojectonev1.exception.BadRequestException;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
-import basepackage.stand.standbasisprojectonev1.model.Enrollment;
-import basepackage.stand.standbasisprojectonev1.model.Rowcall;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Subject;
@@ -38,7 +28,6 @@ import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository
 import basepackage.stand.standbasisprojectonev1.repository.SubjectRepository;
 import basepackage.stand.standbasisprojectonev1.repository.TeacherRepository;
 import basepackage.stand.standbasisprojectonev1.repository.TimetableRepository;
-import basepackage.stand.standbasisprojectonev1.util.AppConstants;
 import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
 @Service
@@ -128,7 +117,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
 		return null;		
 	}
 	
-	public Map<String, Object> getPaginatedTimeTables(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval, Optional<Long> teacherval) {
+	public Map<String, Object> getPaginatedTimeTables(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval, Optional<Long> teacherval, Optional<String> supervisorval) {
         CommonActivity.validatePageNumberAndSize(page, size);
         
         Long owner = ownerval.orElse(null);
@@ -138,11 +127,26 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         // Retrieve TimeTables
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<TimeTable> schs = null;
+
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
         
         if ( query.equals("") || query == null ) {
-        	if ( owner == null && teacher == null && group == null  ) {
+        	
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = timeRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, 
+					pageable
+				);
+			}
+
+			else if ( owner == null && teacher == null && group == null  ) {
         		schs = timeRepository.findAll(pageable);
         	}
+
         	else {
         		//System.out.println("TImetable teachei is here" +  teacher);
         		
@@ -165,9 +169,19 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         	}        	
         }
         else {
-        	if ( owner == null && teacher == null && group == null ) {
+        	
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = timeRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, pageable);
+			}
+
+			else if ( owner == null && teacher == null && group == null ) {
         		schs = timeRepository.filter("%"+ query + "%",  pageable);
         	}
+
         	else {    
         		Optional<School> schownerobj = null;
         		Optional<SchoolGroup> schgroupobj = null ;
@@ -221,7 +235,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         return response;
     }
 	
-	public Map<String, Object> getOrdinaryTimeTables(String query, Optional<Long> ownerval, Optional<Long> groupval) {
+	public Map<String, Object> getOrdinaryTimeTables(String query, Optional<Long> ownerval, Optional<Long> groupval, Optional<String> supervisorval ) {
        // CommonActivity.validatePageNumberAndSize(page, size);
         
         Long owner = ownerval.orElse(null);
@@ -229,9 +243,20 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
 		//Timestamp realDateVal = realDate != null ? realDate.orElse(null) : null;
         
         List<TimeTable> timetables = null;
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
         
         if ( query.equals("") || query == null ) {
-        	if ( group == null  ) {
+        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+				timetables = timeRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null
+				);
+			}
+
+			else if ( group == null  ) {
         		timetables = timeRepository.findAll();
         	}
         	else {
@@ -251,7 +276,15 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         	}        	
         }
         else {
-        	if ( group == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				timetables = timeRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null
+				);
+			}
+        	else if ( group == null ) {
         		timetables = timeRepository.filterAll("%"+ query + "%");
         	}
         	else {    
@@ -280,14 +313,6 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         
         Map<String, Object> response = new HashMap<>();
         response.put("timetables", timearray);
-        
-       
-        
-       // long active = 1; long inactive = 0;
-      /*  long sriTimeTables = schRepository.countBySri(active);
-        long nonSriTimeTables = schRepository.countBySri(inactive);
-        long inactiveTimeTables = schRepository.countByStatus(inactive);*/
-        
        
         return response;
     }

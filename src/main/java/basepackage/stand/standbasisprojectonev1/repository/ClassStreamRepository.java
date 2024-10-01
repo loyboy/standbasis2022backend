@@ -44,21 +44,81 @@ public interface ClassStreamRepository extends JpaRepository<ClassStream, Long> 
        @Query("select cs from ClassStream cs where ( cs.school.owner = :group OR :group is null ) AND ( cs.school = :sch OR :sch is null ) " )
        Page<ClassStream> findBySchoolPage( @Param("sch") School owner, @Param("group") SchoolGroup group, Pageable pg);
        
+       @Query("select cs from ClassStream cs "
+          + "JOIN School s ON s = cs.school "
+          + "WHERE (s.lga_code = :lga OR :lga is null) " 
+          + "and (s.zone = :zone OR :zone is null) " 
+          + "and (s.state = :state OR :state is null) " 
+          + "and (s.type_of = :agency OR :agency is null) "
+       )
+       Page<ClassStream> findBySupervisor( 
+                                        @Param("state") String state,
+                                        @Param("agency") String agency,
+                                        @Param("zone") String zone,
+                                        @Param("lga") String lga, 
+                                        Pageable pg
+                                );
+
+                        @Query("select cs from ClassStream cs "
+                                + "JOIN School s ON s = cs.school "
+                                + "WHERE (s.lga_code = :lga OR :lga is null) " 
+                                + "and (s.zone = :zone OR :zone is null) " 
+                                + "and (s.state = :state OR :state is null) " 
+                                + "and (s.type_of = :agency OR :agency is null) "
+                             )
+                             List<ClassStream> findBySupervisor( 
+                                                              @Param("state") String state,
+                                                              @Param("agency") String agency,
+                                                              @Param("zone") String zone,
+                                                              @Param("lga") String lga                                                              
+                                                      );      
+
        @Query("select cs from ClassStream cs where ( cs.school.owner = :group OR :group is null ) AND ( cs.school = :sch OR :sch is null ) " )
        List<ClassStream> findBySchoolPage( @Param("sch") School owner, @Param("group") SchoolGroup group);
        
        @Query("select cs from ClassStream cs where ( cs.school.owner = :group OR :group is null ) AND ( cs.title like :filter " 
                + "or cs.ext like :filter ) " 
                + "AND ( cs.school = :sch OR :sch is null ) "
-          	 )
-       
+             )       
        Page<ClassStream> findFilterBySchoolPage(@Param("filter") String filter, @Param("sch") School ownerId, @Param("group") SchoolGroup group, Pageable pg);
        
+       @Query("select cs from ClassStream cs "
+                + "JOIN School s ON s = cs.school "
+                + "WHERE (s.lga_code = :lga OR :lga is null) " 
+                + "and (s.zone = :zone OR :zone is null) " 
+                + "and (s.state = :state OR :state is null) " 
+                + "and (s.type_of = :agency OR :agency is null) "
+                + "AND ( cs.title like :filter or cs.ext like :filter ) "
+        )
+        Page<ClassStream> findFilterBySupervisor( 
+                                     @Param("filter") String filter,
+                                     @Param("state") String state,
+                                     @Param("agency") String agency,
+                                     @Param("zone") String zone,
+                                     @Param("lga") String lga, 
+                                     Pageable pg
+                             );
+
+                    @Query("select cs from ClassStream cs "
+                             + "JOIN School s ON s = cs.school "
+                             + "WHERE (s.lga_code = :lga OR :lga is null) " 
+                             + "and (s.zone = :zone OR :zone is null) " 
+                             + "and (s.state = :state OR :state is null) " 
+                             + "and (s.type_of = :agency OR :agency is null) "
+                             + "AND ( cs.title like :filter or cs.ext like :filter ) "
+                     )
+                     List<ClassStream> findFilterBySupervisor( 
+                                                  @Param("filter") String filter,
+                                                  @Param("state") String state,
+                                                  @Param("agency") String agency,
+                                                  @Param("zone") String zone,
+                                                  @Param("lga") String lga                                                  
+                                          );
+
        @Query("select cs from ClassStream cs where ( cs.school.owner = :group OR :group is null ) AND ( cs.title like :filter " 
                + "or cs.ext like :filter ) " 
                + "AND ( cs.school = :sch OR :sch is null ) "
-          	 )
-       
+             )       
        List<ClassStream> findFilterBySchoolPage(@Param("filter") String filter, @Param("sch") School ownerId, @Param("group") SchoolGroup group);
        
        @Query("SELECT COUNT(cs.id) from ClassStream cs where cs.school = :sch ")

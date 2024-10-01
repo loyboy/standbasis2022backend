@@ -115,8 +115,9 @@ public class ScheduledConsole {
         for (TimeTable it : ttnew) {
             //Timestamp realDate = parseTimestamp(todayDate());
             Optional<Long> optionalOwner = Optional.of(it.getSchool().getOwner().getId());
+            Optional<String> nullVal    = Optional.ofNullable(null); 
            // Optional<Timestamp> optionalTimestamp = Optional.of(realDate);
-            Map<String, Object> response2 = schoolService.getOrdinarySchools("", optionalOwner);
+            Map<String, Object> response2 = schoolService.getOrdinarySchools("", optionalOwner, nullVal);
             
             @SuppressWarnings("unchecked")
             List<School> listSchoolTotal = (List<School>) response2.get("schools");
@@ -264,10 +265,11 @@ public class ScheduledConsole {
            
             Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
             Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
+            Optional<String> nullVal     = Optional.ofNullable(null); 
 
-            Map<String, Object> response2 = teacherService.getOrdinaryTeachers("",optionalGroup, optionalOwner);
+            Map<String, Object> response2 = teacherService.getOrdinaryTeachers("",optionalGroup, optionalOwner, nullVal);
             
-            Map<String, Object> response3 = serviceTimetable.getOrdinaryTimeTables("", optionalOwner, optionalGroup);
+            Map<String, Object> response3 = serviceTimetable.getOrdinaryTimeTables("", optionalOwner, optionalGroup, nullVal);
                
             @SuppressWarnings("unchecked")
             List<Teacher> listTeacher = (List<Teacher>) response2.get("teachers");
@@ -427,8 +429,9 @@ public class ScheduledConsole {
            
             Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
             Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
+            Optional<String> nullVal    = Optional.ofNullable(null); 
                
-            Map<String, Object> response2 = serviceEnrollment.getOrdinaryEnrollments("", optionalGroup, optionalOwner);
+            Map<String, Object> response2 = serviceEnrollment.getOrdinaryEnrollments("", optionalGroup, optionalOwner, nullVal);
         
             @SuppressWarnings("unchecked")
             List<Enrollment> listEnrollment = (List<Enrollment>) response2.get("enrollments");
@@ -585,10 +588,11 @@ public class ScheduledConsole {
            
             Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
             Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
+            Optional<String> nullVal    = Optional.ofNullable(null); 
                
-            Map<String, Object> response2 = classService.getOrdinaryClassStreams("", optionalGroup, optionalOwner);
+            Map<String, Object> response2 = classService.getOrdinaryClassStreams("", optionalGroup, optionalOwner, nullVal);
         
-            Map<String, Object> response3 = serviceTimetable.getOrdinaryTimeTables("", optionalOwner, optionalGroup);        
+            Map<String, Object> response3 = serviceTimetable.getOrdinaryTimeTables("", optionalOwner, optionalGroup, nullVal);        
             
             @SuppressWarnings("unchecked")
             List<ClassStream> listClassrooms = (List<ClassStream>) response2.get("classrooms");
@@ -749,8 +753,9 @@ public class ScheduledConsole {
            
             Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
             Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
+            Optional<String> nullVal     = Optional.ofNullable(null); 
                
-            Map<String, Object> response3 = serviceTimetable.getOrdinaryTimeTables("", optionalOwner, optionalGroup); 
+            Map<String, Object> response3 = serviceTimetable.getOrdinaryTimeTables("", optionalOwner, optionalGroup, nullVal); 
             @SuppressWarnings("unchecked")
             List<TimeTable> listTimetable = (List<TimeTable>) response3.get("timetables"); 
 
@@ -889,8 +894,9 @@ public class ScheduledConsole {
            
             Optional<Long> optionalGroup = Optional.of(it.getSchool().getOwner().getId());
             Optional<Long> optionalOwner = Optional.of(it.getSchool().getSchId());
+            Optional<String> nullVal    = Optional.ofNullable(null); 
                
-            Map<String, Object> response2 = calService.getOrdinaryCalendars("", optionalOwner, optionalGroup);
+            Map<String, Object> response2 = calService.getOrdinaryCalendars("", optionalOwner, optionalGroup, nullVal);
         
             @SuppressWarnings("unchecked")
             List<Calendar> listCalendar = (List<Calendar>) response2.get("calendars");

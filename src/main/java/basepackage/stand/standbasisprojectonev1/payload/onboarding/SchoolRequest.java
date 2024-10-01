@@ -31,7 +31,7 @@ public class SchoolRequest {
 	    private Long owner;
 	    
 	    @Size(max = 50)
-	    private String faith;
+	    private String faith, zone;
 	    
 	    @NotBlank
 	    @Size(max = 100)

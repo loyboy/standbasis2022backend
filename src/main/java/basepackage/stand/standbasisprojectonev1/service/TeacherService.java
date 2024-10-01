@@ -140,17 +140,27 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
 		return null;
 	}
 	
-	public Map<String, Object> getOrdinaryTeachers( String query, Optional<Long> groupval, Optional<Long> ownerval) {
+	public Map<String, Object> getOrdinaryTeachers( String query, Optional<Long> groupval, Optional<Long> ownerval, Optional<String> supervisorval) {
 		
         Long owner = ownerval.orElse(null);     
         Long group = groupval.orElse(null);
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
 		//Timestamp realDateVal = realDate != null ? realDate.orElse(null) : null;
         
 		// Retrieve Teachers        
         List<Teacher> teas = null;
         
         if ( query.equals("") || query == null ) {
-        	if ( group == null && owner == null ) {
+        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+				teas = teaRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null				
+				);
+			}
+			else if ( group == null && owner == null ) {
         		teas = teaRepository.findAll();
         	}
         	else {
@@ -167,7 +177,16 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         	}       	
         }
         else {
-        	if ( group == null && owner == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				teas = teaRepository.findFilterBySupervisor( 
+					"%"+ query + "%",
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null				
+				);
+			}
+        	else if ( group == null && owner == null ) {
         		teas = teaRepository.filterAll("%"+ query + "%");
         	}
         	else {    
@@ -200,10 +219,12 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         return response;
     }
 	
-	public Map<String, Object> getPaginatedTeachers(int page, int size, String query, Optional<Long> groupval, Optional<Long> ownerval) {
+	public Map<String, Object> getPaginatedTeachers(int page, int size, String query, Optional<Long> groupval, Optional<Long> ownerval, Optional<String> supervisorval) {
 		CommonActivity.validatePageNumberAndSize(page, size);
         Long owner = ownerval.orElse(null);     
         Long group = groupval.orElse(null);
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
         int underdeployed = 0;
 		int deployed = 0; 
 		int overdeployed = 0;
@@ -214,12 +235,22 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         // Retrieve Teachers
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Teacher> schs = null;
-      //  System.out.println("Long is set "+ owner);
         
         if ( query.equals("") || query == null ) {
-        	if ( group == null && owner == null ) {
+        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = teaRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, 
+					pageable
+				);
+			}
+
+			else if ( group == null && owner == null ) {
         		schs = teaRepository.findAll(pageable);
         	}
+			
         	else {
         		Optional<SchoolGroup> schgroupobj = null ;
         		Optional<School> schownerobj = null;
@@ -234,9 +265,20 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         	}       	
         }
         else {
-        	if ( group == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = teaRepository.findFilterBySupervisor("%"+ query + "%",  
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, 
+					pageable
+				);
+			}
+
+        	else if ( group == null ) {
         		schs = teaRepository.filter("%"+ query + "%",  pageable);
         	}
+			
         	else {    
         		
         		Optional<SchoolGroup> schgroupobj = null ;
@@ -249,7 +291,8 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         		schs = teaRepository.findFilterBySchool( "%"+ query + "%", 
         				schownerobj == null ? null : schownerobj.get(), 
     	        		schgroupobj == null ? null : schgroupobj.get(), 
-    	        pageable);
+    	        		pageable
+				);
         	}
         }
 
@@ -274,9 +317,9 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         
-        Map<String, Object> response2 = serviceTimetable.getOrdinaryTimeTables(query, ownerval, groupval);
+        Map<String, Object> response2 = serviceTimetable.getOrdinaryTimeTables(query, ownerval, groupval, supervisorval);
         
-        Map<String, Object> response4 = getOrdinaryTeachers(query, groupval, ownerval);
+        Map<String, Object> response4 = getOrdinaryTeachers(query, groupval, ownerval, supervisorval);
         
         Map<String, Object> response3 = attTimetable.getOrdinaryTeacherAttendances(query, groupval, ownerval, optionalValue, optionalValue, optionalValue, optionalValue, optionalValueTimestamp, optionalValueTimestamp);
 		

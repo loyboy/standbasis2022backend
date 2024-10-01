@@ -104,11 +104,11 @@ public class TeacherController {
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
 			 @RequestParam(value = "q") String query,
 			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> schoolgroup,
-			 @RequestParam(value = "school", required=false) Optional<Long> school
+			 @RequestParam(value = "school", required=false) Optional<Long> school,
+			 @RequestParam(value = "supervisor", required=false) Optional<String> supervisor
 			 ) {
-		// System.out.println("Long is set here "+ owner);
 		 try {
-			 Map<String, Object> response = service.getPaginatedTeachers( page, size, query, schoolgroup, school );
+			 Map<String, Object> response = service.getPaginatedTeachers( page, size, query, schoolgroup, school, supervisor);
 			 return new ResponseEntity<>(response, HttpStatus.OK);
 		 }
 		 catch (Exception ex) {

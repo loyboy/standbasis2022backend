@@ -68,10 +68,11 @@ public class EnrollmentController {
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
 			 @RequestParam(value = "q") String query,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
-			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> schoolgroup
+			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> schoolgroup,
+			 @RequestParam(value = "supervisor", required=false) Optional<String> supervisor
 			 ) {
 		 
-		 Map<String, Object> response = service.getPaginatedEnrollments( page, size, query, school, schoolgroup );
+		 Map<String, Object> response = service.getPaginatedEnrollments( page, size, query, school, schoolgroup, supervisor );
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 

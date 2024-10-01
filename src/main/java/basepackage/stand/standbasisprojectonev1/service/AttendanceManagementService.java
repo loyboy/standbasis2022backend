@@ -225,17 +225,18 @@ public class AttendanceManagementService {
         List<AttendanceManagement> attendances = null;
         
         if ( query == null || query.equals("") ) {
-        	if ( schgroup == null ) {
+        	/*if ( schgroup == null ) {
         		attendances = attmanageRepository.findAll();
         	}
-        	else {
-        		Optional<SchoolGroup> schgroupobj = groupRepository.findById( schgroup );
+        	else {*/
+        		Optional<SchoolGroup> schgroupobj = null;
         		Optional<School> schownerobj = null;
         		Optional<ClassStream> classownerobj = null ;
         		Optional<Teacher> teacherownerobj = null;
         		Optional<Calendar> calendarownerobj = null;
         		Optional<Subject> subjectownerobj = null;
         		
+				if(schgroup != null) { schgroupobj = groupRepository.findById( schgroup ); }
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
         		if(classowner != null) { classownerobj = clsRepository.findById( classowner );  } 
@@ -252,26 +253,26 @@ public class AttendanceManagementService {
                         datefrom.isEmpty() ? null : datefrom.get(),
                         dateto.isEmpty() ? null : dateto.get()
         		);
-        	}        	
+        	//}        	
         }
-        else {
-        	if ( schgroup == null ) {
+       else {
+        	/*if ( schgroup == null ) {
         		attendances = attmanageRepository.findAll();
         	}
-        	else {    
-        		Optional<SchoolGroup> schgroupobj = groupRepository.findById( schgroup );
+        	else { */   
+        		Optional<SchoolGroup> schgroupobj = null;
         		Optional<School> schownerobj = null;
         		Optional<ClassStream> classownerobj = null;
         		Optional<Teacher> teacherownerobj = null;
         		Optional<Calendar> calendarownerobj = null;
         		Optional<Subject> subjectownerobj = null;
-        		
+
+        		if(schgroup != null) { schgroupobj = groupRepository.findById( schgroup ); }
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
         		if(classowner != null) { classownerobj = clsRepository.findById( classowner );  }
         		if(calendarowner != null) { calendarownerobj = calRepository.findById( calendarowner );  } 
-        		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  }
-        		
+        		if(subjectowner != null) { subjectownerobj = subRepository.findById( subjectowner );  }        		
         		
         		attendances = attmanageRepository.findFilterByTeacherSchoolgroup( 
         				"%"+ query + "%", 
@@ -284,21 +285,19 @@ public class AttendanceManagementService {
                         datefrom.isEmpty() ? null : datefrom.get(),
                         dateto.isEmpty() ? null : dateto.get()
         		);
-        	}
+        	
         }
 
         if(attendances.size() == 0) {
         	Map<String, Object> responseEmpty = new HashMap<>();
-        	responseEmpty.put("attendancemanagement", Collections.emptyList());
-        	        	
+        	responseEmpty.put("attendancemanagement", Collections.emptyList());        	        	
         	return responseEmpty;
         }
         
         List<AttendanceManagement> calarray = new ArrayList<AttendanceManagement>(attendances);
         
         Map<String, Object> response = new HashMap<>();
-        response.put("attendancemanagement", calarray);
-        
+        response.put("attendancemanagement", calarray);        
         
         return response;
     }

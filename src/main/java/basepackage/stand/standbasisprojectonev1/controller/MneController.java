@@ -335,8 +335,8 @@ public class MneController {
 	 public ResponseEntity<?> getStudentAttendance(
 			 @RequestParam(value = "enrol") Long enrolId,
 			 @RequestParam(value = "calendar") Long calendar,
-			 @RequestParam(value = "week",required=false) Integer week
-			 ) {		
+			 @RequestParam(value = "week",required=false) Integer week			
+			) {		
 		 
 		// Map<String, Object> response = service.getPaginatedCalendars( page, size, query, school );
 		// return new ResponseEntity<>(response, HttpStatus.OK);

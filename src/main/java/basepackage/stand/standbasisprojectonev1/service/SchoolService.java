@@ -9,7 +9,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,14 +33,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import basepackage.stand.standbasisprojectonev1.exception.BadRequestException;
-import basepackage.stand.standbasisprojectonev1.model.Attendance;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
-import basepackage.stand.standbasisprojectonev1.model.Teacher;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.SchoolRequest;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
+import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
 @Service
 public class SchoolService {
@@ -68,6 +66,19 @@ public class SchoolService {
 			return schval;
 		}
 		return null;
+	}
+
+	public List<School> findAllBySupervisor(String supervisorCode) {
+		
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisorCode);  
+		//System.out.println(codes.length + "------" + codes[0]);
+		List<School> schval = schRepository.findBySupervisor( 
+			codes.length > 0 ? codes[0] : null,
+			codes.length > 1 ? codes[1] : null,
+			codes.length > 2 ? codes[2] : null,
+			codes.length > 3 ? codes[3] : null
+		);
+		return schval;
 	}
 	
 	public List<School> findAllByLga(String lga) {
@@ -103,15 +114,25 @@ public class SchoolService {
 		return null;
 	}
 	
-	public Map<String, Object> getOrdinarySchools( String query, Optional<Long> groupval) {
+	public Map<String, Object> getOrdinarySchools( String query, Optional<Long> groupval,Optional<String> supervisorval ) {
 		    
         Long group = groupval.orElse(null);
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);  
 		// Retrieve Teachers
         // 
         List<School> schs = null;
         
         if ( query.equals("") || query == null ) {
-        	if ( group == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = schRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null
+				);
+			}
+        	else if ( group == null ) {
         		schs = schRepository.findAll();
         	}
         	else {
@@ -119,13 +140,21 @@ public class SchoolService {
         		 
         		if(group != null) { schgroupobj = schgroupRepository.findById( group ); }        		
         		
-        			schs = schRepository.findByOwner(
-        	        	schgroupobj == null ? null : schgroupobj.get()
-        			);
+        		schs = schRepository.findByOwner(
+        	        schgroupobj == null ? null : schgroupobj.get()
+        		);
         	}       	
         }
         else {
-        	if ( group == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = schRepository.findFilterBySupervisor("%"+ query + "%",  
+				codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+				codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+				codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+				codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null
+				);
+			}
+        	else if ( group == null ) {
         		schs = schRepository.filterAll("%"+ query + "%");
         	}
         	else {    
@@ -155,27 +184,48 @@ public class SchoolService {
         return response;
     } 
 	
-	public Map<String, Object> getPaginatedSchools(int page, int size, String query, Optional<Long> ownerval) {
+	public Map<String, Object> getPaginatedSchools(int page, int size, String query, Optional<Long> ownerval, Optional<String> supervisorval) {
         validatePageNumberAndSize(page, size);
-        Long owner = ownerval.orElse(null);        
+        Long owner = ownerval.orElse(null); 
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);  
+
         // Retrieve Schools
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<School> schs = null;
-      //  System.out.println("Long is set "+ owner);
         
         if ( query.equals("") || query == null ) {
-        	if ( owner == null ) {
+        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = schRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, 
+					pageable);
+			}
+			else if ( owner == null ) {
         		schs = schRepository.findAll(pageable);
         	}
+			
         	else {
         		Optional<SchoolGroup> sg = schgroupRepository.findById( owner );
         		schs = schRepository.findByOwner( sg.orElse(null), pageable);
         	}        	
         }
         else {
-        	if ( owner == null ) {
+        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = schRepository.findFilterBySupervisor("%"+ query + "%",  
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, 
+					pageable
+				);
+			}
+			else if ( owner == null ) {
         		schs = schRepository.filter("%"+ query + "%",  pageable);
         	}
+			
         	else {    
         		Optional<SchoolGroup> sg = schgroupRepository.findById( owner );
         		schs = schRepository.findFilterByOwner( "%"+ query + "%", sg.orElse(null), pageable);
@@ -203,20 +253,24 @@ public class SchoolService {
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         
-        Map<String, Object> response2 = getOrdinarySchools(query, ownerval);
+        Map<String, Object> response2 = getOrdinarySchools(query, ownerval, supervisorval);
         
         @SuppressWarnings("unchecked")
 		List<School> listSchool = (List<School>) response2.get("schools");
         
-        List<School> countSecondary = listSchool.stream()
-			 	.filter(ss -> ss.getType_of().equals("secondary") )
+        List<School> countJuniorSecondary = listSchool.stream()
+			 	.filter(ss -> ss.getType_of().equals("subeb") )
 		        .collect(Collectors.toList());
-        List<School> countPrimary = listSchool.stream()
-			 	.filter(ss -> ss.getType_of().equals("junior_secondary") )
+        List<School> countSeniorSecondary = listSchool.stream()
+			 	.filter(ss -> ss.getType_of().equals("semb") )
 		        .collect(Collectors.toList());
-        
-        response.put("totalSecondary", countSecondary.size());
-		response.put("totalPrimary", countPrimary.size());
+		List<School> countBothSecondary = listSchool.stream()
+				.filter(ss -> ss.getType_of().equals("subeb+semb") )
+			   .collect(Collectors.toList());
+	   
+        response.put("totalSeniorSecondary", countSeniorSecondary.size());
+		response.put("totalJuniorSecondary", countJuniorSecondary.size());
+		response.put("totalBothSchool", 	 countBothSecondary.size());
         
         return response;
     }

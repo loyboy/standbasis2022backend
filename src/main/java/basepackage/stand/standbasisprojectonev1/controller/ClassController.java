@@ -78,10 +78,11 @@ public class ClassController {
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
 			 @RequestParam(value = "q") String query,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
-			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> group
+			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> group,
+			 @RequestParam(value = "supervisor", required=false) Optional<String> supervisor
 			 ) {
 		 
-		 Map<String, Object> response = service.getPaginatedClassStreams( page, size, query, group, school );
+		 Map<String, Object> response = service.getPaginatedClassStreams( page, size, query, group, school, supervisor );
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 

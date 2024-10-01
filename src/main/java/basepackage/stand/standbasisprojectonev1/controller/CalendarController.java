@@ -56,17 +56,24 @@ public class CalendarController {
 		 List<Calendar> list = service.findAllBySchool(id);
 		 return ResponseEntity.ok().body(new ApiContentResponse<Calendar>(true, "List of Calendars by school gotten successfully.", list));		
 	 }
+
+	 @GetMapping("/supervisor/{id}")
+	 public ResponseEntity<?> getCalendarsBySupervisor( @PathVariable(value = "id") String id ) {
+		 List<Calendar> list = service.findAllBySupervisor(id);
+		 return ResponseEntity.ok().body(new ApiContentResponse<Calendar>(true, "List of Calendars by supervisor gotten successfully.", list));		
+	 }
 	 
 	 @GetMapping("/paginate")
 	 public ResponseEntity<?> getPaginatedCalendars(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 			 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
 			 @RequestParam(value = "q") String query,
 			 @RequestParam(value = "school", required=false) Optional<Long> school,
-			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> schoolgroup
+			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> schoolgroup,
+			 @RequestParam(value = "supervisor", required=false) Optional<String> supervisor
 			 ) {
 		// System.out.println("Long is set here "+ owner);
 		 
-		 Map<String, Object> response = service.getPaginatedCalendars( page, size, query, school, schoolgroup );
+		 Map<String, Object> response = service.getPaginatedCalendars( page, size, query, school, schoolgroup , supervisor);
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        
 	 }
 	 

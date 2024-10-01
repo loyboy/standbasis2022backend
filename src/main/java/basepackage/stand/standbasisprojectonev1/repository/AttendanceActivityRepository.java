@@ -47,7 +47,7 @@ public interface AttendanceActivityRepository extends JpaRepository<AttendanceAc
 	
 	@Query("select attact from AttendanceActivity attact "
     		+ "JOIN Attendance att ON att = attact.att_id "
- 			+ "WHERE att.timetable.school.owner = :owner "
+ 			+ "WHERE (att.timetable.school.owner = :owner OR :owner is null) "
     		+ "AND (att.timetable.school = :sch OR :sch is null) "
     		+ "AND (att.timetable.class_stream = :cls OR :cls is null) "
     		+ "AND (att.timetable.teacher = :tea OR :tea is null) "
@@ -69,7 +69,7 @@ public interface AttendanceActivityRepository extends JpaRepository<AttendanceAc
  	
  	@Query("select attact from AttendanceActivity attact "
     		+ "JOIN Attendance att ON att = attact.att_id "
- 			+ "WHERE att.timetable.school.owner = :owner "
+ 			+ "WHERE (att.timetable.school.owner = :owner OR :owner is null) "
     		+ "AND (att.timetable.school = :sch OR :sch is null) "
     		+ "AND (att.timetable.class_stream = :cls OR :cls is null) "
     		+ "AND (att.timetable.teacher = :tea OR :tea is null) "

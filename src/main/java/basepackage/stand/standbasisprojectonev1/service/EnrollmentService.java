@@ -127,15 +127,25 @@ public class EnrollmentService {
 		return null;		
 	}
 	
-	public Map<String, Object> getOrdinaryEnrollments( String query, Optional<Long> groupval, Optional<Long> ownerval) {
+	public Map<String, Object> getOrdinaryEnrollments( String query, Optional<Long> groupval, Optional<Long> ownerval, Optional<String> supervisorval ) {
 		
         Long owner = ownerval.orElse(null);     
         Long group = groupval.orElse(null);        
 		 
         List<Enrollment> nrols = null;
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
           
         if ( query.equals("") || query == null ) {
-        	if ( group == null && owner == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				nrols = enrollRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null
+				);
+			}
+        	else if ( group == null && owner == null ) {
         		nrols = enrollRepository.findAll();
         	}
         	else {
@@ -152,7 +162,15 @@ public class EnrollmentService {
         	}       	
         }
         else {
-        	if ( group == null && owner == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				nrols = enrollRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null
+				);
+			}
+        	else if ( group == null && owner == null ) {
         		nrols = enrollRepository.filterAll("%"+ query + "%");
         	}
         	else {    
@@ -166,7 +184,7 @@ public class EnrollmentService {
         		nrols = enrollRepository.findFilterBySchool( "%"+ query + "%", 
         				schownerobj == null ? null : schownerobj.get(), 
     	        		schgroupobj == null ? null : schgroupobj.get() 
-    	         );
+    	        );
         	}
         }
 
@@ -186,17 +204,33 @@ public class EnrollmentService {
     }
 	
 	
-	public Map<String, Object> getPaginatedEnrollments(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval) {
+	public Map<String, Object> getPaginatedEnrollments(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval, Optional<String> supervisorval ) {
         CommonActivity.validatePageNumberAndSize(page, size);
         
-        Long owner = ownerval.orElse(null);  //School      
-        Long group = groupval.orElse(null);
+        Long owner = ownerval.orElse(null);      
+        Long group = groupval.orElse(null); 
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
+
         // Retrieve Enrollments
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Enrollment> schs = null;
         
-        if ( query.equals("") || query == null ) {        	
-        		
+        if ( query.equals("") || query == null ) { 
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = enrollRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, 
+					pageable
+				);
+			}
+			else if ( group == null && owner == null ) {
+        		schs = enrollRepository.findAll(pageable);
+        	}
+			
+        	else {      		
         		Optional<School> schownerobj = null;
         		Optional<SchoolGroup> schgroupobj = null ;
         		
@@ -207,10 +241,25 @@ public class EnrollmentService {
         				schownerobj == null ? null : schownerobj.get(), 
         				schgroupobj == null ? null : schgroupobj.get(), 		
                 		pageable
-        		);
-        	        	
+        		); 
+			}       	        	
         }
+		
         else {  
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+					schs = enrollRepository.findFilterBySupervisor("%"+ query + "%",  
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, 
+					pageable
+				);
+			}
+			else if ( group == null ) {
+        		schs = enrollRepository.filter("%"+ query + "%",  pageable);
+        	}
+			
+        	else {
         		
         		Optional<School> schownerobj = null;
         		Optional<SchoolGroup> schgroupobj = null ;
@@ -224,7 +273,7 @@ public class EnrollmentService {
                 		schgroupobj == null ? null : schgroupobj.get(),
         				pageable
         		);
-        	
+			}
         }
 
         if(schs.getNumberOfElements() == 0) {
@@ -247,7 +296,7 @@ public class EnrollmentService {
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
          
-        Map<String, Object> response2 = getOrdinaryEnrollments(query, groupval, ownerval);
+        Map<String, Object> response2 = getOrdinaryEnrollments(query, groupval, ownerval, supervisorval);
         
         @SuppressWarnings("unchecked")
 		List<Enrollment> listEnrollment = (List<Enrollment>) response2.get("enrollments");

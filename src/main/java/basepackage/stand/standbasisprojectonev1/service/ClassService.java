@@ -37,6 +37,7 @@ import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository;
 import basepackage.stand.standbasisprojectonev1.repository.TeacherRepository;
 import basepackage.stand.standbasisprojectonev1.util.AppConstants;
+import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
 @Service
 public class ClassService {
@@ -99,18 +100,26 @@ public class ClassService {
 		return null;
 	}
 	
-public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long> groupval, Optional<Long> ownerval) {
+public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long> groupval, Optional<Long> ownerval, Optional<String> supervisorval) {
 		
         Long owner = ownerval.orElse(null);     
         Long group = groupval.orElse(null);
         
-		// Retrieve Teachers
-        
+		// Retrieve Teachers        
         List<ClassStream> cls = null;
-      //  System.out.println("Long is set "+ owner);
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
         
         if ( query.equals("") || query == null ) {
-        	if ( group == null && owner == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				cls = classRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null
+				);
+			}
+        	else if ( group == null && owner == null ) {
         		cls = classRepository.findAll();
         	}
         	else {
@@ -127,7 +136,15 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
         	}       	
         }
         else {
-        	if ( group == null && owner == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				cls = classRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null
+				);
+			}
+        	else if ( group == null && owner == null ) {
         		cls = classRepository.filterAll("%"+ query + "%");
         	}
         	else {    
@@ -161,20 +178,32 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
     }
 	
 	
-	public Map<String, Object> getPaginatedClassStreams(int page, int size, String query,  Optional<Long> groupval, Optional<Long> ownerval) {
+	public Map<String, Object> getPaginatedClassStreams(int page, int size, String query,  Optional<Long> groupval, Optional<Long> ownerval, Optional<String> supervisorval) {
         validatePageNumberAndSize(page, size);
         Long owner = ownerval.orElse(null);
         Long group = groupval.orElse(null);
         int undeployedSeconday = 0;
 		int undeployedPrimary = 0; 
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
         // Retrieve ClassStreams
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<ClassStream> schs = null;
         
         if ( query.equals("") || query == null ) {
-        	if ( owner == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = classRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null,
+					pageable
+				);
+			}
+        	else if ( owner == null ) {
         		schs = classRepository.findAll(pageable);
         	}
+			
         	else {
         		Optional<SchoolGroup> schgroupobj = null ;
         		Optional<School> schownerobj = null;
@@ -189,9 +218,19 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
         	}        	
         }
         else {
-        	if ( owner == null ) {
+        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = classRepository.findFilterBySupervisor("%"+ query + "%", 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, 
+				pageable);
+			}
+
+			else if ( owner == null ) {
         		schs = classRepository.filter("%"+ query + "%",  pageable);
         	}
+			
         	else {    
         		Optional<SchoolGroup> schgroupobj = null ;
         		Optional<School> schownerobj = null;
@@ -225,9 +264,9 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         
-        Map<String, Object> response2 = getOrdinaryClassStreams(query, groupval, ownerval);
+        Map<String, Object> response2 = getOrdinaryClassStreams(query, groupval, ownerval, supervisorval);
         
-        Map<String, Object> response3 = serviceTimetable.getOrdinaryTimeTables(query, ownerval, groupval);        
+        Map<String, Object> response3 = serviceTimetable.getOrdinaryTimeTables(query, ownerval, groupval, supervisorval);        
         
         @SuppressWarnings("unchecked")
 		List<ClassStream> listClassrooms = (List<ClassStream>) response2.get("classrooms");
@@ -236,26 +275,26 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
 		List<TimeTable> listTimetable = (List<TimeTable>) response3.get("timetables");        
         
         List<ClassStream> countPrimary = listClassrooms.stream()
-        		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("primary") )
+        		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("subeb") && en.getClass_index() <= 6 && en.getClass_index() >= 1 )
         		.collect(Collectors.toList());
         
         List<ClassStream> countSecondaryJunior = listClassrooms.stream()
-        		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("secondary") && en.getClass_index() <= 9 && en.getClass_index() >= 7 )
+        		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("subeb") && en.getClass_index() <= 9 && en.getClass_index() >= 7 )
         		.collect(Collectors.toList());
         
         List<ClassStream> countSecondarySenior = listClassrooms.stream()
-        		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("secondary") && en.getClass_index() <= 12 && en.getClass_index() >= 10 )
+        		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("semb") && en.getClass_index() <= 12 && en.getClass_index() >= 10 )
         		.collect(Collectors.toList());
         
         for (ClassStream clsT : listClassrooms) {
         	
         	List<TimeTable> countTimetableTeacherSecondaryHas = listTimetable.stream()
-					.filter(tt -> tt.getClass_stream().getClsId() == clsT.getClsId() && tt.getClass_stream().getSchool().getType_of().equals("secondary")  && tt.getStatus() == 1 && tt.getCalendar().getStatus() == 1 )
+					.filter(tt -> tt.getClass_stream().getClsId() == clsT.getClsId() && tt.getClass_stream().getSchool().getType_of().equals("subeb") && clsT.getClass_index() <= 12 && clsT.getClass_index() >= 7 && tt.getStatus() == 1 && tt.getCalendar().getStatus() == 1 )
 			        .filter(distinctByKey(pr -> Arrays.asList( pr.getSubject(),  pr.getClass_stream() )))
 			        .collect(Collectors.toList());
         	
         	List<TimeTable> countTimetableTeacherPrimaryHas = listTimetable.stream()
-					.filter(tt -> tt.getClass_stream().getClsId() == clsT.getClsId() && tt.getClass_stream().getSchool().getType_of().equals("primary")  && tt.getStatus() == 1 && tt.getCalendar().getStatus() == 1 )
+					.filter(tt -> tt.getClass_stream().getClsId() == clsT.getClsId() && tt.getClass_stream().getSchool().getType_of().equals("subeb") && clsT.getClass_index() <= 6 && clsT.getClass_index() >= 1 && tt.getStatus() == 1 && tt.getCalendar().getStatus() == 1 )
 			        .filter(distinctByKey(pr -> Arrays.asList( pr.getSubject(),  pr.getClass_stream() )))
 			        .collect(Collectors.toList());
         	

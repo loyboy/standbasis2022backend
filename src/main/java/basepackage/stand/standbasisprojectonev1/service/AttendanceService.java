@@ -2,11 +2,6 @@ package basepackage.stand.standbasisprojectonev1.service;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -328,17 +323,18 @@ public class AttendanceService {
         List<Attendance> attendances = null;
         
         if (  query == null || query.equals("") ) {
-        	if ( schgroup == null ) {
+        	/*if ( schgroup == null ) {
         		attendances = attRepository.findAll();
         	}
-        	else {
-        		Optional<SchoolGroup> schgroupobj = groupRepository.findById( schgroup );
+        	else {*/
+        		Optional<SchoolGroup> schgroupobj = null;
         		Optional<School> schownerobj = null;
         		Optional<ClassStream> classownerobj = null ;
         		Optional<Teacher> teacherownerobj = null;
         		Optional<Calendar> calendarownerobj = null;
         		Optional<Subject> subjectownerobj = null;
-        		
+
+        		if(schgroup != null) { schgroupobj = groupRepository.findById( schgroup ); }
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
         		if(classowner != null) { classownerobj = clsRepository.findById( classowner );  } 
@@ -355,20 +351,21 @@ public class AttendanceService {
                 				datefrom.isEmpty() ? null : datefrom.get(),
                 		        dateto.isEmpty() ? null : dateto.get()
         		);
-        	}        	
+        	        	
         }
         else {
-        	if ( schgroup == null ) {
+        	/*if ( schgroup == null ) {
         		attendances = attRepository.filterAll("%"+ query + "%");
         	}
-        	else {    
-        		Optional<SchoolGroup> schgroupobj = groupRepository.findById( schgroup );
+        	else {  */  
+        		Optional<SchoolGroup> schgroupobj = null;
         		Optional<School> schownerobj = null;
         		Optional<ClassStream> classownerobj = null;
         		Optional<Teacher> teacherownerobj = null;
         		Optional<Calendar> calendarownerobj = null;
         		Optional<Subject> subjectownerobj = null;
-        		
+
+        		if(schgroup != null) { schgroupobj = groupRepository.findById( schgroup ); }
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(teacherowner != null) { teacherownerobj = teaRepository.findById( teacherowner );  } 
         		if(classowner != null) { classownerobj = clsRepository.findById( classowner );  }
@@ -386,7 +383,7 @@ public class AttendanceService {
                 				datefrom.isEmpty() ? null : datefrom.get(),
                 		        dateto.isEmpty() ? null : dateto.get()
         		);
-        	}
+        	//}
         }
 
         if(attendances.size() == 0) {
@@ -636,16 +633,17 @@ public class AttendanceService {
         List<Rowcall> attendances = null;
         
         if ( query.equals("") || query == null ) {
-        	if ( schgroup == null ) {
+        	/*if ( schgroup == null ) {
         		attendances = rowRepository.findAll();
         	}
-        	else {
-        		Optional<SchoolGroup> schgroupobj = groupRepository.findById( schgroup );
+        	else {*/
+        		Optional<SchoolGroup> schgroupobj = null;
         		Optional<School> schownerobj = null;
         		Optional<ClassStream> classownerobj = null ;
         		Optional<Student> studentownerobj = null;
         		Optional<Calendar> calendarownerobj = null;
-        		
+
+        		if(schgroup != null) { schgroupobj = groupRepository.findById( schgroup );  } 
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(studentowner != null) { studentownerobj = pupRepository.findById( studentowner );  } 
         		if(classowner != null) { classownerobj = clsRepository.findById( classowner );  } 
@@ -660,19 +658,20 @@ public class AttendanceService {
                 				datefrom.isEmpty() ? null : datefrom.get(),
                 		        dateto.isEmpty() ? null : dateto.get()
         		);
-        	}        	
+        	//}        	
         }
         else {
-        	if ( schgroup == null ) {
+        	/*if ( schgroup == null ) {
         		attendances = rowRepository.filterAll("%"+ query + "%");
         	}
-        	else {    
-        		Optional<SchoolGroup> schgroupobj = groupRepository.findById( schgroup );
+        	else {  */  
+        		Optional<SchoolGroup> schgroupobj = null;
         		Optional<School> schownerobj = null;
         		Optional<ClassStream> classownerobj = null;
         		Optional<Student> studentownerobj = null;
         		Optional<Calendar> calendarownerobj = null;
         		
+				if(schgroup != null) { schgroupobj = groupRepository.findById( schgroup );  } 
         		if(schowner != null) { schownerobj = schRepository.findById( schowner );  } 
         		if(studentowner != null) { studentownerobj = pupRepository.findById( studentowner );  } 
         		if(classowner != null) { classownerobj = clsRepository.findById( classowner );  }
@@ -688,7 +687,7 @@ public class AttendanceService {
                 		datefrom.isEmpty() ? null : datefrom.get(),
                 		dateto.isEmpty() ? null : dateto.get()
         		);
-        	}
+        	//}
         }
 
         if(attendances.size() == 0) {

@@ -59,6 +59,26 @@ public class CalendarService {
 		return null;
 		
 	}
+
+	public List<Calendar> findAllBySupervisor(String id) {
+		List <Calendar> calList = new ArrayList<Calendar>();
+		String[] codes = CommonActivity.parseStringForSupervisor(id);
+		List<School> schs = schRepository.findBySupervisor( 
+			codes.length > 0 ? codes[0] : null,
+			codes.length > 1 ? codes[1] : null,
+			codes.length > 2 ? codes[2] : null,
+			codes.length > 3 ? codes[3] : null
+		);
+		
+		if (schs.size() > 0) {
+			for( School sch : schs ) {		
+				calList.addAll(calRepository.findBySchool(sch));
+			}
+			return calList;
+		}
+		return null;
+		
+	}
 	
 	public Optional<Calendar> findAllByStatus(Long schid, Integer id) {
 		
@@ -93,16 +113,26 @@ public List<Calendar> findByActive() {
 		return null;
 	}
 	
-public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ownerval, Optional<Long> groupval) {
+public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ownerval, Optional<Long> groupval,  Optional<String> supervisorval) {
 		
         Long owner = ownerval.orElse(null); 
         Long group = groupval.orElse(null);
 		// Retrieve Teachers
         
         List<Calendar> teas = null;
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
              
         if ( query.equals("") || query == null ) {
-        	if ( group == null && owner == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				teas = calRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null
+				);
+			}
+        	else if ( group == null && owner == null ) {
         		teas = calRepository.findAll();
         	}
         	else {
@@ -119,7 +149,15 @@ public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ow
         	}       	
         }
         else {
-        	if ( group == null && owner == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				teas = calRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null
+				);
+			}
+        	else if ( group == null && owner == null ) {
         		teas = calRepository.filterAll("%"+ query + "%");
         	}
         	else {    
@@ -139,8 +177,7 @@ public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ow
 
         if(teas.size() == 0) {
         	Map<String, Object> responseEmpty = new HashMap<>();
-        	responseEmpty.put("calendars", Collections.emptyList());
-        	
+        	responseEmpty.put("calendars", Collections.emptyList());        	
         	return responseEmpty;
         }
         
@@ -153,18 +190,32 @@ public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ow
     }
 	
 	
-	public Map<String, Object> getPaginatedCalendars(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval) {
+	public Map<String, Object> getPaginatedCalendars(int page, int size, String query, Optional<Long> ownerval, Optional<Long> groupval, Optional<String> supervisorval) {
         validatePageNumberAndSize(page, size);
         Long owner = ownerval.orElse(null); 
         Long group = groupval.orElse(null);
         // Retrieve Calendars
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Calendar> schs = null;
+		String supervisor = supervisorval.orElse(null);      
+		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
         
         if ( query.equals("") || query == null ) {
-        	if ( group == null && owner == null ) {
+        	
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = calRepository.findBySupervisor( 
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null,
+					pageable
+				);
+			}
+
+			else if ( group == null && owner == null ) {
         		schs = calRepository.findAll(pageable);
         	}
+
         	else {
         		//Optional<School> schobj = schRepository.findById( owner );
         		//schs = calRepository.findBySchoolPage( schobj.orElse(null), pageable);
@@ -182,9 +233,20 @@ public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ow
         	}        	
         }
         else {
-        	if ( group == null && owner == null ) {
+			if (!supervisor.isEmpty() && !supervisor.equals("")){
+				schs = calRepository.findFilterBySupervisor("%"+ query + "%",  
+					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
+					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
+					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null,
+					pageable
+				);
+			}
+
+        	else if ( group == null && owner == null ) {
         		schs = calRepository.filter("%"+ query + "%",  pageable);
         	}
+			
         	else {    
         		//Optional<School> schobj = schRepository.findById( owner );
         		//schs = calRepository.findFilterBySchool( "%"+ query + "%", schobj.orElse(null), pageable);
@@ -223,7 +285,7 @@ public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ow
         response.put("totalPages", schs.getTotalPages());
         response.put("isLast", schs.isLast());
         
-        Map<String, Object> response2 = getOrdinaryCalendars(query, ownerval, groupval);
+        Map<String, Object> response2 = getOrdinaryCalendars(query, ownerval, groupval, supervisorval);
         
         @SuppressWarnings("unchecked")
 		List<Calendar> listCalendar = (List<Calendar>) response2.get("calendars");
