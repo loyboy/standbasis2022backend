@@ -251,7 +251,7 @@ public class AuthController {
    
 	@PostMapping("/onboard")
     public ResponseEntity<?> onboardUser(@Valid @RequestBody OnboardRequest simpleRequest) {
-		
+		System.out.println("Sch request 1>>> " + simpleRequest.getSchRequest() );
 		/**/
 		if ( simpleRequest.getSchRequest() != null && 
 				 simpleRequest.getTeaRequest() != null && 
@@ -267,7 +267,7 @@ public class AuthController {
 						simpleRequest.getClassRequest(),
 						simpleRequest.getTimeRequest(),
 						simpleRequest.getAccountRequest() );
-				System.out.println("Sch request >>> " + simpleRequest.getSchRequest() );
+				System.out.println("Sch request 2>>> " + simpleRequest.getSchRequest() );
 				if (status) {
 					return ResponseEntity.ok().body(new ApiResponse(true, "School Onboarding successfully"));
 				}
