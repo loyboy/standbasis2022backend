@@ -259,20 +259,25 @@ public class AuthController {
 				 simpleRequest.getClassRequest() != null &&
 				 simpleRequest.getTimeRequest() != null && 
 				 simpleRequest.getAccountRequest() != null ) {
-			
-			boolean status = boardService.onboardNewSchool( 
-					simpleRequest.getSchRequest(), 
-					simpleRequest.getTeaRequest(),
-					simpleRequest.getPupRequest(),
-					simpleRequest.getClassRequest(),
-					simpleRequest.getTimeRequest(),
-					simpleRequest.getAccountRequest() );
-			
-			if (status) {
-				return ResponseEntity.ok().body(new ApiResponse(true, "School Onboarding successfully"));
-			}
-			else {
-				return ResponseEntity.status(500).body(new ApiResponse(false, "School Onboarding failed"));
+			try{
+				boolean status = boardService.onboardNewSchool( 
+						simpleRequest.getSchRequest(), 
+						simpleRequest.getTeaRequest(),
+						simpleRequest.getPupRequest(),
+						simpleRequest.getClassRequest(),
+						simpleRequest.getTimeRequest(),
+						simpleRequest.getAccountRequest() );
+				
+				if (status) {
+					return ResponseEntity.ok().body(new ApiResponse(true, "School Onboarding successfully"));
+				}
+				else {
+					return ResponseEntity.status(500).body(new ApiResponse(false, "School Onboarding failed"));
+				}
+
+			} catch (Exception ex) {
+				System.out.println("Error in displaytaqline " + ex.getMessage() );
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, ex.getMessage()));
 			}
 			
 		} 
