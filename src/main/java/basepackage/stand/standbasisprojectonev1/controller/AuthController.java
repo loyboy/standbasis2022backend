@@ -267,7 +267,7 @@ public class AuthController {
 						simpleRequest.getClassRequest(),
 						simpleRequest.getTimeRequest(),
 						simpleRequest.getAccountRequest() );
-				
+				System.out.println("Sch request >>> " + simpleRequest.getSchRequest() );
 				if (status) {
 					return ResponseEntity.ok().body(new ApiResponse(true, "School Onboarding successfully"));
 				}
