@@ -342,7 +342,7 @@ public class MyScheduler {
 	// 0 0 0 ? * WED fjfjfjfjfj
 	// 35 * * 31 11 * default
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "35 30 8 * * *")
+	@Scheduled(cron = "35 * * 31 11 *")
     public void insertLessonnotes() {
 		
 		 Map<Integer, String> classMap = new HashMap<>();
