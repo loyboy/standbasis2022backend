@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import basepackage.stand.standbasisprojectonev1.model.Assessment;
 import basepackage.stand.standbasisprojectonev1.model.Attendance;
-import basepackage.stand.standbasisprojectonev1.model.AttendanceActivity;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceManagement;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;

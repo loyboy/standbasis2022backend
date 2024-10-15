@@ -453,18 +453,5 @@ public class MyScheduler {
 		return new Timestamp(cal.getTime().getTime());
 	}
 	 
-	 
-	 /*
-	  * 
-	  *  	SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-	    	Session session = sessionFactory.openSession();
-	    	Criteria criteria = session.createCriteria(TimeTable.class);
-	    	criteria.setFetchMode("calendar", FetchMode.JOIN);
-	    	session.beginTransaction();
-	    	
-	    	TimeTable mytimetable = session.find(TimeTable.class,it.getTimeId());
-	    	Calendar cal = calRepository.findById(it.getCalendar());
-	    	
-	    	if ( it.getCalendar().getEnddate().compareTo( parseTimestamp(todayDate()) ) > 0 ) { **/
-	 
+	
 }
