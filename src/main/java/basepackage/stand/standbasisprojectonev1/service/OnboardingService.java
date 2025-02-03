@@ -497,7 +497,14 @@ public class OnboardingService {
 		schids.put("ukwa-west", "96314");
 		schids.put("umuahia-north", "96315");
 		schids.put("umuahia-south", "96316");
-		schids.put("umu-neochi", "96317");		
+		schids.put("umu-neochi", "96317");	
+		schids.put("bwari", "96401");	
+		schids.put("muncipal", "96402");	
+		schids.put("amac", "96403");
+		schids.put("abaji", "96404");	
+		schids.put("kuje", "96405");
+		schids.put("kwali", "96406");		
+		schids.put("gwagwalada", "96407");	
 		
     	String code = schids.get( schoolDefault.getLga().toLowerCase() );
 		schoolDefault.setLga_code(code);

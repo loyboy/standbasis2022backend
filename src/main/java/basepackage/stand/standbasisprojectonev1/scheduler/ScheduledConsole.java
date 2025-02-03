@@ -163,7 +163,7 @@ public class ScheduledConsole {
             String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
             String bucketName = "standb670";
             String schoolId = String.valueOf(it.getSchool().getId());
-            String s3FileName = "schools" + "/" + date + "_" + "schools" + "_" + schoolId + "_console_snapshot.zip";
+            String s3FileName = "schools" + "/" + date + "_" + "schools" + "_" + "government" + "_console_snapshot.zip";
 
             S3Client client = S3Client.builder().build();
 		        
@@ -198,8 +198,7 @@ public class ScheduledConsole {
             }
 
             // Zip the CSV
-            try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(ziplogFile));
-                    FileInputStream fis = new FileInputStream(csvlogFile)) {
+            try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(ziplogFile)); FileInputStream fis = new FileInputStream(csvlogFile)) {
                 ZipEntry zipEntry = new ZipEntry(csvlogFile);
                 zipOut.putNextEntry(zipEntry);
 
