@@ -45,6 +45,8 @@ import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 public class SchoolService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SchoolService.class);
+
+	private final Long FCTA_ID = 4L;
 	
 	@Autowired		
     private SchoolRepository schRepository;
@@ -258,12 +260,16 @@ public class SchoolService {
         @SuppressWarnings("unchecked")
 		List<School> listSchool = (List<School>) response2.get("schools");
         
-        List<School> countJuniorSecondary = listSchool.stream()
-			 	.filter(ss -> ss.getType_of().equals("subeb") )
-		        .collect(Collectors.toList());
-        List<School> countSeniorSecondary = listSchool.stream()
-			 	.filter(ss -> ss.getType_of().equals("semb") )
-		        .collect(Collectors.toList());
+        List<School> countJuniorSecondary = listSchool.stream().anyMatch(school -> school.getOwner().getId() == FCTA_ID) ? listSchool.stream()
+			 	.filter(ss -> ss.getType_of().equals("fctubeb") )
+		        .collect(Collectors.toList()) : listSchool.stream()
+				.filter(ss -> ss.getType_of().equals("subeb") )
+			   .collect(Collectors.toList());
+        List<School> countSeniorSecondary =  listSchool.stream().anyMatch(school -> school.getOwner().getId() == FCTA_ID) ? listSchool.stream()
+				.filter(ss -> ss.getType_of().equals("fctseb") )
+				.collect(Collectors.toList()) : listSchool.stream()
+				.filter(ss -> ss.getType_of().equals("semb") )
+				.collect(Collectors.toList());
 		List<School> countBothSecondary = listSchool.stream()
 				.filter(ss -> ss.getType_of().equals("subeb+semb") )
 			   .collect(Collectors.toList());
