@@ -130,7 +130,9 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
 
 		String supervisor = supervisorval.orElse(null);      
 		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
-        
+        Optional<Teacher> teacherownerobj1st = null;       		
+    
+		if(teacher != null) { teacherownerobj1st = teaRepository.findById( teacher );  }
         if ( query.equals("") || query == null ) {
         	
 			if (!supervisor.isEmpty() && !supervisor.equals("")){
@@ -139,6 +141,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
 					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
 					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, 
+					teacherownerobj1st == null ? null : teacherownerobj1st.get(),
 					pageable
 				);
 			}
@@ -170,12 +173,17 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         }
         else {
         	
+			Optional<Teacher> teacherownerobj2nd = null;       		
+    
+			if(teacher != null) { teacherownerobj2nd = teaRepository.findById( teacher );  }
 			if (!supervisor.isEmpty() && !supervisor.equals("")){
 				schs = timeRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
 					codes.length > 2 ? codes[2].equalsIgnoreCase("Null") ? null : codes[2] : null,
-					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, pageable);
+					codes.length > 3 ? codes[3].equalsIgnoreCase("Null") ? null : codes[3] : null, 
+					teacherownerobj2nd == null ? null : teacherownerobj2nd.get(),
+					pageable);
 			}
 
 			else if ( owner == null && teacher == null && group == null ) {

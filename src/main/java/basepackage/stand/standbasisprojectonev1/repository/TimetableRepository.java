@@ -70,11 +70,14 @@ public interface TimetableRepository extends JpaRepository<TimeTable, Long> {
                         + "WHERE (s.lga_code = :lga OR :lga is null) "
                         + "and (s.zone = :zone OR :zone is null) "
                         + "and (s.state = :state OR :state is null) "
-                        + "and (s.type_of = :agency OR :agency is null) ")
+                        + "and (s.type_of = :agency OR :agency is null) "
+                        + "and (tt.teacher = :tea OR :tea is null) "
+                        )
         Page<TimeTable> findBySupervisor(@Param("state") String state,
                         @Param("agency") String agency,
                         @Param("zone") String zone,
                         @Param("lga") String lga,
+                        @Param("tea") Teacher tea,
                         Pageable pg);
  
         @Query("SELECT tt from TimeTable tt "
