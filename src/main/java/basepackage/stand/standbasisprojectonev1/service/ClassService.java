@@ -41,6 +41,8 @@ import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
 @Service
 public class ClassService {
+
+	private final Long FCTA_ID = 4L;
 	
 	@Autowired		
     private ClassStreamRepository classRepository;
@@ -267,22 +269,28 @@ public Map<String, Object> getOrdinaryClassStreams( String query, Optional<Long>
         Map<String, Object> response2 = getOrdinaryClassStreams(query, groupval, ownerval, supervisorval);
         
         Map<String, Object> response3 = serviceTimetable.getOrdinaryTimeTables(query, ownerval, groupval, supervisorval);        
-        
+         
         @SuppressWarnings("unchecked")
 		List<ClassStream> listClassrooms = (List<ClassStream>) response2.get("classrooms");
         
         @SuppressWarnings("unchecked")
 		List<TimeTable> listTimetable = (List<TimeTable>) response3.get("timetables");        
         
-        List<ClassStream> countPrimary = listClassrooms.stream()
+        List<ClassStream> countPrimary = listClassrooms.stream().anyMatch(classrm -> classrm.getSchool().getOwner().getId() == FCTA_ID) ? listClassrooms.stream()
+        		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("fctubeb") && en.getClass_index() <= 6 && en.getClass_index() >= 1 )
+        		.collect(Collectors.toList()) : listClassrooms.stream()
         		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("subeb") && en.getClass_index() <= 6 && en.getClass_index() >= 1 )
         		.collect(Collectors.toList());
         
-        List<ClassStream> countSecondaryJunior = listClassrooms.stream()
+        List<ClassStream> countSecondaryJunior = listClassrooms.stream().anyMatch(classrm -> classrm.getSchool().getOwner().getId() == FCTA_ID) ? listClassrooms.stream()
+        		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("fctubeb") && en.getClass_index() <= 9 && en.getClass_index() >= 7 )
+        		.collect(Collectors.toList()) : listClassrooms.stream()
         		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("subeb") && en.getClass_index() <= 9 && en.getClass_index() >= 7 )
         		.collect(Collectors.toList());
         
-        List<ClassStream> countSecondarySenior = listClassrooms.stream()
+        List<ClassStream> countSecondarySenior = listClassrooms.stream().anyMatch(classrm -> classrm.getSchool().getOwner().getId() == FCTA_ID) ? listClassrooms.stream()
+        		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("fctseb") && en.getClass_index() <= 12 && en.getClass_index() >= 10 )
+        		.collect(Collectors.toList()) : listClassrooms.stream()
         		.filter(en -> en.getStatus() == 1 && en.getSchool().getType_of().equals("semb") && en.getClass_index() <= 12 && en.getClass_index() >= 10 )
         		.collect(Collectors.toList());
         
