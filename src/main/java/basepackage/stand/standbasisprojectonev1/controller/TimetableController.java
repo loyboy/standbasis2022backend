@@ -59,7 +59,7 @@ public class TimetableController {
 			 @RequestParam(value = "schoolgroup", required=false) Optional<Long> schoolgroup,
 			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
 			 @RequestParam(value = "supervisor", required=false) Optional<String> supervisor
-			 ) {
+			 ) { 
 		 
 		 Map<String, Object> response = service.getPaginatedTimeTables( page, size, query, school, schoolgroup, teacher, supervisor );
 		 return new ResponseEntity<>(response, HttpStatus.OK);	        

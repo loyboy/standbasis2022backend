@@ -58,9 +58,9 @@ public interface TimetableRepository extends JpaRepository<TimeTable, Long> {
                         + "or tt.class_name like :filter ")
         List<TimeTable> filterAll(@Param("filter") String filter);
 
-        @Query(" SELECT tt from TimeTable tt where (tt.teacher = :tea OR :tea is null) "
+        @Query("SELECT tt from TimeTable tt where (tt.school.owner = :group OR :group is null) "
                         + "AND (tt.school = :owner OR :owner is null) "
-                        + "AND (tt.school.owner = :group OR :group is null) ")
+                        + "AND (tt.teacher = :tea OR :tea is null) ")
         Page<TimeTable> findBySchoolAndTeacherPage(@Param("owner") School owner, @Param("group") SchoolGroup group,
                         @Param("tea") Teacher tea, Pageable pg);
 
@@ -75,7 +75,7 @@ public interface TimetableRepository extends JpaRepository<TimeTable, Long> {
                         @Param("zone") String zone,
                         @Param("lga") String lga,
                         Pageable pg);
-
+ 
         @Query("SELECT tt from TimeTable tt "
                         + "JOIN School s ON s = tt.school "
                         + "WHERE (s.lga_code = :lga OR :lga is null) "
