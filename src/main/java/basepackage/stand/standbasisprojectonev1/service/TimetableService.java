@@ -160,7 +160,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         		
         		//System.out.println("TImetable teachei is here 2" +  teacherownerobj.get() );
         		
-        		schs = timeRepository.findBySchoolAndTeacherPage( 
+        		schs = timeRepository.findBySchoolAndSchoolOwnerAndTeacher( 
         				schownerobj == null ? null : schownerobj.get(), 
         				schgroupobj == null ? null : schgroupobj.get(), 		
         				teacherownerobj == null ? null : teacherownerobj.get(), 

@@ -58,11 +58,12 @@ public interface TimetableRepository extends JpaRepository<TimeTable, Long> {
                         + "or tt.class_name like :filter ")
         List<TimeTable> filterAll(@Param("filter") String filter);
 
-        @Query("SELECT tt from TimeTable tt where (tt.school.owner = :group OR :group is null) "
+        /*@Query("SELECT tt from TimeTable tt where (tt.school.owner = :group OR :group is null) "
                         + "AND (tt.school = :owner OR :owner is null) "
                         + "AND (tt.teacher = :tea OR :tea is null) ")
         Page<TimeTable> findBySchoolAndTeacherPage(@Param("owner") School owner, @Param("group") SchoolGroup group,
-                        @Param("tea") Teacher tea, Pageable pg);
+                        @Param("tea") Teacher tea, Pageable pg);*/
+        Page<TimeTable> findBySchoolAndSchoolOwnerAndTeacher(School school, SchoolGroup schoolOwner, Teacher teacher, Pageable pg);
 
         @Query("SELECT tt from TimeTable tt "
                         + "JOIN School s ON s = tt.school "
