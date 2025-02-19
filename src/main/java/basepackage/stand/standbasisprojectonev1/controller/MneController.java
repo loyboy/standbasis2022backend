@@ -572,14 +572,13 @@ public class MneController {
 		    		 perf = (double)(sum * 100)/(new_my_attendance1.size() * 100);
 		    	 } 
 
-				 String idsString = new_my_attendance1.stream()
+				/** String idsString = new_my_attendance1.stream()
                                              .map(AttendanceManagement::getAttmanId) 
                                              .map(String::valueOf)            
                                              .collect(Collectors.joining(", "));
 				 
 				 System.out.println("Perf on line 575 " + perf);
-				 System.out.println("Management line "  + idsString );
-
+				 System.out.println("Management line "  + idsString );**/
 		    	 
 		    	 j++;
 		    	 
@@ -604,16 +603,18 @@ public class MneController {
 	                .mapToInt(Double::intValue)
 	                .average()
 	                .orElse(0.0);
+		 String formattedAverageMain = String.format("%.2f", averagePerf);			
 	     
-	     objectmnecolumndata.put("performance", averagePerf);
+	     objectmnecolumndata.put("performance", formattedAverageMain);
 	  //   mnecolumndata.add( objectmnecolumndata );
 	     
 	     double averagePerfManagement = allAverageManagement.stream()
 	                .mapToInt(Double::intValue)
 	                .average()
 	                .orElse(0.0);
-	     
-	     objectmnecolumndata.put("management", averagePerfManagement);
+		 String formattedAverageManagement = String.format("%.2f", averagePerfManagement);
+
+	     objectmnecolumndata.put("management", formattedAverageManagement);
 	     
 	     mnecolumndata.add( objectmnecolumndata );
 	     
