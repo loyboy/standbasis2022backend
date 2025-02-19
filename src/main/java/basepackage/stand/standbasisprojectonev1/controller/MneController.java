@@ -963,9 +963,7 @@ public class MneController {
 				     
 				     objectmnecolumndata.put("d"+j , (int) management_perf  );
 				     
-			     }
-			     
-			     
+			     }	     
 			     
 			     j++;
 			     
