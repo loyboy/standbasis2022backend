@@ -912,7 +912,7 @@ public class MneController {
 			    	 
 				     Map<String, Object> objectmnecolumntemp = new HashMap<>();
 			    	 objectmnecolumntemp.put("key", "d"+j);
-			    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Classwork %" );
+			    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Classwork" );
 			    	 objectmnecolumntemp.put("sortable", true);
 			    	 
 				     mnecolumn.add( objectmnecolumntemp );
@@ -926,7 +926,7 @@ public class MneController {
 				     
 				     Map<String, Object> objectmnecolumntemp2 = new HashMap<>();
 			    	 objectmnecolumntemp2.put("key", "d"+j);
-			    	 objectmnecolumntemp2.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Homework %" );
+			    	 objectmnecolumntemp2.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Homework" );
 			    	 objectmnecolumntemp2.put("sortable", true);
 			    	 
 				     mnecolumn.add( objectmnecolumntemp2 );
@@ -940,7 +940,7 @@ public class MneController {
 				     
 				     Map<String, Object> objectmnecolumntemp3 = new HashMap<>();
 			    	 objectmnecolumntemp3.put("key", "d"+j);
-			    	 objectmnecolumntemp3.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Test %" );
+			    	 objectmnecolumntemp3.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Test" );
 			    	 objectmnecolumntemp3.put("sortable", true);
 			    	 
 				     mnecolumn.add( objectmnecolumntemp3 );
