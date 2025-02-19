@@ -571,9 +571,14 @@ public class MneController {
 	                            .sum();
 		    		 perf = (double)(sum * 100)/(new_my_attendance1.size() * 100);
 		    	 } 
+
+				 String idsString = new_my_attendance1.stream()
+                                             .map(AttendanceManagement::getAttmanId) 
+                                             .map(String::valueOf)            
+                                             .collect(Collectors.joining(", "));
 				 
 				 System.out.println("Perf on line 575 " + perf);
-				 System.out.println("Management line "  + new_my_attendance1.size());
+				 System.out.println("Management line "  + idsString );
 
 		    	 
 		    	 j++;
