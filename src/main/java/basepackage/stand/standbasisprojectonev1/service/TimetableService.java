@@ -1,18 +1,11 @@
 package basepackage.stand.standbasisprojectonev1.service;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,12 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import basepackage.stand.standbasisprojectonev1.exception.BadRequestException;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
-import basepackage.stand.standbasisprojectonev1.model.Enrollment;
-import basepackage.stand.standbasisprojectonev1.model.Rowcall;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Subject;
@@ -38,7 +28,6 @@ import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository
 import basepackage.stand.standbasisprojectonev1.repository.SubjectRepository;
 import basepackage.stand.standbasisprojectonev1.repository.TeacherRepository;
 import basepackage.stand.standbasisprojectonev1.repository.TimetableRepository;
-import basepackage.stand.standbasisprojectonev1.util.AppConstants;
 import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 
 @Service
@@ -279,15 +268,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         List<TimeTable> timearray = new ArrayList<TimeTable>(timetables);
         
         Map<String, Object> response = new HashMap<>();
-        response.put("timetables", timearray);
-        
-       
-        
-       // long active = 1; long inactive = 0;
-      /*  long sriTimeTables = schRepository.countBySri(active);
-        long nonSriTimeTables = schRepository.countBySri(inactive);
-        long inactiveTimeTables = schRepository.countByStatus(inactive);*/
-        
+        response.put("timetables", timearray);        
        
         return response;
     }

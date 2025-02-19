@@ -533,7 +533,7 @@ public class MneController {
 		     List<AttendanceManagement> attcall_manage = my_attendancemanagement.stream().filter(att -> att.getAtt_id().getTimetable().getSubject().equals(subclass.getSubject()) && att.getAtt_id().getTimetable().getClass_stream().equals( subclass.getClass_stream() ) ).collect(Collectors.toList());
 		     
 		    // System.out.println("Inside the for loop : " + attcall.size() + " >> " + attcall_manage.size() + ">>" + j );
-		     
+			
 		     if (attcall.size() > 0) {
 		    	 
 		    	 double perf = 0.0;
@@ -570,7 +570,11 @@ public class MneController {
 	                            .mapToInt(att -> att.getScore())
 	                            .sum();
 		    		 perf = (double)(sum * 100)/(new_my_attendance1.size() * 100);
-		    	 }    	
+		    	 } 
+				 
+				 System.out.println("Perf on line 575 " + perf);
+				 System.out.println("Management line "  + new_my_attendance1.size());
+
 		    	 
 		    	 j++;
 		    	 
