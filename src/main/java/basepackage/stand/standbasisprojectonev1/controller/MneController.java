@@ -994,7 +994,7 @@ public class MneController {
 			     
 			 //    objectmnecolumndata.put("management", averagePerfManagement);
 			     
-			//     mnecolumndata.add( objectmnecolumndata );
+			      mnecolumndata.add( objectmnecolumndata );
 		     }
 		     else {
 		    	 
