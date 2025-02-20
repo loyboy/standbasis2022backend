@@ -294,7 +294,7 @@ public class MyScheduler {
 	
 	// "0 0/10 * * * *" - 10 minutes interval
 	// "0 0 1 * * *" - Everyday at 1:00 WAT 
-	@Scheduled(cron = "0 30 8 * * *")
+	@Scheduled(cron = "0 30 6 * * *")
     public void insertAttendances() {       
 		
 		//Check what day of the week is this
