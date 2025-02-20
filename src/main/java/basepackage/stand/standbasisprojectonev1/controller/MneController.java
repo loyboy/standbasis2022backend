@@ -788,21 +788,21 @@ public class MneController {
 			     objectmnecolumn2.put("label", "Classwork");
 			     objectmnecolumn2.put("sortable", true);
 			     
-			    // mnecolumn.add( objectmnecolumn2 );
+			     mnecolumn.add( objectmnecolumn2 );
 			     
 			     Map<String, Object> objectmnecolumn21 = new HashMap<>();
 			     objectmnecolumn21.put("key", "homework_performance");
 			     objectmnecolumn21.put("label", "Homework");
 			     objectmnecolumn21.put("sortable", true);
 			     
-			    // mnecolumn.add( objectmnecolumn21 );
+			     mnecolumn.add( objectmnecolumn21 );
 			     
 			     Map<String, Object> objectmnecolumn22 = new HashMap<>();
 			     objectmnecolumn22.put("key", "test_performance");
 			     objectmnecolumn22.put("label", "Test");
 			     objectmnecolumn22.put("sortable", true);
 			     
-			   //  mnecolumn.add( objectmnecolumn22 );
+			     mnecolumn.add( objectmnecolumn22 );
 		     
 		     }
 		     
@@ -811,7 +811,7 @@ public class MneController {
 		     objectmnecolumn3.put("label", "Management");
 		     objectmnecolumn3.put("sortable", true);
 		     
-		   //  mnecolumn.add( objectmnecolumn3 );
+		     mnecolumn.add( objectmnecolumn3 );
 		     
 		     Map<String, Object> objectmnecolumndata = new HashMap<>();
 		     if (teacher != null) {			     
@@ -983,16 +983,16 @@ public class MneController {
 			                .average()
 			                .orElse(0.0);
 			     
-			 //    objectmnecolumndata.put("classwork_performance", averagePerfClasswork);
-			 //    objectmnecolumndata.put("homework_performance", averagePerfHomework);
-			 //    objectmnecolumndata.put("test_performance", averagePerfTest);
+			     objectmnecolumndata.put("classwork_performance", averagePerfClasswork);
+			     objectmnecolumndata.put("homework_performance", averagePerfHomework);
+			     objectmnecolumndata.put("test_performance", averagePerfTest);
 			     
 			     double averagePerfManagement = allAverageManagement.stream()
 			                .mapToInt(Double::intValue)
 			                .average()
 			                .orElse(0.0);
 			     
-			 //    objectmnecolumndata.put("management", averagePerfManagement);
+			     objectmnecolumndata.put("management", averagePerfManagement);
 			     
 			      mnecolumndata.add( objectmnecolumndata );
 		     }
