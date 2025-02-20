@@ -395,8 +395,7 @@ public class LessonnoteService {
         Long studentowner = studentId.orElse(null);
         Integer scoreowner = score.orElse(null);
         String typeowner = type.orElse(null);
-        Long lessonnoteowner = lsn.orElse(null);
-        
+        Long lessonnoteowner = lsn.orElse(null);        
         
         // Retrieve Lessonnotes
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
@@ -496,9 +495,12 @@ public class LessonnoteService {
         response.put("totalItems", Lessonnotes.getTotalElements());
         response.put("totalPages", Lessonnotes.getTotalPages());
         response.put("isLast", Lessonnotes.isLast());        
+
+		Map<String, Object> response2 = getOrdinaryStudentLessonnotes(query, schgroupId, schId, classId, null, calendarId, studentId, datefrom, dateto );
+        List<Assessment> ordinaryArray = (List<Assessment>) response2.get("lessonnotes");
         
-        long passedAssessment = calarray.stream().filter(o -> o.getScore() > 50).count();       
-        long notpassedAssessment = calarray.stream().filter(o -> o.getScore() < 50).count();
+        long passedAssessment = ordinaryArray.stream().filter(o -> o.getScore() > 50).count();       
+        long notpassedAssessment = ordinaryArray.stream().filter(o -> o.getScore() < 50).count();
         
         response.put("passedAssessment", passedAssessment);
         response.put("notPassedAssessment", notpassedAssessment);
@@ -515,11 +517,11 @@ public class LessonnoteService {
         Long studentowner = studentId.orElse(null);
         Long calendarowner = calendarId.orElse(null);    
         
-        List<Lessonnote> Lessonnotes = null;
+        List<Assessment> Lessonnotes = null;
         
         if ( query == null || query.equals("") ) {
         	if ( schgroup == null ) {
-        		Lessonnotes = lsnRepository.findAll();
+        		Lessonnotes = assRepository.findAll();
         	}
         	else {
         		Optional<SchoolGroup> schgroupobj = groupRepository.findById( schgroup );
@@ -547,7 +549,7 @@ public class LessonnoteService {
         }
         else {
         	if ( schgroup == null ) {
-        		Lessonnotes = lsnRepository.filterAll("%"+ query + "%");
+        		Lessonnotes = assRepository.filterAll("%"+ query + "%");
         	}
         	else {    
         		Optional<SchoolGroup> schgroupobj = groupRepository.findById( schgroup );
@@ -581,13 +583,13 @@ public class LessonnoteService {
         	return responseEmpty;
         }
         
-        List<Lessonnote> calarray = new ArrayList<Lessonnote>(Lessonnotes);
+        List<Assessment> calarray = new ArrayList<Assessment>(Lessonnotes);
         
         Map<String, Object> response = new HashMap<>();
         response.put("lessonnotes", calarray);
   
-        long approvedLess = calarray.stream().filter(o -> o.getApproval() != null).count();       
-        long notapprovedLess = calarray.stream().filter(o -> o.getApproval() == null).count();
+        long approvedLess = calarray.stream().filter(o -> o.getLsn().getApproval() != null).count();       
+        long notapprovedLess = calarray.stream().filter(o -> o.getLsn().getApproval() == null).count();
         
         response.put("totalApproved", approvedLess);
         response.put("totalNotApproved", notapprovedLess);
