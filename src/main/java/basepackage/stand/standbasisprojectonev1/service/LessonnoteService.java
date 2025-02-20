@@ -494,9 +494,11 @@ public class LessonnoteService {
         response.put("currentPage", Lessonnotes.getNumber());
         response.put("totalItems", Lessonnotes.getTotalElements());
         response.put("totalPages", Lessonnotes.getTotalPages());
-        response.put("isLast", Lessonnotes.isLast());        
+        response.put("isLast", Lessonnotes.isLast());  
+		
+		Optional<Integer> weekFake = Optional.ofNullable(null);
 
-		Map<String, Object> response2 = getOrdinaryStudentLessonnotes(query, schgroupId, schId, classId, null, calendarId, studentId, datefrom, dateto );
+		Map<String, Object> response2 = getOrdinaryStudentLessonnotes(query, schgroupId, schId, classId, weekFake, calendarId, studentId, datefrom, dateto );
         List<Assessment> ordinaryArray = (List<Assessment>) response2.get("lessonnotes");
         
         long passedAssessment = ordinaryArray.stream().filter(o -> o.getScore() > 50).count();       
