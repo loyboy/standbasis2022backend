@@ -636,37 +636,68 @@ public class MneController {
 	 @GetMapping("/lessonnote/students")
 	 public ResponseEntity<?> getStudentLessonnote( 
 			 @RequestParam(value = "enrol") Long enrolId,
+			 @RequestParam(value = "teacher") Long teacherId,
 			 @RequestParam(value = "calendar") Long calendar,
 			 @RequestParam(value = "week",required=false) Integer week,
 			 @RequestParam(value = "type",required=false) String typeof
 	  ){
 		 
 		 Calendar calobj = calendarservice.findCalendar(calendar);
-		 Enrollment enrolobj = enrolservice.findEnrollment(enrolId);
-		 
-		 List<Assessment> myassesssments = assRepository.findStudentMne( week, enrolobj.getStudent(), calobj, typeof );
-	     
-		 List<TimeTable> pupilclasses = timetableservice.findClassOffered(enrolobj.getClassstream().getClsId(), calendar);
-		    
 		 List< Map<String, Object> > mnecolumndata = new ArrayList<>();
-	     List< Map<String, Object> > mnecolumn = new ArrayList<>();
+		 List< Map<String, Object> > mnecolumn = new ArrayList<>();
+		 Map<String, Object> objectmnecolumndata = new HashMap<>();
+
+		 List<TimeTable> pupilclasses 	 = null;
+		 List<Assessment> myassesssments = null;
+
+		 if (enrolId != null){
+			Enrollment enrolobj = enrolId != null ? enrolservice.findEnrollment(enrolId) : null;
 		 
-	     Map<String, Object> objectmnecolumn = new HashMap<>();
-	     objectmnecolumn.put("key", "student_name");
-	     objectmnecolumn.put("label", "Student Name");
-	     objectmnecolumn.put("sortable", true);
-	     
-	     mnecolumn.add( objectmnecolumn );
-	     
-	     Map<String, Object> objectmnecolumn2 = new HashMap<>();
-	     objectmnecolumn2.put("key", "performance");
-	     objectmnecolumn2.put("label", "Performance");
-	     objectmnecolumn2.put("sortable", true);
-	     
-	     mnecolumn.add( objectmnecolumn2 );
-	     
-	     Map<String, Object> objectmnecolumndata = new HashMap<>();
-	     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );
+			myassesssments = assRepository.findStudentMne( week, enrolobj.getStudent(), calobj, typeof );
+			
+			pupilclasses = timetableservice.findClassOffered(enrolobj.getClassstream().getClsId(), calendar);		
+			
+			Map<String, Object> objectmnecolumn = new HashMap<>();
+			objectmnecolumn.put("key", "student_name");
+			objectmnecolumn.put("label", "Student Name");
+			objectmnecolumn.put("sortable", true);
+			
+			mnecolumn.add( objectmnecolumn );
+			
+			Map<String, Object> objectmnecolumn2 = new HashMap<>();
+			objectmnecolumn2.put("key", "performance");
+			objectmnecolumn2.put("label", "Performance");
+			objectmnecolumn2.put("sortable", true);
+			
+			mnecolumn.add( objectmnecolumn2 );
+			
+			objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );
+		 }
+
+		 if (teacherId != null){
+			Teacher teacherobj = teacherId != null ? teacherservice.findTeacher(teacherId) : null;
+		 
+			myassesssments = assRepository.findTeacherMne( week, teacherobj, calobj, typeof );
+			
+			pupilclasses = timetableservice.findClassTaught(teacherobj.getTeaId(), calendar);		
+			
+			Map<String, Object> objectmnecolumn = new HashMap<>();
+			objectmnecolumn.put("key", "teacher_name");
+			objectmnecolumn.put("label", "Teacher Name");
+			objectmnecolumn.put("sortable", true);
+			
+			mnecolumn.add( objectmnecolumn );
+			
+			Map<String, Object> objectmnecolumn2 = new HashMap<>();
+			objectmnecolumn2.put("key", "performance");
+			objectmnecolumn2.put("label", "Performance");
+			objectmnecolumn2.put("sortable", true);
+			
+			mnecolumn.add( objectmnecolumn2 );			
+			
+			objectmnecolumndata.put("teacher_name", teacherobj.getFname() + " " + teacherobj.getLname());
+		 }
+		 
 	     
 	     int j = 1;
 	     
@@ -696,7 +727,7 @@ public class MneController {
 			    	 
 				 mnecolumn.add( objectmnecolumntemp );
 				     
-				 System.out.println("pupilclass chose: " + sub );
+				// System.out.println("pupilclass chose: " + sub );
 				     
 				 allAverage.add(perf);
 				     
@@ -719,7 +750,7 @@ public class MneController {
 			    	 
 				 mnecolumn.add( objectmnecolumntemp );
 				     
-				 System.out.println("pupilclass chose: " + sub );
+				 //System.out.println("pupilclass chose: " + sub );
 				     
 				 allAverage.add(perf);
 				     

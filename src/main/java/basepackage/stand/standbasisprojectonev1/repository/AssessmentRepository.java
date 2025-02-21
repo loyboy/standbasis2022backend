@@ -62,6 +62,15 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long>{
 	List<Assessment> findStudentMne( @Param("week") Integer week, @Param("pup") Student pup, @Param("cal") Calendar cal, @Param("typeof")  String typeof );
 	
 	@Query("select assess from Assessment assess "
+			+ "JOIN Lessonnote lsn ON lsn = assess.lsn "
+			+ "WHERE assess._type = :typeof " 
+			+ "AND (lsn.teacher = :tea OR :tea is null) "
+			+ "AND (lsn.calendar = :cal OR :cal is null) "
+			+ "AND (lsn.week = :week OR :week is null) "
+       	  )
+	List<Assessment> findTeacherMne( @Param("week") Integer week, @Param("tea") Teacher tea, @Param("cal") Calendar cal, @Param("typeof")  String typeof );
+	
+	@Query("select assess from Assessment assess "
     		+ "JOIN Lessonnote lsn ON lsn = assess.lsn "
     		+ "WHERE lsn.calendar.school.owner = :owner " 
     		+ "AND (lsn.calendar.school = :sch OR :sch is null) "
