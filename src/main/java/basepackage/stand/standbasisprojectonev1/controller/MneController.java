@@ -701,7 +701,7 @@ public class MneController {
 	     
 	     int j = 1;
 	     
-	     Set<String> subjectNamesSet = new HashSet<>();
+	     /*Set<String> subjectNamesSet = new HashSet<>();
 	     
 	     for (TimeTable timetable : pupilclasses) {
 	         Subject subject = timetable.getSubject();
@@ -709,20 +709,25 @@ public class MneController {
 	             String subjectName = subject.getName();
 	             subjectNamesSet.add(subjectName);
 	         }
-	     }
+	     }*/
 	     
 	     List<Integer> allAverage = new ArrayList<>();
 	     if ( myassesssments.size() > 0 ) {
-	    	 String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
-		     for (String sub : subjectNamesArray) {	    	
+	    	// String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
+			 for (TimeTable timetable : pupilclasses) {    	
 			     
-			     List<Assessment> ascallOne = myassesssments.stream().filter(as -> as.getLsn().getSubject().getName().equals(sub) ).collect(Collectors.toList());
+			     List<Assessment> ascallOne = myassesssments.stream().filter(as -> 
+				 as.getLsn().getSubject().getName().equals(timetable.getSubject().getName()) 
+				 && 
+				 as.getLsn().getClass_index().equals(timetable.getClass_stream().getClass_index())
+				 ).collect(Collectors.toList());
+
 			     int perf = 0;
 			     perf = ascallOne.get(0).getScore();        		    	 
 				     
 				 Map<String, Object> objectmnecolumntemp = new HashMap<>();
 			     objectmnecolumntemp.put("key", "d"+j);
-			     objectmnecolumntemp.put("label", sub );
+			     objectmnecolumntemp.put("label", timetable.getSubject().getName() + " " + timetable.getClass_stream().getTitle() + " " + timetable.getClass_stream().getExt()  );
 			     objectmnecolumntemp.put("sortable", true);
 			    	 
 				 mnecolumn.add( objectmnecolumntemp );
@@ -738,14 +743,14 @@ public class MneController {
 			 }
 	     }
 	     else{
-	    	 String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
-		     for (String sub : subjectNamesArray) {	    	
+	    	// String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
+		     for (TimeTable timetable : pupilclasses) {	    	
 			     
 			     int perf = 0;    		    	 
 				     
 				 Map<String, Object> objectmnecolumntemp = new HashMap<>();
 			     objectmnecolumntemp.put("key", "d"+j);
-			     objectmnecolumntemp.put("label", sub );
+			     objectmnecolumntemp.put("label", timetable.getSubject().getName() );
 			     objectmnecolumntemp.put("sortable", true);
 			    	 
 				 mnecolumn.add( objectmnecolumntemp );
