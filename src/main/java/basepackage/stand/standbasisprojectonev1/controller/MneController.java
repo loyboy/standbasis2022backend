@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -710,11 +712,20 @@ public class MneController {
 	             subjectNamesSet.add(subjectName);
 	         }
 	     }*/
-	     
+	     List<TimeTable> pupilclassesnew = pupilclasses.stream()
+	            .collect(Collectors.toMap(
+	                    obj -> Arrays.asList(obj.getSubject(), obj.getClass_stream()),  // Composite key
+	                    Function.identity(),  // Keep the original object
+	                    (obj1, obj2) -> obj1  // Merge function (in case of duplicate keys)
+	            ))
+	            .values()
+	            .stream()
+	            .collect(Collectors.toList());
+
 	     List<Integer> allAverage = new ArrayList<>();
 	     if ( myassesssments.size() > 0 ) {
 	    	// String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
-			 for (TimeTable timetable : pupilclasses) {    	
+			 for (TimeTable timetable : pupilclassesnew) {    	
 			     
 			     List<Assessment> ascallOne = myassesssments.stream().filter(as -> 
 				 as.getLsn().getSubject().getName().equals(timetable.getSubject().getName()) 
@@ -744,7 +755,7 @@ public class MneController {
 	     }
 	     else{
 	    	// String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
-		     for (TimeTable timetable : pupilclasses) {	    	
+		     for (TimeTable timetable : pupilclassesnew) {	    	
 			     
 			     int perf = 0;    		    	 
 				     
