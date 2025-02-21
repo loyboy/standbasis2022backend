@@ -748,7 +748,7 @@ public class MneController {
 			     perf = ascallOne.get(0).getScore();        		    	 
 				     
 				 Map<String, Object> objectmnecolumntemp = new HashMap<>();
-			     objectmnecolumntemp.put("key", "d_" + alphabetMap.get(j));
+			     objectmnecolumntemp.put("key", timetable.getSubject().getName() + "_" + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + timetable.getClass_stream().getExt());
 			     objectmnecolumntemp.put("label", timetable.getSubject().getName() + " " + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + " " + timetable.getClass_stream().getExt()  );
 			     objectmnecolumntemp.put("sortable", true);
 			    	 
@@ -758,7 +758,7 @@ public class MneController {
 				     
 				 allAverage.add(perf);
 				     
-				 objectmnecolumndata.put("d_" + alphabetMap.get(j), perf  );		     
+				 objectmnecolumndata.put(timetable.getSubject().getName() + "_" + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + timetable.getClass_stream().getExt(), perf  );		     
 				     
 				 j++;		     
 			     
