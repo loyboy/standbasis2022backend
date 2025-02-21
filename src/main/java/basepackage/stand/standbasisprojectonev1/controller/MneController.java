@@ -643,7 +643,18 @@ public class MneController {
 			 @RequestParam(value = "week",required=false) Integer week,
 			 @RequestParam(value = "type",required=false) String typeof
 	  ){
-		 
+		 Map<Integer, String> alphabetMap = new HashMap<>();
+		 alphabetMap.put(1, "one");
+		 alphabetMap.put(2, "two");
+		 alphabetMap.put(3, "three");
+		 alphabetMap.put(4, "four");
+		 alphabetMap.put(5, "five");
+		 alphabetMap.put(6, "six");
+		 alphabetMap.put(7, "seven");
+		 alphabetMap.put(8, "eight");
+		 alphabetMap.put(9, "nine");
+		 alphabetMap.put(10, "ten");
+
 		 Calendar calobj = calendarservice.findCalendar(calendar);
 		 List< Map<String, Object> > mnecolumndata = new ArrayList<>();
 		 List< Map<String, Object> > mnecolumn = new ArrayList<>();
@@ -737,7 +748,7 @@ public class MneController {
 			     perf = ascallOne.get(0).getScore();        		    	 
 				     
 				 Map<String, Object> objectmnecolumntemp = new HashMap<>();
-			     objectmnecolumntemp.put("key", "d"+j);
+			     objectmnecolumntemp.put("key", "d_" + alphabetMap.get(j));
 			     objectmnecolumntemp.put("label", timetable.getSubject().getName() + " " + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + " " + timetable.getClass_stream().getExt()  );
 			     objectmnecolumntemp.put("sortable", true);
 			    	 
@@ -747,7 +758,7 @@ public class MneController {
 				     
 				 allAverage.add(perf);
 				     
-				 objectmnecolumndata.put("d"+j, perf  );		     
+				 objectmnecolumndata.put("d_" + alphabetMap.get(j), perf  );		     
 				     
 				 j++;		     
 			     
