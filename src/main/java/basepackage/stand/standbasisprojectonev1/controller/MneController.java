@@ -635,8 +635,8 @@ public class MneController {
 	
 	 @GetMapping("/lessonnote/students")
 	 public ResponseEntity<?> getStudentLessonnote( 
-			 @RequestParam(value = "enrol") Long enrolId,
-			 @RequestParam(value = "teacher") Long teacherId,
+			 @RequestParam(value = "enrol",required=false) Long enrolId,
+			 @RequestParam(value = "teacher",required=false) Long teacherId,
 			 @RequestParam(value = "calendar") Long calendar,
 			 @RequestParam(value = "week",required=false) Integer week,
 			 @RequestParam(value = "type",required=false) String typeof
