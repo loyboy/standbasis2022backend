@@ -738,7 +738,7 @@ public class MneController {
 				     
 				 Map<String, Object> objectmnecolumntemp = new HashMap<>();
 			     objectmnecolumntemp.put("key", "d"+j);
-			     objectmnecolumntemp.put("label", timetable.getSubject().getName() + " " + timetable.getClass_stream().getTitle() + " " + timetable.getClass_stream().getExt()  );
+			     objectmnecolumntemp.put("label", timetable.getSubject().getName() + " " + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + " " + timetable.getClass_stream().getExt()  );
 			     objectmnecolumntemp.put("sortable", true);
 			    	 
 				 mnecolumn.add( objectmnecolumntemp );
@@ -780,9 +780,9 @@ public class MneController {
 	     double averagePerf = allAverage.stream()
 	                .mapToInt(Integer::intValue)
 	                .average()
-	                .orElse(0.0);
-	     
-	     objectmnecolumndata.put("performance", averagePerf);
+	                .orElse(0.0);	     
+								
+	     objectmnecolumndata.put("performance", Double.parseDouble(String.format("%.2f", averagePerf)));
 	     mnecolumndata.add( objectmnecolumndata ); 
 	     
 	     Map<String, Object> response = new HashMap<>();
