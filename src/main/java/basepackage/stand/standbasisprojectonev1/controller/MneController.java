@@ -750,7 +750,7 @@ public class MneController {
 				 ).collect(Collectors.toList());
 
 			     int perf = 0;
-			     perf = ascallOne.get(0).getScore();        		    	 
+			     perf = ascallOne.size() > 0 ? ascallOne.get(0).getScore() : 0;        		    	 
 				     
 				 Map<String, Object> objectmnecolumntemp = new HashMap<>();
 			     objectmnecolumntemp.put("key", timetable.getSubject().getName() + "_" + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + timetable.getClass_stream().getExt());
