@@ -668,7 +668,10 @@ public class MneController {
 		 
 			myassesssments = assRepository.findStudentMne( week, enrolobj.getStudent(), calobj, typeof );
 			
-			pupilclasses = timetableservice.findClassOffered(enrolobj.getClassstream().getClsId(), calendar);		
+			pupilclasses = timetableservice.findClassOffered(enrolobj.getClassstream().getClsId(), calendar);
+			
+			System.out.println("My pupilclass  has been entered: " + pupilclasses.size() );
+			System.out.println("My assessments has been entered: " + myassesssments.size() );
 			
 			Map<String, Object> objectmnecolumn = new HashMap<>();
 			objectmnecolumn.put("key", "student_name");
@@ -732,6 +735,8 @@ public class MneController {
 	            .values()
 	            .stream()
 	            .collect(Collectors.toList());
+		
+		 System.out.println("My new timetables has been entered: " + pupilclassesnew.size() );
 
 	     List<Integer> allAverage = new ArrayList<>();
 	     if ( myassesssments.size() > 0 ) {
