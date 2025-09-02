@@ -176,7 +176,7 @@ public class MyScheduler {
 	}
 	
 	//0 0 1 * * *
-	@Scheduled(cron = "0 45 14 * * *")
+	@Scheduled(cron = "0 0 1 * * *")
     public void switchToNewTerm() {
 		
 	try {
@@ -343,7 +343,7 @@ public class MyScheduler {
 	// 0 0 0 ? * WED fjfjfjfjfj
 	// 35 * * 31 11 * default
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "35 10 14 * * *")
+	@Scheduled(cron = "35 00 15 * * *")
     public void insertLessonnotes() {
 		//helo
 		 Map<Integer, String> classMap = new HashMap<>();
