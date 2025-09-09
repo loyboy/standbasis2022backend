@@ -175,6 +175,7 @@ public class MyScheduler {
 		
 	}
 	
+	//0 0 1 * * *
 	@Scheduled(cron = "0 0 1 * * *")
     public void switchToNewTerm() {
 		
@@ -294,7 +295,7 @@ public class MyScheduler {
 	
 	// "0 0/10 * * * *" - 10 minutes interval
 	// "0 0 1 * * *" - Everyday at 1:00 WAT 
-	@Scheduled(cron = "0 30 18 * * *")
+	@Scheduled(cron = "0 30 6 * * *")
     public void insertAttendances() {       
 		
 		//Check what day of the week is this
@@ -339,12 +340,12 @@ public class MyScheduler {
     }	
 	
 	// "0 0 0 * * 0" -- once a week
-	// 0 0 0 ? * WED
+	// 0 0 0 ? * WED fjfjfjfjfj
 	// 35 * * 31 11 * default
 	//@SuppressWarnings("deprecation")
 	@Scheduled(cron = "35 30 18 * * *")
     public void insertLessonnotes() {
-		
+		//helo
 		 Map<Integer, String> classMap = new HashMap<>();
 		 classMap.put(7, "JSS1");
 		 classMap.put(8, "JSS2"); 
@@ -453,18 +454,5 @@ public class MyScheduler {
 		return new Timestamp(cal.getTime().getTime());
 	}
 	 
-	 
-	 /*
-	  * 
-	  *  	SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-	    	Session session = sessionFactory.openSession();
-	    	Criteria criteria = session.createCriteria(TimeTable.class);
-	    	criteria.setFetchMode("calendar", FetchMode.JOIN);
-	    	session.beginTransaction();
-	    	
-	    	TimeTable mytimetable = session.find(TimeTable.class,it.getTimeId());
-	    	Calendar cal = calRepository.findById(it.getCalendar());
-	    	
-	    	if ( it.getCalendar().getEnddate().compareTo( parseTimestamp(todayDate()) ) > 0 ) { **/
-	 
+	
 }

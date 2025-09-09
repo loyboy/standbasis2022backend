@@ -1,6 +1,7 @@
 package basepackage.stand.standbasisprojectonev1.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -28,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import basepackage.stand.standbasisprojectonev1.model.Assessment;
 import basepackage.stand.standbasisprojectonev1.model.Attendance;
-import basepackage.stand.standbasisprojectonev1.model.AttendanceActivity;
 import basepackage.stand.standbasisprojectonev1.model.AttendanceManagement;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;
@@ -534,7 +535,7 @@ public class MneController {
 		     List<AttendanceManagement> attcall_manage = my_attendancemanagement.stream().filter(att -> att.getAtt_id().getTimetable().getSubject().equals(subclass.getSubject()) && att.getAtt_id().getTimetable().getClass_stream().equals( subclass.getClass_stream() ) ).collect(Collectors.toList());
 		     
 		    // System.out.println("Inside the for loop : " + attcall.size() + " >> " + attcall_manage.size() + ">>" + j );
-		     
+			
 		     if (attcall.size() > 0) {
 		    	 
 		    	 double perf = 0.0;
@@ -571,7 +572,15 @@ public class MneController {
 	                            .mapToInt(att -> att.getScore())
 	                            .sum();
 		    		 perf = (double)(sum * 100)/(new_my_attendance1.size() * 100);
-		    	 }    	
+		    	 } 
+
+				/** String idsString = new_my_attendance1.stream()
+                                             .map(AttendanceManagement::getAttmanId) 
+                                             .map(String::valueOf)            
+                                             .collect(Collectors.joining(", "));
+				 
+				 System.out.println("Perf on line 575 " + perf);
+				 System.out.println("Management line "  + idsString );**/
 		    	 
 		    	 j++;
 		    	 
@@ -596,16 +605,18 @@ public class MneController {
 	                .mapToInt(Double::intValue)
 	                .average()
 	                .orElse(0.0);
+		 String formattedAverageMain = String.format("%.2f", averagePerf);			
 	     
-	     objectmnecolumndata.put("performance", averagePerf);
+	     objectmnecolumndata.put("performance", formattedAverageMain);
 	  //   mnecolumndata.add( objectmnecolumndata );
 	     
 	     double averagePerfManagement = allAverageManagement.stream()
 	                .mapToInt(Double::intValue)
 	                .average()
 	                .orElse(0.0);
-	     
-	     objectmnecolumndata.put("management", averagePerfManagement);
+		 String formattedAverageManagement = String.format("%.2f", averagePerfManagement);
+
+	     objectmnecolumndata.put("management", formattedAverageManagement);
 	     
 	     mnecolumndata.add( objectmnecolumndata );
 	     
@@ -626,42 +637,87 @@ public class MneController {
 	
 	 @GetMapping("/lessonnote/students")
 	 public ResponseEntity<?> getStudentLessonnote( 
-			 @RequestParam(value = "enrol") Long enrolId,
+			 @RequestParam(value = "enrol",required=false) Long enrolId,
+			 @RequestParam(value = "teacher",required=false) Long teacherId,
 			 @RequestParam(value = "calendar") Long calendar,
 			 @RequestParam(value = "week",required=false) Integer week,
 			 @RequestParam(value = "type",required=false) String typeof
 	  ){
-		 
+		 Map<Integer, String> alphabetMap = new HashMap<>();
+		 alphabetMap.put(1, "one");
+		 alphabetMap.put(2, "two");
+		 alphabetMap.put(3, "three");
+		 alphabetMap.put(4, "four");
+		 alphabetMap.put(5, "five");
+		 alphabetMap.put(6, "six");
+		 alphabetMap.put(7, "seven");
+		 alphabetMap.put(8, "eight");
+		 alphabetMap.put(9, "nine");
+		 alphabetMap.put(10, "ten");
+
 		 Calendar calobj = calendarservice.findCalendar(calendar);
-		 Enrollment enrolobj = enrolservice.findEnrollment(enrolId);
-		 
-		 List<Assessment> myassesssments = assRepository.findStudentMne( week, enrolobj.getStudent(), calobj, typeof );
-	     
-		 List<TimeTable> pupilclasses = timetableservice.findClassOffered(enrolobj.getClassstream().getClsId(), calendar);
-		    
 		 List< Map<String, Object> > mnecolumndata = new ArrayList<>();
-	     List< Map<String, Object> > mnecolumn = new ArrayList<>();
+		 List< Map<String, Object> > mnecolumn = new ArrayList<>();
+		 Map<String, Object> objectmnecolumndata = new HashMap<>();
+
+		 List<TimeTable> pupilclasses 	 = null;
+		 List<Assessment> myassesssments = null;
+
+		 if (enrolId != null){
+			Enrollment enrolobj = enrolId != null ? enrolservice.findEnrollment(enrolId) : null;
 		 
-	     Map<String, Object> objectmnecolumn = new HashMap<>();
-	     objectmnecolumn.put("key", "student_name");
-	     objectmnecolumn.put("label", "Student Name");
-	     objectmnecolumn.put("sortable", true);
-	     
-	     mnecolumn.add( objectmnecolumn );
-	     
-	     Map<String, Object> objectmnecolumn2 = new HashMap<>();
-	     objectmnecolumn2.put("key", "performance");
-	     objectmnecolumn2.put("label", "Performance");
-	     objectmnecolumn2.put("sortable", true);
-	     
-	     mnecolumn.add( objectmnecolumn2 );
-	     
-	     Map<String, Object> objectmnecolumndata = new HashMap<>();
-	     objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );
+			myassesssments = assRepository.findStudentMne( week, enrolobj.getStudent(), calobj, typeof );
+			
+			pupilclasses = timetableservice.findClassOffered(enrolobj.getClassstream().getClsId(), calendar);
+			
+			System.out.println("My pupilclass  has been entered: " + pupilclasses.size() );
+			System.out.println("My assessments has been entered: " + myassesssments.size() );
+			
+			Map<String, Object> objectmnecolumn = new HashMap<>();
+			objectmnecolumn.put("key", "student_name");
+			objectmnecolumn.put("label", "Student Name");
+			objectmnecolumn.put("sortable", true);
+			
+			mnecolumn.add( objectmnecolumn );
+			
+			Map<String, Object> objectmnecolumn2 = new HashMap<>();
+			objectmnecolumn2.put("key", "performance");
+			objectmnecolumn2.put("label", "Performance");
+			objectmnecolumn2.put("sortable", true);
+			
+			mnecolumn.add( objectmnecolumn2 );
+			
+			objectmnecolumndata.put("student_name", enrolobj.getStudent().getName() );
+		 }
+
+		 if (teacherId != null){
+			Teacher teacherobj = teacherId != null ? teacherservice.findTeacher(teacherId) : null;
+		 
+			myassesssments = assRepository.findTeacherMne( week, teacherobj, calobj, typeof );
+			
+			pupilclasses = timetableservice.findClassTaught(teacherobj.getTeaId(), calendar);		
+			
+			Map<String, Object> objectmnecolumn = new HashMap<>();
+			objectmnecolumn.put("key", "teacher_name");
+			objectmnecolumn.put("label", "Teacher Name");
+			objectmnecolumn.put("sortable", true);
+			
+			mnecolumn.add( objectmnecolumn );
+			
+			Map<String, Object> objectmnecolumn2 = new HashMap<>();
+			objectmnecolumn2.put("key", "performance");
+			objectmnecolumn2.put("label", "Performance");
+			objectmnecolumn2.put("sortable", true);
+			
+			mnecolumn.add( objectmnecolumn2 );			
+			
+			objectmnecolumndata.put("teacher_name", teacherobj.getFname() + " " + teacherobj.getLname());
+		 }
+		 
 	     
 	     int j = 1;
 	     
-	     Set<String> subjectNamesSet = new HashSet<>();
+	     /*Set<String> subjectNamesSet = new HashSet<>();
 	     
 	     for (TimeTable timetable : pupilclasses) {
 	         Subject subject = timetable.getSubject();
@@ -669,48 +725,64 @@ public class MneController {
 	             String subjectName = subject.getName();
 	             subjectNamesSet.add(subjectName);
 	         }
-	     }
-	     
+	     }*/
+	     List<TimeTable> pupilclassesnew = pupilclasses.stream()
+	            .collect(Collectors.toMap(
+	                    obj -> Arrays.asList(obj.getSubject(), obj.getClass_stream()),  // Composite key
+	                    Function.identity(),  // Keep the original object
+	                    (obj1, obj2) -> obj1  // Merge function (in case of duplicate keys)
+	            ))
+	            .values()
+	            .stream()
+	            .collect(Collectors.toList());
+		
+		 System.out.println("My new timetables has been entered: " + pupilclassesnew.size() );
+
 	     List<Integer> allAverage = new ArrayList<>();
 	     if ( myassesssments.size() > 0 ) {
-	    	 String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
-		     for (String sub : subjectNamesArray) {	    	
+	    	// String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
+			 for (TimeTable timetable : pupilclassesnew) {    	
 			     
-			     List<Assessment> ascallOne = myassesssments.stream().filter(as -> as.getLsn().getSubject().getName().equals(sub) ).collect(Collectors.toList());
+			     List<Assessment> ascallOne = myassesssments.stream().filter(as -> 
+				 as.getLsn().getSubject().getName().equals(timetable.getSubject().getName()) 
+				 && 
+				 as.getLsn().getClass_index().equals(timetable.getClass_stream().getClass_index())
+				 ).collect(Collectors.toList());
+
 			     int perf = 0;
-			     perf = ascallOne.get(0).getScore();        		    	 
+			     perf = ascallOne.size() > 0 ? ascallOne.get(0).getScore() : 0;        		    	 
 				     
 				 Map<String, Object> objectmnecolumntemp = new HashMap<>();
-			     objectmnecolumntemp.put("key", "d"+j);
-			     objectmnecolumntemp.put("label", sub );
+			     objectmnecolumntemp.put("key", timetable.getSubject().getName() + "_" + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + timetable.getClass_stream().getExt());
+			     objectmnecolumntemp.put("label", timetable.getSubject().getName() + " " + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + " " + timetable.getClass_stream().getExt()  );
 			     objectmnecolumntemp.put("sortable", true);
 			    	 
 				 mnecolumn.add( objectmnecolumntemp );
 				     
-				 System.out.println("pupilclass chose: " + sub );
+				// System.out.println("pupilclass chose: " + sub );
 				     
 				 allAverage.add(perf);
 				     
-				 objectmnecolumndata.put("d"+j, perf  );		     
+				 objectmnecolumndata.put(timetable.getSubject().getName() + "_" + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + timetable.getClass_stream().getExt(), perf  );		     
 				     
 				 j++;		     
 			     
 			 }
 	     }
 	     else{
-	    	 String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
-		     for (String sub : subjectNamesArray) {	    	
+	    	// String[] subjectNamesArray = subjectNamesSet.toArray(new String[0]);
+		     for (TimeTable timetable : pupilclassesnew) {	    	
 			     
 			     int perf = 0;    		    	 
 				     
 				 Map<String, Object> objectmnecolumntemp = new HashMap<>();
 			     objectmnecolumntemp.put("key", "d"+j);
-			     objectmnecolumntemp.put("label", sub );
+			     objectmnecolumntemp.put("label", timetable.getSubject().getName() );
 			     objectmnecolumntemp.put("sortable", true);
 			    	 
 				 mnecolumn.add( objectmnecolumntemp );
 				     
-				 System.out.println("pupilclass chose: " + sub );
+				 //System.out.println("pupilclass chose: " + sub );
 				     
 				 allAverage.add(perf);
 				     
@@ -724,9 +796,9 @@ public class MneController {
 	     double averagePerf = allAverage.stream()
 	                .mapToInt(Integer::intValue)
 	                .average()
-	                .orElse(0.0);
-	     
-	     objectmnecolumndata.put("performance", averagePerf);
+	                .orElse(0.0);	     
+								
+	     objectmnecolumndata.put("performance", Double.parseDouble(String.format("%.2f", averagePerf)));
 	     mnecolumndata.add( objectmnecolumndata ); 
 	     
 	     Map<String, Object> response = new HashMap<>();
@@ -902,61 +974,59 @@ public class MneController {
 			    	 j++;
 			    	 
 				     Map<String, Object> objectmnecolumntemp = new HashMap<>();
-			    	 objectmnecolumntemp.put("key", "d"+j);
-			    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Classwork %" );
+			    	 objectmnecolumntemp.put("key", "D"+j);
+			    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Classwork" );
 			    	 objectmnecolumntemp.put("sortable", true);
 			    	 
 				     mnecolumn.add( objectmnecolumntemp );
 				     
 				     allAverageClaswork.add(classwork_perf);	     
 				     
-				     objectmnecolumndata.put("d"+j , (int) classwork_perf  );
+				     objectmnecolumndata.put("D"+j , (int) classwork_perf  );
 				     
 				     ////////////////////////////
 				     j++;
 				     
 				     Map<String, Object> objectmnecolumntemp2 = new HashMap<>();
-			    	 objectmnecolumntemp2.put("key", "d"+j);
-			    	 objectmnecolumntemp2.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Homework %" );
+			    	 objectmnecolumntemp2.put("key", "D"+j);
+			    	 objectmnecolumntemp2.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Homework" );
 			    	 objectmnecolumntemp2.put("sortable", true);
 			    	 
 				     mnecolumn.add( objectmnecolumntemp2 );
 				     
 				     allAverageHomework.add(homework_perf);	     
 				     
-				     objectmnecolumndata.put("d"+j , (int) homework_perf  );
+				     objectmnecolumndata.put("D"+j , (int) homework_perf  );
 				     
 				     /////////////////////////////
 				     j++;
 				     
 				     Map<String, Object> objectmnecolumntemp3 = new HashMap<>();
-			    	 objectmnecolumntemp3.put("key", "d"+j);
-			    	 objectmnecolumntemp3.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Test %" );
+			    	 objectmnecolumntemp3.put("key", "D"+j);
+			    	 objectmnecolumntemp3.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Test" );
 			    	 objectmnecolumntemp3.put("sortable", true);
 			    	 
 				     mnecolumn.add( objectmnecolumntemp3 );
 				     
 				     allAverageTest.add(test_perf);	     
 				     
-				     objectmnecolumndata.put("d"+j , (int) test_perf  );
+				     objectmnecolumndata.put("D"+j , (int) test_perf  );
 				     
 				     ///////////////////////////////
 				     j++;
 				     
 				     Map<String, Object> objectmnecolumntemp4 = new HashMap<>();
-			    	 objectmnecolumntemp4.put("key", "d"+j);
-			    	 objectmnecolumntemp4.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Management %" );
+			    	 objectmnecolumntemp4.put("key", "D"+j);
+			    	 objectmnecolumntemp4.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Management" );
 			    	 objectmnecolumntemp4.put("sortable", true);
 			    	 
 				     mnecolumn.add( objectmnecolumntemp4 );
 				     
 				     allAverageManagement.add(management_perf);	     
 				     
-				     objectmnecolumndata.put("d"+j , (int) management_perf  );
+				     objectmnecolumndata.put("D"+j , (int) management_perf  );
 				     
-			     }
-			     
-			     
+			     }	     
 			     
 			     j++;
 			     
@@ -987,7 +1057,7 @@ public class MneController {
 			     
 			     objectmnecolumndata.put("management", averagePerfManagement);
 			     
-			     mnecolumndata.add( objectmnecolumndata );
+			      mnecolumndata.add( objectmnecolumndata );
 		     }
 		     else {
 		    	 

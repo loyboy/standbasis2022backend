@@ -224,7 +224,7 @@ public class LessonnoteController {
 			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
 			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto,
-			 
+		 	 
 			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
 			 @RequestParam(value = "status", required=false) Optional<String> status
 			 ) {
@@ -385,9 +385,9 @@ public class LessonnoteController {
 		 Map<String, Object> newResponse = new HashMap<>();
 		 
 		 Integer max = ordinaryArray.size();
-		 Long studentHomework = ordinaryArray.stream().filter( o -> o.getScore() != null && o.getScore() < 50 && o.getScore() != 0 && o.get_type().equals("hwk") ).count(); 
-		 Long studentTest = ordinaryArray.stream().filter(o -> o.getScore() != null && o.getScore() < 50 && o.getScore() != 0 && o.get_type().equals("tst") ).count(); 
-		 Long studentClasswork = ordinaryArray.stream().filter(o -> o.getScore() != null && o.getScore() < 50 && o.getScore() != 0 && o.get_type().equals("clw") ).count(); 
+		 Long studentHomework = ordinaryArray.stream().filter( o -> o.getScore() != null && o.getScore() > 50 && o.getScore() != 0 && o.get_type().equals("hwk") ).count(); 
+		 Long studentTest = ordinaryArray.stream().filter(o -> o.getScore() != null && o.getScore() > 50 && o.getScore() != 0 && o.get_type().equals("tst") ).count(); 
+		 Long studentClasswork = ordinaryArray.stream().filter(o -> o.getScore() != null && o.getScore() > 50 && o.getScore() != 0 && o.get_type().equals("clw") ).count(); 
 			 
 		 newResponse.put("student_homework", studentHomework.intValue() );
 		 newResponse.put("student_classwork", studentClasswork.intValue() );

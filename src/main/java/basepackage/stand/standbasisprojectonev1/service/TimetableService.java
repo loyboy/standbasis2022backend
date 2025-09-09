@@ -320,7 +320,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         List<TimeTable> timearray = new ArrayList<TimeTable>(timetables);
         
         Map<String, Object> response = new HashMap<>();
-        response.put("timetables", timearray);
+        response.put("timetables", timearray);        
        
         return response;
     }

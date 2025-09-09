@@ -20,6 +20,7 @@ import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
 import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
+import basepackage.stand.standbasisprojectonev1.model.LessonnoteManagement;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Student;
@@ -28,6 +29,7 @@ import basepackage.stand.standbasisprojectonev1.repository.AssessmentRepository;
 import basepackage.stand.standbasisprojectonev1.repository.CalendarRepository;
 import basepackage.stand.standbasisprojectonev1.repository.ClassStreamRepository;
 import basepackage.stand.standbasisprojectonev1.repository.EnrollmentRepository;
+import basepackage.stand.standbasisprojectonev1.repository.LessonnoteManagementRepository;
 import basepackage.stand.standbasisprojectonev1.repository.LessonnoteRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolRepository;
 import basepackage.stand.standbasisprojectonev1.repository.SchoolgroupRepository;
@@ -38,7 +40,10 @@ import basepackage.stand.standbasisprojectonev1.util.CommonActivity;
 public class AssessmentService {
 
 	@Autowired		
-    private AssessmentRepository assessRepository;	
+    private AssessmentRepository assessRepository;
+	
+	@Autowired
+	private LessonnoteManagementRepository lsnManageRepository;
 	
 	@Autowired
     private SchoolgroupRepository groupRepository;
@@ -95,14 +100,54 @@ public class AssessmentService {
 		}
 		return null;
 	}
-	
+
 	public Assessment update(AssessmentRequest assessRequest, long id) {
 		Optional<Assessment> existing = assessRepository.findById(id);
 		if (existing.isPresent()) {
 			Assessment assval = existing.get();
 			CommonActivity.copyNonNullProperties(assessRequest, assval);
+
+			List<Assessment> assessmentList = assessRepository.findByLessonnote(assval.getLsn());
+			
+			int classworkSum = 0, homeworkSum = 0, testSum = 0;
+			int classworkCount = 0, homeworkCount = 0, testCount = 0;
+
+			for (Assessment tempAssessment : assessmentList) {
+				Integer score = tempAssessment.getScore();
+				if (score == null) continue;
+
+				switch (tempAssessment.get_type()) {
+					case "clw":
+						classworkSum += score;
+						classworkCount++;
+						break;
+					case "hwk":
+						homeworkSum += score;
+						homeworkCount++;
+						break;
+					case "tst":
+						testSum += score;
+						testCount++;
+						break;
+				}
+			}
+
+			Integer classworkAverage = (classworkCount > 0) ? classworkSum / classworkCount : 0;
+			Integer homeworkAverage = (homeworkCount > 0) ? homeworkSum / homeworkCount : 0;
+			Integer testAverage = (testCount > 0) ? testSum / testCount : 0;
+
+			Optional<LessonnoteManagement> lsnmanageOpt = lsnManageRepository.findByLessonnote(assval.getLsn());
+			if (lsnmanageOpt.isPresent()) {
+				LessonnoteManagement lsnm = lsnmanageOpt.get();
+				lsnm.setSub_perf_classwork(classworkAverage);
+				lsnm.setSub_perf_homework(homeworkAverage);
+				lsnm.setSub_perf_test(testAverage);
+				lsnManageRepository.save(lsnm);
+			}
+
 			return assessRepository.save(assval);
-		} 
+		}
+
 		return null;
 	}
 	
@@ -295,6 +340,5 @@ public class AssessmentService {
         return response;
     }
 	
-
 	
 }

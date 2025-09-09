@@ -197,7 +197,7 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		+ "AND (lsn.submission <= :dateto OR :dateto is null) "
        	 )
     
-    List<Lessonnote> findByStudentSchoolgroup(
+    List<Assessment> findByStudentSchoolgroup(
     		@Param("owner") SchoolGroup owner, 
     		@Param("sch") School sch, 
     		@Param("cls") ClassStream cls, 
@@ -257,7 +257,7 @@ public interface LessonnoteRepository extends JpaRepository<Lessonnote, Long>{
     		+ "AND (lsn.submission <= :dateto OR :dateto is null) "
     		+ "OR lsn.title like :filter "
        	 )    
-    List<Lessonnote> findFilterByStudentSchoolgroup(
+    List<Assessment> findFilterByStudentSchoolgroup(
     		@Param("filter") String filter, 
     		@Param("owner") SchoolGroup owner, 
     		@Param("sch") School sch, 
