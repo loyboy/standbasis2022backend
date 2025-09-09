@@ -112,7 +112,7 @@ public class AssessmentService {
 			int classworkSum = 0, homeworkSum = 0, testSum = 0;
 			int classworkCount = 0, homeworkCount = 0, testCount = 0;
 
-			for (Assessment tempAssessment : assessmentList) {
+			for (Assessment tempAssessment : assessmentList) { 
 				Integer score = tempAssessment.getScore();
 				if (score == null) continue;
 

@@ -18,7 +18,8 @@ import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Student;
-
+import basepackage.stand.standbasisprojectonev1.model.Lessonnote;
+import basepackage.stand.standbasisprojectonev1.model.Teacher;
 
 @Repository
 public interface AssessmentRepository extends JpaRepository<Assessment, Long>{
