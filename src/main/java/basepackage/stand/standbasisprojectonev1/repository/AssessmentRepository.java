@@ -26,6 +26,9 @@ import basepackage.stand.standbasisprojectonev1.model.Teacher;
 public interface AssessmentRepository extends JpaRepository<Assessment, Long>{
 
 	Optional<Assessment> findById(Long assessId);
+
+	@Query("select assess from Assessment assess WHERE assess.lsn = :lsn ")
+	List<Assessment> findByLessonnote( @Param("lsn") Lessonnote lsn);
 	
 	@Query( "select assess from Assessment assess "
 			+ "JOIN Lessonnote lsn ON lsn = assess.lsn "

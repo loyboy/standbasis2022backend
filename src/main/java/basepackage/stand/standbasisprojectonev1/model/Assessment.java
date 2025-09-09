@@ -30,7 +30,7 @@ public class Assessment extends DateAudit{
     
     @NotNull    
     private String title; 
-    
+ 
     @NotNull    
     @Column(name="assessment_type",columnDefinition="char(5)")
     private String _type; // clw, tst, hwk, mid, final 

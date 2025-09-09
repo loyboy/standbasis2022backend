@@ -52,7 +52,10 @@ public class Teacher extends DateAudit{
     
     @NotNull
     @Email
-    private String email;//
+    private String email;
+
+    @Column(name="teacher_code",columnDefinition="varchar(100)")
+    private String teacher_code;
     
     private Integer experience;
     

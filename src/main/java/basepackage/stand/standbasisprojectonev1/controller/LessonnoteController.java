@@ -224,7 +224,7 @@ public class LessonnoteController {
 			 @RequestParam(value = "teacher", required=false) Optional<Long> teacher,
 			 @RequestParam(value = "datefrom", required=false) Optional<Timestamp> datefrom,
 			 @RequestParam(value = "dateto", required=false) Optional<Timestamp> dateto,
-			 
+		 	 
 			 @RequestParam(value = "subject", required=false) Optional<Long> subject,
 			 @RequestParam(value = "status", required=false) Optional<String> status
 			 ) {
@@ -604,6 +604,28 @@ public class LessonnoteController {
 			 saveEvent("assessment", "create", "The User with name: " + u.get().getName() + "has created a assessment score with ID:  " + val.getAssessId(), 
 					 new Date(), u.get(), u.get().getSchool()
 			 );
+			 
+			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Assessment has been created successfully.", val));	
+		 }
+		 catch (Exception ex) {
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "You do not have access to this resource because your Bearer token is either expired or not set."));
+	     }
+	 }
+
+	 @PostMapping("/assessment")
+	 public ResponseEntity<?> getStudentsForExcel( 
+			 @AuthenticationPrincipal UserPrincipal userDetails,
+			 @RequestBody AssessmentRequest assRequest		 
+	 ) {
+		 try {			 
+			 Assessment val = serviceAssessment.saveOne(assRequest);
+			 
+			/*  Optional<User> u = userRepository.findById( userDetails.getId() );
+				
+			
+			 saveEvent("assessment", "create", "The User with name: " + u.get().getName() + "has created a assessment score with ID:  " + val.getAssessId(), 
+					 new Date(), u.get(), u.get().getSchool()
+			 );*/
 			 
 			 return ResponseEntity.ok().body(new ApiDataResponse(true, "Assessment has been created successfully.", val));	
 		 }
