@@ -295,7 +295,7 @@ public class MyScheduler {
 	
 	// "0 0/10 * * * *" - 10 minutes interval
 	// "0 0 1 * * *" - Everyday at 1:00 WAT 
-	@Scheduled(cron = "0 45 12 * * *")
+	@Scheduled(cron = "0 30 6 * * *")
     public void insertAttendances() {       
 		
 		//Check what day of the week is this
@@ -342,8 +342,9 @@ public class MyScheduler {
 	// "0 0 0 * * 0" -- once a week
 	// 0 0 0 ? * WED fjfjfjfjfj
 	// 35 * * 31 11 * default
+	//35 0 5 31 2 * impossible
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "35 45 12 * * *")
+	@Scheduled(cron = "35 0 5 31 2 *")
     public void insertLessonnotes() {
 		//helo
 		 Map<Integer, String> classMap = new HashMap<>();
