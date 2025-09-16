@@ -917,7 +917,8 @@ public class MneController {
 			    	 j++;
 			    	 
 				     Map<String, Object> objectmnecolumntemp = new HashMap<>();
-			    	 objectmnecolumntemp.put("key", "d"+j);
+					 // objectmnecolumntemp.put("key", "d"+j);
+					 objectmnecolumntemp.put("key", subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() );
 			    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Principal Management" );
 			    	 objectmnecolumntemp.put("sortable", true);
 			    	 
@@ -925,8 +926,8 @@ public class MneController {
 				     
 				     allAveragePrincipal.add(perf);	     
 				     
-				     objectmnecolumndata.put("d"+j, (int) perf  );	     	     
-				     
+				  //  objectmnecolumndata.put("d"+j, (int) perf  );	  
+				 	 objectmnecolumndata.put( subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() , (int) perf  );	
 			     }
 			     
 			     if (teacher != null && lsncall_manage.size() > 0) {
@@ -974,7 +975,8 @@ public class MneController {
 			    	 j++;
 			    	 
 				     Map<String, Object> objectmnecolumntemp = new HashMap<>();
-			    	 objectmnecolumntemp.put("key", "D"+j);
+			    	// objectmnecolumntemp.put("key", "D"+j);
+					 objectmnecolumntemp.put("key", subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() + "_" + j );
 			    	 objectmnecolumntemp.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Classwork" );
 			    	 objectmnecolumntemp.put("sortable", true);
 			    	 
@@ -982,13 +984,14 @@ public class MneController {
 				     
 				     allAverageClaswork.add(classwork_perf);	     
 				     
-				     objectmnecolumndata.put("D"+j , (int) classwork_perf  );
+				     //objectmnecolumndata.put("D"+j , (int) classwork_perf  );
+					 objectmnecolumndata.put(subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() + "_" + j, (int) classwork_perf  );
 				     
 				     ////////////////////////////
 				     j++;
 				     
 				     Map<String, Object> objectmnecolumntemp2 = new HashMap<>();
-			    	 objectmnecolumntemp2.put("key", "D"+j);
+			    	 objectmnecolumntemp2.put("key", subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() + "_" + j);
 			    	 objectmnecolumntemp2.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Homework" );
 			    	 objectmnecolumntemp2.put("sortable", true);
 			    	 
@@ -996,13 +999,13 @@ public class MneController {
 				     
 				     allAverageHomework.add(homework_perf);	     
 				     
-				     objectmnecolumndata.put("D"+j , (int) homework_perf  );
+				     objectmnecolumndata.put(subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() + "_" + j , (int) homework_perf  );
 				     
 				     /////////////////////////////
 				     j++;
 				     
 				     Map<String, Object> objectmnecolumntemp3 = new HashMap<>();
-			    	 objectmnecolumntemp3.put("key", "D"+j);
+			    	 objectmnecolumntemp3.put("key", subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() + "_" + j);
 			    	 objectmnecolumntemp3.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Test" );
 			    	 objectmnecolumntemp3.put("sortable", true);
 			    	 
@@ -1010,13 +1013,13 @@ public class MneController {
 				     
 				     allAverageTest.add(test_perf);	     
 				     
-				     objectmnecolumndata.put("D"+j , (int) test_perf  );
+				     objectmnecolumndata.put(subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() + "_" + j, (int) test_perf  );
 				     
 				     ///////////////////////////////
 				     j++;
 				     
 				     Map<String, Object> objectmnecolumntemp4 = new HashMap<>();
-			    	 objectmnecolumntemp4.put("key", "D"+j);
+			    	 objectmnecolumntemp4.put("key", subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() + "_" + j);
 			    	 objectmnecolumntemp4.put("label", subclass.getClass_stream().getTitle() + " " + subclass.getSubject().getName() + " " + "Management" );
 			    	 objectmnecolumntemp4.put("sortable", true);
 			    	 
@@ -1024,7 +1027,7 @@ public class MneController {
 				     
 				     allAverageManagement.add(management_perf);	     
 				     
-				     objectmnecolumndata.put("D"+j , (int) management_perf  );
+				     objectmnecolumndata.put(subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() + "_" + j , (int) management_perf  );
 				     
 			     }	     
 			     
