@@ -999,7 +999,7 @@ public class MneController {
 				     
 				     allAverageHomework.add(homework_perf);	     
 				     
-				     objectmnecolumndata.put(subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() + "_" + j , (int) homework_perf  );
+				     objectmnecolumndata.put(subclass.getSubject().getName() + "_" + new String(subclass.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + subclass.getClass_stream().getExt() + "_" + "Homework", (int) homework_perf  );
 				     
 				     /////////////////////////////
 				     j++;
