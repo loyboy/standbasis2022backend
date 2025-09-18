@@ -750,22 +750,23 @@ public class MneController {
 				 ).collect(Collectors.toList());
 
 			     int perf = 0;
-			     perf = ascallOne.size() > 0 ? ascallOne.get(0).getScore() : 0;        		    	 
+			     perf = ascallOne.size() > 0 ? ascallOne.get(0).getScore() : 0;        
+				 
+				 if (perf > 0) {
 				     
-				 Map<String, Object> objectmnecolumntemp = new HashMap<>();
-			     objectmnecolumntemp.put("key", timetable.getSubject().getName() + "_" + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + timetable.getClass_stream().getExt());
-			     objectmnecolumntemp.put("label", timetable.getSubject().getName() + " " + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + " " + timetable.getClass_stream().getExt()  );
-			     objectmnecolumntemp.put("sortable", true);
-			    	 
-				 mnecolumn.add( objectmnecolumntemp );
-				     
-				// System.out.println("pupilclass chose: " + sub );
-				     
-				 allAverage.add(perf);
-				     
-				 objectmnecolumndata.put(timetable.getSubject().getName() + "_" + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + timetable.getClass_stream().getExt(), perf  );		     
-				     
-				 j++;		     
+					Map<String, Object> objectmnecolumntemp = new HashMap<>();
+					objectmnecolumntemp.put("key", timetable.getSubject().getName() + "_" + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + timetable.getClass_stream().getExt());
+					objectmnecolumntemp.put("label", timetable.getSubject().getName() + " " + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + " " + timetable.getClass_stream().getExt()  );
+					objectmnecolumntemp.put("sortable", true);
+						
+					mnecolumn.add( objectmnecolumntemp );
+						
+					allAverage.add(perf);
+						
+					objectmnecolumndata.put(timetable.getSubject().getName() + "_" + new String(timetable.getClass_stream().getTitle()).replaceAll("[\\r\\n]", "") + "_" + timetable.getClass_stream().getExt(), perf  );		     
+						
+					j++;	
+				 }	     
 			     
 			 }
 	     }
