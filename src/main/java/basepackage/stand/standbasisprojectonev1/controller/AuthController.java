@@ -170,7 +170,7 @@ public class AuthController {
 		            lgres.setData_id(user.getProprietor_id());
 		            lgres.setId(realId);
 		            
-		            System.out.println( " >> " + lgres );
+		          //  System.out.println( " >> " + lgres );
 		        }
 		        
 		        if ( user.getRole() == RoleName.SUPERADMIN) {
@@ -182,6 +182,7 @@ public class AuthController {
 		            lgres.setEmail(user.getEmail());
 		            lgres.setRole("admin");
 		            lgres.setData_id(null);
+					lgres.setCode( user.getSupervisor_id() );
 		            lgres.setId(realId);
 		        }   
 		        

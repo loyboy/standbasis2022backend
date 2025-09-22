@@ -85,7 +85,7 @@ public class CommonActivity {
         String pattern4 = "^\\d{2}-\\w+-\\w+-\\d+$"; // Matches "01-subeb-A-96301"
 
         // Check if the input matches any of the four patterns
-        if (input.matches(pattern4)) {
+        if (input.matches(pattern4)) { 
             // Matches "01-subeb-A-96301"
             return input.split("-");
         } else if (input.matches(pattern3)) {
