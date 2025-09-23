@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.BeanUtils;
@@ -83,7 +84,9 @@ public class CommonActivity {
         String pattern2 = "^\\d{2}-\\w+$"; // Matches "01-subeb"
         String pattern3 = "^\\d{2}-\\w+-\\w+$"; // Matches "01-subeb-A"
         String pattern4 = "^\\d{2}-\\w+-\\w+-\\d+$"; // Matches "01-subeb-A-96301"
-
+		if (input == null){
+			return List.of().toArray(new String[0]);
+		}
         // Check if the input matches any of the four patterns
         if (input.matches(pattern4)) { 
             // Matches "01-subeb-A-96301"
