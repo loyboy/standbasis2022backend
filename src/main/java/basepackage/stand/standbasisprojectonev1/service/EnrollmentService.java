@@ -137,7 +137,7 @@ public class EnrollmentService {
 		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
           
         if ( query.equals("") || query == null ) {
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				nrols = enrollRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -162,7 +162,7 @@ public class EnrollmentService {
         	}       	
         }
         else {
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				nrols = enrollRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -217,7 +217,7 @@ public class EnrollmentService {
         Page<Enrollment> schs = null;
         
         if ( query.equals("") || query == null ) { 
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = enrollRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -246,7 +246,7 @@ public class EnrollmentService {
         }
 		
         else {  
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 					schs = enrollRepository.findFilterBySupervisor("%"+ query + "%",  
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,

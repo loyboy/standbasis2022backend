@@ -152,7 +152,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         List<Teacher> teas = null;
         
         if ( query.equals("") || query == null ) {
-        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+        	if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				teas = teaRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -177,7 +177,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         	}       	
         }
         else {
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				teas = teaRepository.findFilterBySupervisor( 
 					"%"+ query + "%",
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
@@ -237,7 +237,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         Page<Teacher> schs = null;
         
         if ( query.equals("") || query == null ) {
-        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+        	if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = teaRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -265,7 +265,7 @@ private static final Logger logger = LoggerFactory.getLogger(TeacherService.clas
         	}       	
         }
         else {
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = teaRepository.findFilterBySupervisor("%"+ query + "%",  
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,

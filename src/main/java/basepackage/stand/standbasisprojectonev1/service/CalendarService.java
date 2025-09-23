@@ -124,7 +124,7 @@ public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ow
 		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
              
         if ( query.equals("") || query == null ) {
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				teas = calRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -149,7 +149,7 @@ public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ow
         	}       	
         }
         else {
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				teas = calRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -202,7 +202,7 @@ public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ow
         
         if ( query.equals("") || query == null ) {
         	
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = calRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -233,7 +233,7 @@ public Map<String, Object> getOrdinaryCalendars( String query, Optional<Long> ow
         	}        	
         }
         else {
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = calRepository.findFilterBySupervisor("%"+ query + "%",  
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,

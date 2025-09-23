@@ -126,7 +126,7 @@ public class SchoolService {
         List<School> schs = null;
         
         if ( query.equals("") || query == null ) {
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = schRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -148,7 +148,7 @@ public class SchoolService {
         	}       	
         }
         else {
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = schRepository.findFilterBySupervisor("%"+ query + "%",  
 				codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 				codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -197,7 +197,7 @@ public class SchoolService {
         Page<School> schs = null;
         
         if ( query.equals("") || query == null ) {
-        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+        	if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = schRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -215,7 +215,7 @@ public class SchoolService {
         	}        	
         }
         else {
-        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+        	if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = schRepository.findFilterBySupervisor("%"+ query + "%",  
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,

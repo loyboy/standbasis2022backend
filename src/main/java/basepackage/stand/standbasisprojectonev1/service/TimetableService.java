@@ -135,7 +135,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
 		if(teacher != null) { teacherownerobj1st = teaRepository.findById( teacher );  }
         if ( query.equals("") || query == null ) {
         	
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = timeRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -176,7 +176,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
 			Optional<Teacher> teacherownerobj2nd = null;       		
     
 			if(teacher != null) { teacherownerobj2nd = teaRepository.findById( teacher );  }
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				schs = timeRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -255,7 +255,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
 		String[] codes = CommonActivity.parseStringForSupervisor(supervisor);
         
         if ( query.equals("") || query == null ) {
-        	if (!supervisor.isEmpty() && !supervisor.equals("")){
+        	if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				timetables = timeRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
@@ -284,7 +284,7 @@ public List<TimeTable> findClassOffered(Long classstream, Long cal) {
         	}        	
         }
         else {
-			if (!supervisor.isEmpty() && !supervisor.equals("")){
+			if (supervisor != null && !supervisor.isEmpty() && !supervisor.equals("")){
 				timetables = timeRepository.findBySupervisor( 
 					codes.length > 0 ? codes[0].equalsIgnoreCase("Null") ? null : codes[0] : null,
 					codes.length > 1 ? codes[1].equalsIgnoreCase("Null") ? null : codes[1] : null,
