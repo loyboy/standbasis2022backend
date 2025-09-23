@@ -156,6 +156,7 @@ public class AuthController {
 		            lgres.setEmail(user.getEmail());
 		            lgres.setRole("principal");
 		            lgres.setData_id(user.getPrincipal_id());
+					lgres.setCode( user.getSupervisor_id() );
 		            lgres.setId(realId);
 		        }
 		        
