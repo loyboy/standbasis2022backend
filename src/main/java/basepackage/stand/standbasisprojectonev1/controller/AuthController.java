@@ -125,6 +125,7 @@ public class AuthController {
 		            lgres.setAccess_token(jwt);
 		            lgres.setSchool_date( new Date( foundCal.getStartdate().getTime() ).toLocaleString() );
 		            lgres.setSchool_name( user.getSchool().getName() );
+					lgres.setSchool_type( user.getSchool().getType_of() );
 		            lgres.setCalendar_id( foundCal.getCalendarId() );
 		            lgres.setCalendar_text( "Week "+weekNumber + " | " + foundCal.getSession() + " | " + "Term " + foundCal.getTerm() );
 		            //lgres.setSchool_date( "2023-01-01" );
@@ -149,6 +150,7 @@ public class AuthController {
 		        	lgres.setPermissions(user.getPermissionsJSON());
 		        	lgres.setUsername(user.getName());
 		        	lgres.setSchool_name( user.getSchool().getName() );
+					lgres.setSchool_name( user.getSchool().getName() );
 		        	lgres.setCalendar_id( foundCal == null ? null : foundCal.getCalendarId() );
 		        	lgres.setCalendar_text( "Week "+weekNumber + " | " + foundCal.getSession() + " | " + "Term " + foundCal.getTerm() );
 			          

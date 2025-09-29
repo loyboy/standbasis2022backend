@@ -16,6 +16,7 @@ public class LoginResponse{
 	private Long calendar_id;
 	private String calendar_text;
 	private String school_name;
+	private String school_type;
 	private String role;
 	private Long data_id;
 	private String permissions;
