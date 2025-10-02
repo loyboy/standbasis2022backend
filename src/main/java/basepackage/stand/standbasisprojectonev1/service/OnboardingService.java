@@ -81,6 +81,67 @@ public class OnboardingService {
     
     @Autowired
     private CalendarRepository calRepository;
+
+	@Autowired
+	private CalendarService calService;
+
+	@Autowired
+	private ClassService clsService;
+
+	public Boolean onboardNewStudent( List<StudentRequest> pupRequest, Long calendarId ) {	
+		try{
+				Calendar mycal = calService.findCalendar(calendarId);
+
+				List<ClassStream> clsstream = clsService.findAllBySchool(mycal.getSchool().getSchId());
+
+				Map< String, List<ClassStream> > foundUniqueClass = new HashMap< String, List<ClassStream> >();
+
+			    for (StudentRequest c : pupRequest) {
+			    	String clsname = c.getClass_name(); 
+					String arm = c.getArm(); 
+					List<ClassStream> foundMatch = findWithTitleAndArm( clsname, arm, clsstream );	
+					 	 
+					if(foundMatch.size() > 0) {
+						List<ClassStream> noduplicateclass = foundMatch.stream().distinct().collect(Collectors.toList());
+						String mykey = c.getName().toString() + "_" + c.getGender().toString() + "_" + c.getRegno().toString();					 		
+						foundUniqueClass.put( mykey , noduplicateclass );
+					}
+			    }
+
+				if(foundUniqueClass.size() > 0) {
+			    		 
+			    		 for (Map.Entry<String, List<ClassStream>> entry : foundUniqueClass.entrySet()) {
+			    		        Student s = new Student();
+			    		        
+			    		        //save student first
+			    		        String[] separateValues = entry.getKey().split("_");
+			    		        String specialIdStudent = createUuid("student-", mycal.getSchool().getSchId() );
+			    		        
+			    		        s.setId(specialIdStudent);
+			    		        s.setName(separateValues[0]);
+			    		        s.setGender(separateValues[1]);
+			    		        s.setReg_no(separateValues[2]);
+			    		        s.setSchool(mycal.getSchool());
+			    		        
+			    		        Student savedValue = pupilRepository.save(s);
+			    		        List<ClassStream> classFound = entry.getValue();
+			    		        
+			    		        String specialId = createUuid("enrollment-", mycal.getSchool().getSchId());
+			    		        Enrollment e = new Enrollment(specialId, savedValue, classFound.get(0), mycal, 1 );
+			    		        enrollRepository.save(e);
+			    		 }
+
+						return true; 
+			    }
+
+			return false;
+		}
+    	catch (Exception e) {
+    		e.printStackTrace();
+    		System.out.println( "Student Onboarding Error: " + e.getLocalizedMessage() );
+    		return false;
+    	}
+	}
 	
     public Boolean onboardNewSchool( SchoolRequest schRequest, List<TeacherRequest> teaRequest, List<StudentRequest> pupRequest, List<ClassRequest> classRequest, List<TimetableRequest> timeRequest, UserAccountRequest userRequest ) {
     	ModelMapper modelMapper = new ModelMapper();    	

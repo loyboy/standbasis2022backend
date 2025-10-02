@@ -13,6 +13,7 @@ import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserPass
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardOnboardRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardStudentsRequest;
 import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.security.JwtTokenProvider;
@@ -35,6 +36,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -133,7 +135,7 @@ public class AuthController {
 		            lgres.setRole("teacher");
 		            lgres.setData_id(user.getTeacher_id());
 		            lgres.setId(realId);
-		        }
+		        } 
 		        
 		        if ( user.getRole() == RoleName.PRINCIPAL) {
 		        	Calendar foundCal = calService.findAllByStatus( user.getSchool().getSchId() , 1).get();
@@ -252,6 +254,34 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "Login has failed due to invalid user credentials."));
         }
     }
+
+	@PostMapping("/onboardnewstudents/{calendarId}")
+	public ResponseEntity<?> onboardStudents(@Valid @RequestBody OnboardStudentsRequest simpleRequest, @PathVariable(value = "calendarId") Long calendarId) {
+			if  ( 
+				 simpleRequest.getPupRequest() != null
+				) {
+			try{
+				boolean status = boardService.onboardNewStudent( 
+					simpleRequest.getPupRequest(),
+					calendarId
+				);
+				//System.out.println("Sch request 2>>> " + simpleRequest.getPupRequest() );
+				if (status) {
+					return ResponseEntity.ok().body(new ApiResponse(true, "Student Onboarding successfully"));
+				}
+				else {
+					return ResponseEntity.status(500).body(new ApiResponse(false, "Student Onboarding failed"));
+				}
+
+			} catch (Exception ex) {
+				System.out.println("Error in display taqline " + ex.getMessage() );
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, ex.getMessage()));
+			}
+			
+		} 
+		
+		return ResponseEntity.ok( "cannot Onboard" ); 
+	}
    
 	@PostMapping("/onboard")
     public ResponseEntity<?> onboardUser(@Valid @RequestBody OnboardRequest simpleRequest) {
