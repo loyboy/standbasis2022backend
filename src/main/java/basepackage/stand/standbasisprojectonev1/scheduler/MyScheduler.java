@@ -345,7 +345,7 @@ public class MyScheduler {
 	// 35 * * 31 11 * default
 	//35 0 5 31 2 * impossible
 	//@SuppressWarnings("deprecation")
-	@Scheduled(cron = "35 25 09 * * *")
+	@Scheduled(cron = "35 27 09 * * *")
     public void insertLessonnotes() {
 		//helo
 		 Map<Integer, String> classMap = new HashMap<>();
