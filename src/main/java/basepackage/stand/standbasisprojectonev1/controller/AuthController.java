@@ -151,6 +151,7 @@ public class AuthController {
 					
 		        	lgres.setPermissions(user.getPermissionsJSON());
 		        	lgres.setUsername(user.getName());
+					lgres.setSchool_id( user.getSchool().getSchId() );
 		        	lgres.setSchool_name( user.getSchool().getName() );
 					lgres.setSchool_type( user.getSchool().getType_of() );
 		        	lgres.setCalendar_id( foundCal == null ? null : foundCal.getCalendarId() );
