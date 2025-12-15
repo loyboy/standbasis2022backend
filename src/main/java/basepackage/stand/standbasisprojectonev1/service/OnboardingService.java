@@ -18,6 +18,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
 
@@ -88,6 +89,10 @@ public class OnboardingService {
 	@Autowired
 	private ClassService clsService;
 
+	ModelMapper modelMapper = new ModelMapper();   
+
+	
+
 	public Boolean onboardNewStudent( List<StudentRequest> pupRequest, Long calendarId ) {	
 		try{
 				Calendar mycal = calService.findCalendar(calendarId);
@@ -144,7 +149,7 @@ public class OnboardingService {
 	}
 	
     public Boolean onboardNewSchool( SchoolRequest schRequest, List<TeacherRequest> teaRequest, List<StudentRequest> pupRequest, List<ClassRequest> classRequest, List<TimetableRequest> timeRequest, UserAccountRequest userRequest ) {
-    	ModelMapper modelMapper = new ModelMapper();    	
+    	 	
     	HashMap<String, Integer> dayToInteger = new HashMap<String, Integer>();
     	dayToInteger.put("Monday",1);
     	dayToInteger.put("Tuesday",2);
@@ -282,7 +287,6 @@ public class OnboardingService {
 					 	
 			    	}	
 			    	
-			    	//add to Calendar
 			    	  	
 			    	User u = modelMapper.map(userRequest, User.class);
 			    	String specialIdUser = createUuid("user-", savedSchool.getSchId() );
@@ -308,26 +312,9 @@ public class OnboardingService {
 			    	
 			    	u.setPermissionsJSON(jsonStr);
 			    	u.setEmail( userRequest.getEmail() );   	
-			    	
-			    	/*Teacher _tea = new Teacher();
-		    		String myidcal2 = createUuid("principal-", savedSchool.getSchId() );
-		    		_tea.setId(myidcal2);
-		    		_tea.setStatus(1);
-		    		_tea.setSchool(savedSchool);
-		    	
-		    		_tea.setFname(userRequest.getName().split(" ")[0]);
-		    		_tea.setLname(userRequest.getName().split(" ")[1]);
-		    		_tea.setGender( "M" );
-		    		_tea.setOffice("Principal");
-		    		_tea.setEmail( userRequest.getEmail() );
-		    		
-		    		Teacher tt = teaRepository.save(_tea);
-		    		
-		    		u.setPrincipal_id( tt.getTeaId() );*/
+			    
 		    		userRepository.save(u); 
-		    		
-		    		//Save the proprietor as a Teacher oBject		    		
-		    		//savedTeachers.add(savedProprietor);
+		    			    		
 			    	TimeUnit.SECONDS.sleep(1);   
 			    	
 			    	// Create users for teachers and send them all a mail 
@@ -372,44 +359,7 @@ public class OnboardingService {
 					    	_u.setPermissionsJSON(jsonStr2);
 							userRepository.save(_u);
 			    		}
-			    		/*else if (t.getOffice().equalsIgnoreCase("Principal")) {
-			    			_u.setId(specialIdUser2);
-							String specialIdUsername = createUuidUsername("head");
-				    		_u.setUsername(specialIdUsername);
-				    		_u.setStatus(1);
-				    		_u.setEmail( t.getEmail() );
-				    		_u.setName( t.getFname() + " " + t.getLname() );
-				    		_u.setRole(RoleName.PRINCIPAL);
-				    		_u.setPassword( passwordencoder.encode( specialPassword ) );
-				    		_u.setPrincipal_id(t.getTeaId());
-				    		_u.setSchool(t.getSchool());
-				    		
-				    		Map<String, Object> _attributes = new HashMap<>();
-					    	
-					    	_attributes.put("school",  new Permissions( true, true, false, false));
-					    	_attributes.put("teacher", new Permissions( true, true, false, true));
-					    	_attributes.put("enrollment", new Permissions( true, true, false, true));
-					    	_attributes.put("classroom", new Permissions( true, true, false, true));
-					    	_attributes.put("calendar", new Permissions( true, true, false, true));
-					    	_attributes.put("timetable", new Permissions( true, true, false, true));
-					    	_attributes.put("user", new Permissions( true, true, false, true));
-					    	_attributes.put("attendance", new Permissions( true, true, false, false));
-					    	_attributes.put("lessonnote", new Permissions( true, true, false, false));
-					    	
-					    	String jsonStr2 = gsonObj.toJson(_attributes);		
-					    	
-					    	_u.setPermissionsJSON(jsonStr2);
-			    		}*/
-			    		
-			    						    	
-			    		/*message.setFrom(from);
-			    		message.setTo(to);
-			    		message.setSubject("Welcome to Standbasis :: You are a Teacher from " + savedSchool.getName() + " school" );
-			    		message.setText("Hello sir/mrs! This is to congratulate you on your successful onboarding process into the Standbasis school standards management system. Your login details are: " + System.lineSeparator() + "User: " + specialIdUsername +  System.lineSeparator() + "Password: " + specialPassword  );
-			    		mailSender.send(message);*/
-			    		
-			    		//userRepository.save(_u);
-			    		//TimeUnit.SECONDS.sleep(1);   
+			    		 
 			    		
 			    	}
 					return true;
@@ -423,6 +373,272 @@ public class OnboardingService {
     		return false;
     	}
     }
+
+	/**
+     * STEP 1: Initialize School, Calendar, and Admin User
+     */
+    @Transactional
+    public Boolean registerSchoolAndAdmin(OnboardStepOneRequest.SchoolRequest schRequest, OnboardStepOneRequest.UserAccountRequest userRequest) {
+        try {
+            // 1. Save School
+            School sch = modelMapper.map(schRequest, School.class);
+            Optional<SchoolGroup> sg = schgroupRepository.findById(schRequest.getOwner());
+            
+            if (sg.isPresent()) {
+                String uuid = UUID.randomUUID().toString();
+                School prePersistSchool = prePersistFunction(sch); // Your existing helper
+                String schStringId = prePersistSchool.getId();
+                
+                prePersistSchool.setOwner(sg.get());
+                prePersistSchool.setStatus(1);
+                // Custom ID logic from your code
+                prePersistSchool.setId(schStringId + "-" + uuid.split("-")[4].substring(4));
+                
+                School savedSchool = schRepository.save(prePersistSchool);
+                
+                // 2. Create Default Calendar
+                Calendar _cal = new Calendar();
+                String myidcal = createUuid("calendar-", savedSchool.getSchId());
+                _cal.setId(myidcal);
+                _cal.setTerm(-99);
+                _cal.setStartdate(parseTimestamp("1999-01-03 00:00:00"));
+                _cal.setEnddate(parseTimestamp("1999-04-21 00:00:00"));
+                _cal.setStatus(0); // 0 = Inactive/Setup mode
+                _cal.setSession("1999/2000");
+                _cal.setSchool(savedSchool);
+                calRepository.save(_cal);
+
+                // 3. Create Admin User (Principal)
+                User u = new User();
+                String specialIdUser = createUuid("user-", savedSchool.getSchId());
+                
+                // Map fields from accountRequest
+                u.setName(userRequest.getName());
+                u.setUsername(userRequest.getUsername());
+                u.setEmail(userRequest.getEmail());
+                u.setPassword(passwordencoder.encode(userRequest.getPassword()));
+                
+                u.setRole(RoleName.PRINCIPAL);
+                u.setId(specialIdUser);
+                u.setStatus(1);
+                u.setSchool(savedSchool);
+
+                // Set Permissions (Your existing logic)
+                Map<String, Object> attributes = new HashMap<>();
+                Permissions perm = new Permissions(true, true, true, false);
+                attributes.put("school", perm);
+                attributes.put("teacher", perm);
+                attributes.put("enrollment", perm);
+                attributes.put("classroom", perm);
+                attributes.put("calendar", perm);
+                attributes.put("timetable", perm);
+                attributes.put("attendance", perm);
+                attributes.put("lessonnote", perm);
+                attributes.put("user", perm);
+                
+                u.setPermissionsJSON(gsonObj.toJson(attributes));
+                userRepository.save(u);
+
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Registration failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * STEP 2-5: Process Optional Lists (Classes, Teachers, Students, Timetable)
+     */
+    @Transactional
+    public void processOnboardingData(School school, OnboardingStepTwoRequest request) {
+        
+        // 1. Process Classes (If present)
+        if (request.getClassRequest() != null && !request.getClassRequest().isEmpty()) {
+            saveClassrooms(school, request.getClassRequest());
+        }
+
+        // 2. Process Teachers (If present)
+        if (request.getTeaRequest() != null && !request.getTeaRequest().isEmpty()) {
+            saveTeachers(school, request.getTeaRequest());
+        }
+
+        // 3. Process Students (If present)
+        // Note: Students require Classes to exist.
+        if (request.getStudentRequest() != null && !request.getStudentRequest().isEmpty()) {
+            saveStudents(school, request.getStudentRequest());
+        }
+
+        // 4. Process Timetable (If present)
+        // Note: Requires Classes, Teachers, and Subjects.
+        if (request.getTimetableRequest() != null && !request.getTimetableRequest().isEmpty()) {
+            saveTimetable(school, request.getTimetableRequest());
+        }
+    }
+
+    // --- HELPER METHODS FOR MODULARITY ---
+
+    private void saveClassrooms(School school, List<ClassRequest> classRequests) {
+        List<ClassStream> newClassObject = classRequests.stream().map(c -> {
+            ClassStream cs = modelMapper.map(c, ClassStream.class);
+            String myid = createUuid("classroom-", school.getSchId());
+            cs.setId(myid);
+            cs.setStatus(1);
+            cs.setSchool(school);
+            return cs;
+        }).collect(Collectors.toList());
+        classRepository.saveAll(newClassObject);
+    }
+
+    private void saveTeachers(School school, List<TeacherRequest> teaRequests) {
+        List<Teacher> newTeaObject = teaRequests.stream().map(t -> {
+            Teacher tea = modelMapper.map(t, Teacher.class);
+            String myid = createUuid("teacher-", school.getSchId());
+            tea.setId(myid);
+            tea.setStatus(1);
+            tea.setSchool(school);
+            return tea;
+        }).collect(Collectors.toList());
+        
+        List<Teacher> savedTeachers = teaRepository.saveAll(newTeaObject);
+        
+        // Create User Accounts for Teachers immediately
+        createTeacherUsers(savedTeachers);
+    }
+
+    private void createTeacherUsers(List<Teacher> teachers) {
+        for (Teacher t : teachers) {
+            // Basic check if user already exists could be added here
+            String specialIdUser = createUuid("user-", t.getSchool().getSchId());
+            String specialPassword = "mypassword"; // Or generate random
+
+            if (t.getOffice().equalsIgnoreCase("Teacher")) {
+                User _u = new User();
+                String specialIdUsername = createUuidUsername("teacher"); // Your helper
+                _u.setId(specialIdUser);
+                _u.setUsername(specialIdUsername);
+                _u.setStatus(1);
+                _u.setEmail(t.getEmail());
+                _u.setName(t.getFname() + " " + t.getLname());
+                _u.setRole(RoleName.TEACHER);
+                _u.setPassword(passwordencoder.encode(specialPassword));
+                _u.setTeacher_id(t.getTeaId());
+                _u.setSchool(t.getSchool());
+
+                // Set Teacher Permissions
+                Map<String, Object> _attributes = new HashMap<>();
+                _attributes.put("school", new Permissions(true, false, false, false));
+                _attributes.put("teacher", new Permissions(true, true, false, false));
+                _attributes.put("enrollment", new Permissions(true, false, false, false));
+                _attributes.put("classroom", new Permissions(true, false, false, false));
+                _attributes.put("calendar", new Permissions(true, false, false, false));
+                _attributes.put("timetable", new Permissions(true, false, false, false));
+                _attributes.put("user", new Permissions(true, false, false, false));
+                _attributes.put("attendance", new Permissions(true, true, false, true));
+                _attributes.put("lessonnote", new Permissions(true, true, false, true));
+
+                _u.setPermissionsJSON(gsonObj.toJson(_attributes));
+                userRepository.save(_u);
+            }
+        }
+    }
+
+    private void saveStudents(School school, List<StudentRequest> pupRequests) {
+        // We need to fetch existing classes to link students
+        // Note: Use school.getId() to ensure we only get classes for this school
+        List<ClassStream> existingClasses = classRepository.findBySchool(school);
+        Calendar currentCalendar = calRepository.findBySchool(school).get(0); // Assuming you have this query
+
+        for (StudentRequest c : pupRequests) {
+            String clsname = c.getClass_name(); 
+            String arm = c.getArm();         
+            
+            // Your logic: findWithTitleAndArm
+            List<ClassStream> foundMatch = findWithTitleAndArm(clsname, arm, existingClasses);
+
+            if (!foundMatch.isEmpty()) {
+                Student s = new Student();
+                String specialIdStudent = createUuid("student-", school.getSchId());
+                
+                s.setId(specialIdStudent);
+                s.setName(c.getName());
+                s.setGender(c.getGender());
+                s.setReg_no(c.getRegno());
+                s.setSchool(school);
+                
+                Student savedValue = pupilRepository.save(s);
+                
+                // Enroll student
+                String specialId = createUuid("enrollment-", school.getSchId());
+                Enrollment e = new Enrollment(specialId, savedValue, foundMatch.get(0), currentCalendar, 1);
+                enrollRepository.save(e);
+            }
+        }
+    }
+
+    private void saveTimetable(School school, List<TimetableRequest> timeRequests) {
+        List<ClassStream> savedClasses = classRepository.findBySchool(school);
+        List<Teacher> savedTeachers = teaRepository.findBySchool(school);
+        List<Subject> savedSubjects = subRepository.findAll(); // Assuming subjects are global?
+        Calendar currentCalendar = calRepository.findBySchool(school).get(0); 
+        
+        // Day mapping
+        HashMap<String, Integer> dayToInteger = new HashMap<>();
+        dayToInteger.put("Monday", 1);
+        dayToInteger.put("Tuesday", 2);
+        dayToInteger.put("Wednesday", 3);
+        dayToInteger.put("Thursday", 4);
+        dayToInteger.put("Friday", 5);
+        dayToInteger.put("Saturday", 6);
+        dayToInteger.put("Sunday", 7); // Added Sunday just in case
+
+        for (TimetableRequest t : timeRequests) {
+            String clsname = t.getClass_name();
+            String arm = t.getArm();
+            String teac = t.getTea_name();
+            String sub = t.getSubject();
+            String day = t.getDay(); // Ensure casing matches map keys (e.g. "Monday" vs "monday")
+
+            // Case-insensitive day lookup
+            Integer dayInt = dayToInteger.get(day.substring(0, 1).toUpperCase() + day.substring(1).toLowerCase());
+            if(dayInt == null) dayInt = 1;
+
+            List<ClassStream> foundMatchC = findWithTitleAndArm(clsname, arm, savedClasses);
+            List<Teacher> foundMatchT = findWithName(teac, savedTeachers);
+            List<Subject> foundMatchS = findWithSubName(sub, savedSubjects);
+
+            if (!foundMatchC.isEmpty() && !foundMatchT.isEmpty() && !foundMatchS.isEmpty()) {
+                ClassStream selectedClass = foundMatchC.get(0);
+                Teacher selectedTeacher = foundMatchT.get(0);
+                Subject selectedSubject = foundMatchS.get(0);
+
+                TimeTable time = new TimeTable();
+                String specialId = createUuid("timetable-", school.getSchId());
+                
+                time.setId(specialId);
+                time.setClass_stream(selectedClass);
+                time.setTeacher(selectedTeacher);
+                time.setSubject(selectedSubject);
+                time.setSchool(school);
+                
+                // Store Denormalized names (as per your legacy code)
+                time.setClass_name(selectedClass.getTitle());
+                time.setTea_name(selectedTeacher.getFname() + " " + selectedTeacher.getLname());
+                time.setSub_name(selectedSubject.getName());
+                
+                time.setTime_of(t.getTime());
+                time.setDay_of(dayInt);
+                time.setStatus(1);
+                time.setCalendar(currentCalendar);
+
+                timeRepository.save(time);
+            }
+        }
+    }
+
+	/*public Boolean onboardNewSchoolTwo( SchoolRequest schRequest, List<TeacherRequest> teaRequest, List<StudentRequest> pupRequest, List<ClassRequest> classRequest, List<TimetableRequest> timeRequest, UserAccountRequest userRequest ) {
+	}*/
 
     private String createUuid( String type, Long schId ) {
     	String uuid = UUID.randomUUID().toString();

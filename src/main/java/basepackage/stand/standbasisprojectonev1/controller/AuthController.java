@@ -13,7 +13,9 @@ import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserPass
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.CheckUserRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardOnboardRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardStepOneRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardStudentsRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardingStepTwoRequest;
 import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
 import basepackage.stand.standbasisprojectonev1.security.JwtTokenProvider;
@@ -25,6 +27,7 @@ import basepackage.stand.standbasisprojectonev1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -321,6 +324,40 @@ public class AuthController {
 		
 	}
 	
+	 // STEP 1: School Details + Admin Account
+    @PostMapping("/onboardinitial")
+    public ResponseEntity<?> registerSchool(@RequestBody OnboardStepOneRequest request) {
+        // Wrapper containing { schRequest, accountRequest }
+        try {
+            boolean success = boardService.registerSchoolAndAdmin(request.getSchRequest(), request.getAccountRequest());
+            if (success) {
+                return ResponseEntity.ok(new ApiResponse(true, "School registered successfully"));
+            }
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Registration failed"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ApiResponse(false, e.getMessage()));
+        }
+    }
+
+    // STEP 2-5: Classes, Teachers, Students, Timetable
+    // Uses the logged-in user to determine the School
+    @PostMapping("/onboard2")
+    @PreAuthorize("hasRole('PRINCIPAL') or hasRole('ADMIN')") 
+    public ResponseEntity<?> saveOnboardingData(@RequestBody OnboardingStepTwoRequest request, @AuthenticationPrincipal UserPrincipal userDetails) {
+        try {
+			Optional<User> u = userRepository.findById( userDetails.getId() );
+            // We fetch the School entity based on the currently logged-in Admin
+            School school = u.get().getSchool();
+            
+            boardService.processOnboardingData(school, request);
+            
+            return ResponseEntity.ok(new ApiResponse(true, "Data saved successfully"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new ApiResponse(false, "Error saving data: " + e.getMessage()));
+        }
+    }
+
 	@PostMapping("/checkUsername")
     public ResponseEntity<?> checkUsernameExists(@Valid @RequestBody CheckUserRequest checkuser) {
 		
