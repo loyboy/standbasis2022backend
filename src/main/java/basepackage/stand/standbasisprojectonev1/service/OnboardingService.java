@@ -477,6 +477,29 @@ public class OnboardingService {
         }
     }
 
+	public OnboardingStatusResponse getOnboardingStatus(School school) {
+				
+		if (school == null) {
+			return new OnboardingStatusResponse(false, false, false, false, false);
+		}
+
+		// 2. Check counts
+		// School Details is implicitly true if we have a School object
+		boolean isSchoolFilled = true; 
+		
+		boolean isClassFilled = classRepository.countBySchool(school) > 0;
+		boolean isTeacherFilled = teaRepository.countBySchool(school) > 0;
+		boolean isStudentFilled = pupilRepository.countBySchool(school) > 0;
+		boolean isTimetableFilled = timeRepository.countBySchool(school) > 0;
+
+		return new OnboardingStatusResponse(
+			isSchoolFilled,
+			isClassFilled,
+			isTeacherFilled,
+			isStudentFilled,
+			isTimetableFilled
+		);
+	}
     // --- HELPER METHODS FOR MODULARITY ---
 
     private void saveClassrooms(School school, List<ClassRequest> classRequests) {
