@@ -22,6 +22,7 @@ import basepackage.stand.standbasisprojectonev1.model.Teacher;
 @Repository
 public interface ClassStreamRepository extends JpaRepository<ClassStream, Long> {
 
+        
 	   Optional<ClassStream> findById(Long classId);
 	    
 	   List<ClassStream> findBySchool(School sch);

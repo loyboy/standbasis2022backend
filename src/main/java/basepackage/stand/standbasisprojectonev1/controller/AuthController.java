@@ -15,6 +15,7 @@ import basepackage.stand.standbasisprojectonev1.payload.onboarding.DashboardOnbo
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardStepOneRequest;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardStudentsRequest;
+import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardingStatusResponse;
 import basepackage.stand.standbasisprojectonev1.payload.onboarding.OnboardingStepTwoRequest;
 import basepackage.stand.standbasisprojectonev1.repository.EventManagerRepository;
 import basepackage.stand.standbasisprojectonev1.repository.UserRepository;
@@ -357,6 +358,21 @@ public class AuthController {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Error saving data: " + e.getMessage()));
         }
     }
+
+
+	@GetMapping("/onboarding-status")
+	@PreAuthorize("hasRole('PRINCIPAL') or hasRole('ADMIN')")
+	public ResponseEntity<OnboardingStatusResponse> getOnboardingStatus(@AuthenticationPrincipal UserPrincipal userDetails) {
+		try {
+			Optional<User> u = userRepository.findById( userDetails.getId() );
+			School school = u.get().getSchool();
+			OnboardingStatusResponse status = boardService.getOnboardingStatus(school);
+			return ResponseEntity.ok(status);
+		} catch (Exception e) {
+			// Return all false on error to be safe
+			return ResponseEntity.ok(new OnboardingStatusResponse(false, false, false, false, false));
+		}
+	}
 
 	@PostMapping("/checkUsername")
     public ResponseEntity<?> checkUsernameExists(@Valid @RequestBody CheckUserRequest checkuser) {

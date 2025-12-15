@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import basepackage.stand.standbasisprojectonev1.model.TimeTable;
 import basepackage.stand.standbasisprojectonev1.model.Calendar;
 import basepackage.stand.standbasisprojectonev1.model.ClassStream;
-import basepackage.stand.standbasisprojectonev1.model.Enrollment;
 import basepackage.stand.standbasisprojectonev1.model.School;
 import basepackage.stand.standbasisprojectonev1.model.SchoolGroup;
 import basepackage.stand.standbasisprojectonev1.model.Teacher;
@@ -25,6 +24,8 @@ import basepackage.stand.standbasisprojectonev1.model.Teacher;
 
 @Repository
 public interface TimetableRepository extends JpaRepository<TimeTable, Long> {
+
+        long countBySchool(School school);
 
         Optional<TimeTable> findById(Long timetableId);
 
