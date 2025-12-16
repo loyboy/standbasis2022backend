@@ -100,8 +100,14 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
                         "/**/*.css",
                         "/**/*.js")
                         .permitAll()
-                    .antMatchers("/api/auth/**")
-                        .permitAll()                        
+
+                    .antMatchers("/api/auth/signin").permitAll()
+                    .antMatchers("/api/auth/onboard").permitAll() 
+
+                    .antMatchers("/api/auth/onboard2").authenticated() // <--- CRITICAL
+                    .antMatchers("/api/auth/onboarding-status").authenticated()
+                    .antMatchers("/api/auth/dashboard/**").authenticated() 
+
                     .antMatchers("/api/misc/**")
                         .permitAll()
                     .antMatchers(HttpMethod.GET, "/api/teacher/**")
