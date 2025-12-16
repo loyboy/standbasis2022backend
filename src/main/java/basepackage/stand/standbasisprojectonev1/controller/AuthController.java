@@ -115,6 +115,7 @@ public class AuthController {
 		        LoginResponse lgres = new LoginResponse();
 		        
 		        if ( user.getRole() == RoleName.TEACHER) {
+					
 		        	Calendar foundCal = calService.findAllByStatus( user.getSchool().getSchId() , 1).get();
 		        	if (foundCal == null) {
 		        		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse(false, "Login has failed due to Calendar expiration."));   
@@ -141,33 +142,81 @@ public class AuthController {
 		            lgres.setId(realId);
 		        } 
 		        
-		        if ( user.getRole() == RoleName.PRINCIPAL) {
-		        	Calendar foundCal = calService.findAllByStatus( user.getSchool().getSchId() , 1).get();
-		        	realId = user.getUserId();
-		        	if (foundCal == null) {
-		        		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse(false, "Login has failed due to Calendar expiration."));   
-		        	}
-		        	
-		        	LocalDate stDate = foundCal.getStartdate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
-					LocalDate endDate = foundCal.getEnddate().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
-					LocalDate todayDate = LocalDate.now();
-					int weekNumber = calculateWeekNumber(todayDate, stDate, endDate);
-					
-		        	lgres.setPermissions(user.getPermissionsJSON());
-		        	lgres.setUsername(user.getName());
-					lgres.setSchool_id( user.getSchool().getSchId() );
-		        	lgres.setSchool_name( user.getSchool().getName() );
-					lgres.setSchool_type( user.getSchool().getType_of() );
-		        	lgres.setCalendar_id( foundCal == null ? null : foundCal.getCalendarId() );
-		        	lgres.setCalendar_text( "Week "+weekNumber + " | " + foundCal.getSession() + " | " + "Term " + foundCal.getTerm() );
-			          
-		            lgres.setAccess_token(jwt);
-		            lgres.setEmail(user.getEmail());
-		            lgres.setRole("principal");
-		            lgres.setData_id(user.getPrincipal_id());
-					lgres.setCode( user.getSupervisor_id() );
-		            lgres.setId(realId);
-		        }
+		        if (user.getRole() == RoleName.PRINCIPAL) {
+
+					realId = user.getUserId();
+
+					// 1. Check onboarding calendar
+					Calendar foundCalOnboard =
+							calService.findAllByStatus(user.getSchool().getSchId(), 0).get();
+
+					if (foundCalOnboard != null) {
+
+						lgres.setPermissions(user.getPermissionsJSON());
+						lgres.setUsername(user.getName());
+						lgres.setSchool_id(user.getSchool().getSchId());
+						lgres.setSchool_name(user.getSchool().getName());
+						lgres.setSchool_type(user.getSchool().getType_of());
+						lgres.setCalendar_id(null);
+						lgres.setCalendar_text("Onboard");
+
+						lgres.setAccess_token(jwt);
+						lgres.setEmail(user.getEmail());
+						lgres.setRole("principal");
+						lgres.setData_id(user.getPrincipal_id());
+						// lgres.setCode(user.getSupervisor_id());
+						lgres.setId(realId);
+
+					} else {
+
+						// 2. Check active calendar
+						Calendar foundCal =
+								calService.findAllByStatus(user.getSchool().getSchId(), 1).get();
+
+						if (foundCal != null) {
+
+							LocalDate stDate = foundCal.getStartdate()
+									.toInstant()
+									.atZone(ZoneId.of("UTC"))
+									.toLocalDate();
+
+							LocalDate endDate = foundCal.getEnddate()
+									.toInstant()
+									.atZone(ZoneId.of("UTC"))
+									.toLocalDate();
+
+							LocalDate todayDate = LocalDate.now();
+							int weekNumber = calculateWeekNumber(todayDate, stDate, endDate);
+
+							lgres.setPermissions(user.getPermissionsJSON());
+							lgres.setUsername(user.getName());
+							lgres.setSchool_id(user.getSchool().getSchId());
+							lgres.setSchool_name(user.getSchool().getName());
+							lgres.setSchool_type(user.getSchool().getType_of());
+							lgres.setCalendar_id(foundCal.getCalendarId());
+							lgres.setCalendar_text(
+									"Week " + weekNumber + " | " +
+									foundCal.getSession() + " | Term " + foundCal.getTerm()
+							);
+
+							lgres.setAccess_token(jwt);
+							lgres.setEmail(user.getEmail());
+							lgres.setRole("principal");
+							lgres.setData_id(user.getPrincipal_id());
+							lgres.setCode(user.getSupervisor_id());
+							lgres.setId(realId);
+
+						} else {
+
+							return ResponseEntity
+									.status(HttpStatus.FORBIDDEN)
+									.body(new ApiResponse(
+											false,
+											"Login has failed due to Calendar expiration."
+									));
+						}
+					}
+				}
 		        
 		        if ( user.getRole() == RoleName.PROPRIETOR) {
 		        	realId = user.getUserId();
