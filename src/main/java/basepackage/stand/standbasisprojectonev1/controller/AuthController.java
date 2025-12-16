@@ -418,8 +418,7 @@ public class AuthController {
 			OnboardingStatusResponse status = boardService.getOnboardingStatus(school);
 			return ResponseEntity.ok(status);
 		} catch (Exception e) {
-			// Return all false on error to be safe
-			return ResponseEntity.ok(new OnboardingStatusResponse(false, false, false, false, false));
+			return ResponseEntity.ok(new OnboardingStatusResponse(0,0,0,0,false, false, false, false, false));
 		}
 	}
 
