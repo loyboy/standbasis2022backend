@@ -392,7 +392,6 @@ public class AuthController {
     // STEP 2-5: Classes, Teachers, Students, Timetable
     // Uses the logged-in user to determine the School
     @PostMapping("/onboard2")
-    @PreAuthorize("hasRole('PRINCIPAL') or hasRole('ADMIN')") 
     public ResponseEntity<?> saveOnboardingData(@RequestBody OnboardingStepTwoRequest request, @AuthenticationPrincipal UserPrincipal userDetails) {
         try {
 			Optional<User> u = userRepository.findById( userDetails.getId() );
@@ -410,7 +409,6 @@ public class AuthController {
 
 
 	@GetMapping("/onboarding-status")
-	@PreAuthorize("hasRole('PRINCIPAL') or hasRole('ADMIN')")
 	public ResponseEntity<OnboardingStatusResponse> getOnboardingStatus(@AuthenticationPrincipal UserPrincipal userDetails) {
 		try {
 			Optional<User> u = userRepository.findById( userDetails.getId() );
