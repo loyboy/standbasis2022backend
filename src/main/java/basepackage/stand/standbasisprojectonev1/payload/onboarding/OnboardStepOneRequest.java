@@ -16,7 +16,7 @@ public class OnboardStepOneRequest {
         private String name;
 
         @JsonProperty("type_of") // Maps to frontend "type_of"
-        private String typeOf; 
+        private String type_of; 
 
         private Long owner; // The School Group ID
         private String state;
