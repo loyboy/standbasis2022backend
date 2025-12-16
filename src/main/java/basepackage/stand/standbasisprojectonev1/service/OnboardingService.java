@@ -480,7 +480,7 @@ public class OnboardingService {
 	public OnboardingStatusResponse getOnboardingStatus(School school) {
 				
 		if (school == null) {
-			return new OnboardingStatusResponse(false, false, false, false, false);
+			return new OnboardingStatusResponse(0, 0, 0, 0, false, false, false, false, false);
 		}
 
 		// 2. Check counts
@@ -492,7 +492,16 @@ public class OnboardingService {
 		boolean isStudentFilled = pupilRepository.countBySchool(school) > 0;
 		boolean isTimetableFilled = timeRepository.countBySchool(school) > 0;
 
+		long classCount = classRepository.countBySchool(school);
+    	long teaCount = teaRepository.countBySchool(school);
+    	long stuCount = pupilRepository.countBySchool(school);
+    	long timeCount = timeRepository.countBySchool(school);
+
 		return new OnboardingStatusResponse(
+			classCount,
+			teaCount,
+			stuCount,
+			timeCount,
 			isSchoolFilled,
 			isClassFilled,
 			isTeacherFilled,

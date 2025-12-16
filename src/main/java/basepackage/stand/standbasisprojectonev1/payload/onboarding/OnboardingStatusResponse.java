@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 @Data
 @AllArgsConstructor
 public class OnboardingStatusResponse {
+    private long classCount;
+    private long teacherCount;
+    private long studentCount;
+    private long timetableCount;
+    
     private boolean schoolFilled;
     private boolean classroomFilled;
     private boolean teacherFilled;
