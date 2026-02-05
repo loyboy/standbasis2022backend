@@ -103,6 +103,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 
                     .antMatchers("/api/auth/signin").permitAll()
                     .antMatchers("/api/auth/onboard").permitAll() 
+                    .antMatchers("/api/auth/checkUsername").permitAll() 
                     .antMatchers("/api/auth/onboardinitial").permitAll() 
 
                     .antMatchers("/api/auth/onboard2").authenticated() // <--- CRITICAL
