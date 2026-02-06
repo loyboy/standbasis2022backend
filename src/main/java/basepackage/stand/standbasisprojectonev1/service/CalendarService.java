@@ -82,12 +82,12 @@ public class CalendarService {
 	
 	public Optional<Calendar> findAllByStatus(Long schid, Integer id) {
 		
-	Optional<School> sch = schRepository.findById(schid);
-	if (sch.isPresent()) {
-		School schval = sch.get();
-		
-		return calRepository.findByStatus(id, schval);
-	}
+		Optional<School> sch = schRepository.findById(schid);
+		if (sch.isPresent()) {
+			School schval = sch.get();
+			
+			return calRepository.findByStatus(id, schval);
+		}
 		return null;
 		
 	}

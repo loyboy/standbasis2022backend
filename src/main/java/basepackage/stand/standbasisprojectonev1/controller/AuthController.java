@@ -147,10 +147,9 @@ public class AuthController {
 					realId = user.getUserId();
 
 					// 1. Check onboarding calendar
-					Calendar foundCalOnboard =
-							calService.findAllByStatus(user.getSchool().getSchId(), 0).get();
+					// Calendar foundCalOnboard =	calService.findAllByStatus(user.getSchool().getSchId(), 0).get();
 
-					if (foundCalOnboard != null) {
+					/*if (foundCalOnboard != null) {
 
 						lgres.setPermissions(user.getPermissionsJSON());
 						lgres.setUsername(user.getName());
@@ -167,7 +166,7 @@ public class AuthController {
 						// lgres.setCode(user.getSupervisor_id());
 						lgres.setId(realId);
 
-					} else {
+					} else {*/
 
 						// 2. Check active calendar
 						Calendar foundCal =
@@ -215,7 +214,7 @@ public class AuthController {
 											"Login has failed due to Calendar expiration."
 									));
 						}
-					}
+					//}
 				}
 		        
 		        if ( user.getRole() == RoleName.PROPRIETOR) {
