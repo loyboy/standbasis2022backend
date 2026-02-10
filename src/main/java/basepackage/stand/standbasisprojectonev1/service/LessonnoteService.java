@@ -295,6 +295,8 @@ public class LessonnoteService {
         Long teacherowner = teacherId.orElse(null);     
         Integer termval = term.orElse(null);
         String yearval = year.orElse(null);
+
+		System.out.println(" Each query param ...>   " + schgroup + " >> "  + schowner + " >> " + classowner + " >> " + termval + " >> " + yearval );
         
         List<Lessonnote> lessonnotes = null;
         

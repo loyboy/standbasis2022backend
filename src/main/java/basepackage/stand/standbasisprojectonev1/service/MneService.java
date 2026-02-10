@@ -234,7 +234,8 @@ public class MneService {
     
     @SuppressWarnings("unchecked")
     public Map<String, Object> getOrdinaryLessonnoteFlags( String query, Optional<Long> schoolgroup, Optional<Long> school, Optional<String> schoolyear, Optional<Integer> schoolterm, Optional<Integer> week, Optional<Integer> classid,  Optional<Long> teacher, Optional<Long> subject, Optional<Timestamp> datefrom, Optional<Timestamp> dateto ) {
-    
+        
+        
         Map<String, Object> response = lsnService.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, schoolyear, schoolterm, teacher, subject, datefrom, dateto );
         Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, schoolyear, schoolterm, teacher, subject, datefrom, dateto );
         
