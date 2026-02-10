@@ -327,7 +327,7 @@ public class LessonnoteService {
                         subjectownerobj == null ? null : subjectownerobj.get(),		
                        // calendarownerobj == null ? null : calendarownerobj.get(),
                         termval,
-                        yearval,
+                        null,
                         datefrom.isEmpty() ? null : datefrom.get(),
                         dateto.isEmpty() ? null : dateto.get() 
         		);
