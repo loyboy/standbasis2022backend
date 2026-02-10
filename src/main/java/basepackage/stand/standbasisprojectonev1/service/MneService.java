@@ -237,7 +237,8 @@ public class MneService {
     
         Map<String, Object> response = lsnService.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, schoolyear, schoolterm, teacher, subject, datefrom, dateto );
         Map<String, Object> lsnManageResponse = serviceManagement.getOrdinaryTeacherLessonnotes(query, schoolgroup, school, classid, week, schoolyear, schoolterm, teacher, subject, datefrom, dateto );
-               
+        
+        System.out.println(" Ordinary Lessonnote ...>   " + response.get("lessonnotes"));
         List<Lessonnote> ordinaryArray = (List<Lessonnote>) response.get("lessonnotes");
         List<LessonnoteManagement> ordinaryArrayManagement = (List<LessonnoteManagement>) lsnManageResponse.get("lessonnotemanagement");
         //List<LessonnoteActivity> ordinaryArrayLessonnote = (List<LessonnoteActivity>) lsnActivityResponse.get("Lessonnoteactivity");
